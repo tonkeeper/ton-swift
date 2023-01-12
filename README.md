@@ -20,3 +20,12 @@ The focus of the library is type safety and serialization. It does not support c
 - [ ] Jettons
 - [ ] NFT
 - [ ] TON.DNS
+
+# Authors
+
+* [Sergey Kotov](kotov@tonkeeper.com)
+* [Oleg Andreev](oleg@tonkeeper.com)
+
+# License
+
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
