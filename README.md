@@ -7,7 +7,6 @@ The focus of the library is type safety and serialization. It does not support c
 # Current status
 
 - [ ] TON mnemonic and key pairs
-- [ ] 257-bit integers
 - [ ] Bitstrings
 - [ ] Cells
 - [ ] Contract
