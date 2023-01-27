@@ -1,6 +1,6 @@
 import Foundation
 
-struct BitString {
+public struct BitString {
     
     static let empty = BitString(data: .init(), offset: 0, length: 0)
     
@@ -11,23 +11,17 @@ struct BitString {
     /**
      - returns the length of the bitstring
      */
-    var length: Int {
-        return _length
-    }
+    public var length: Int { _length }
     
     /**
      Constructing BitString from a buffer
      
-     - Parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
-     - Parameter offset: offset in bits from the start of the buffer
-     - Parameter length: length of the bitstring in bits
+     - parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
+     - parameter offset: offset in bits from the start of the buffer
+     - parameter length: length of the bitstring in bits
      */
-    init(data: Data, offset: Int, length: Int) {
-        guard length > 0 else {
-            fatalError("Length \(length) is out of bounds")
-        }
-        
-        self._offset = offset
+    public init(data: Data, offset: Int, length: Int) {
+        self._offset = max(0, offset)
         self._length = length
         self._data = data
     }
@@ -35,18 +29,13 @@ struct BitString {
     /**
      Returns the bit at the specified index
      
-     - Parameter index:index of the bit
+     - parameter index:index of the bit
      - throws error: if index is out of bounds
      - returns true if the bit is set, false otherwise
      */
-    func at(index: Int) throws -> Bool {
-        guard index <= _length else {
-//            throw new Error(`Index ${index} > ${this._length} is out of bounds`);
-            throw NSError()
-        }
-        guard index >= 0 else {
-//            throw new Error(`Index ${index} < 0 is out of bounds`);
-            throw NSError()
+    public func at(index: Int) throws -> Bool {
+        guard index <= _length && index >= 0 else {
+            throw TonError.indexOutOfBounds(index)
         }
         
         let byteIndex = (_offset + index) >> 3
@@ -58,11 +47,11 @@ struct BitString {
     /**
      Get a subscring of the bitstring
      
-     - Parameter offset: offset in bits from the start of the buffer
-     - Parameter length: length of the bitstring in bits
+     - parameter offset: offset in bits from the start of the buffer
+     - parameter length: length of the bitstring in bits
      - returns substring of bitstring
      */
-    func substring(offset: Int, length: Int) throws -> BitString {
+    public func substring(offset: Int, length: Int) throws -> BitString {
         // Corner case of empty string
         if length == 0 && offset == _length {
             return BitString.empty
@@ -76,11 +65,11 @@ struct BitString {
     /**
      Get a subscring of the bitstring
      
-     - Parameter offset: offset in bits from the start of the buffer
-     - Parameter length: length of the bitstring in bits
+     - parameter offset: offset in bits from the start of the buffer
+     - parameter length: length of the bitstring in bits
      - returns buffer if the bitstring is aligned to bytes, null otherwise
      */
-    func subbuffer(offset: Int, length: Int) throws -> Data? {
+    public func subbuffer(offset: Int, length: Int) throws -> Data? {
         try checkOffset(offset: offset, length: length)
         
         // Check alignment
@@ -94,7 +83,8 @@ struct BitString {
         // Create substring
         let start = ((_offset + offset) >> 3)
         let end = start + (length >> 3)
-        return _data.subdata(in: start...end)//this._data.subarray(start, end)
+        
+        return _data.subdata(in: start...end)
     }
     
     /**
@@ -102,7 +92,7 @@ struct BitString {
      
      - returns formatted bits as a string
      */
-    func toString() throws -> String {
+    public func toString() throws -> String {
         let padded = Data(try bitsToPaddedBuffer(bits: self))
         
         if _length % 4 == 0 {
@@ -123,17 +113,8 @@ struct BitString {
     }
     
     private func checkOffset(offset: Int, length: Int) throws {
-        if offset >= _length {
-//            throw new Error(`Offset ${offset} is out of bounds`);
-            throw NSError()
-        }
-        if offset < 0 {
-//            throw new Error(`Offset ${offset} is out of bounds`);
-            throw NSError()
-        }
-        if offset + length > _length {
-//            throw new Error(`Offset + Lenght = ${offset + length} is out of bounds`);
-            throw NSError()
+        if offset >= _length || offset < 0 || offset + length > _length {
+            throw TonError.offsetOutOfBounds(offset)
         }
     }
     
@@ -141,7 +122,7 @@ struct BitString {
 
 // MARK: - Equatable
 extension BitString: Equatable {
-    static func == (lhs: BitString, rhs: BitString) -> Bool {
+    public static func == (lhs: BitString, rhs: BitString) -> Bool {
         return lhs._data == rhs._data &&
                lhs._length == rhs._length &&
                lhs._offset == rhs._offset
@@ -149,7 +130,11 @@ extension BitString: Equatable {
 }
 
 extension Data {
-    func subdata(in range: ClosedRange<Index>) -> Data {
+    public func subdata(in range: ClosedRange<Index>) -> Data {
         return subdata(in: range.lowerBound ..< range.upperBound)
+    }
+    
+    public func hexString() -> String {
+        map({ String(format: "%02hhx", $0) }).joined()
     }
 }

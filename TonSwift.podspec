@@ -1,11 +1,3 @@
-#
-# Be sure to run `pod lib lint ton-swift.podspec' to ensure this is a
-# valid spec before submitting.
-#
-# Any lines starting with a # are optional, but their use is encouraged
-# To learn more about a Podspec see https://guides.cocoapods.org/syntax/podspec.html
-#
-
 Pod::Spec.new do |s|
   s.name             = 'TonSwift'
   s.version          = '0.0.1'
@@ -18,6 +10,8 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '11.0'
   s.swift_version = '5.0'
   
-  s.source_files  = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}"]
+  s.source_files  = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
+
+  s.dependency 'BigInt'
   
 end
