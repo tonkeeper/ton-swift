@@ -122,10 +122,32 @@ public struct BitString {
 
 // MARK: - Equatable
 extension BitString: Equatable {
+    
+    /**
+     Checks for equality
+    - parameter lhs: bitstring
+    - parameter rhs: bitstring
+    - returns true if the bitstrings are equal, false otherwise
+     */
     public static func == (lhs: BitString, rhs: BitString) -> Bool {
-        return lhs._data == rhs._data &&
-               lhs._length == rhs._length &&
-               lhs._offset == rhs._offset
+        if lhs._length != rhs._length {
+            return false
+        }
+        
+        do {
+            for i in 0..<lhs._length {
+                let lhsI = try lhs.at(index: i)
+                let rhsI = try rhs.at(index: i)
+                
+                if lhsI != rhsI {
+                    return false
+                }
+            }
+        } catch {
+            return false
+        }
+        
+        return true
     }
 }
 

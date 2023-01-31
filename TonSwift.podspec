@@ -10,8 +10,13 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '11.0'
   s.swift_version = '5.0'
   
-  s.source_files  = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
+  s.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
 
   s.dependency 'BigInt'
+  s.frameworks = 'XCTest'
+
+  s.test_spec 'Tests' do |test_spec|
+    test_spec.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
+  end
   
 end
