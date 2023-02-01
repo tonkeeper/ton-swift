@@ -132,8 +132,8 @@ class BitReader {
     - parameter bits: uint bits
     - returns read value as number
     */
-    public func preloadUint(bits: Int) throws -> UInt64 {
-        return UInt64(try _preloadUint(bits: bits, offset: _offset))
+    public func preloadUint(bits: Int) throws -> UInt32 {
+        return UInt32(try _preloadUint(bits: bits, offset: _offset))
     }
 
     /**
