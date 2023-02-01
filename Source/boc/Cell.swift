@@ -105,7 +105,16 @@ public struct Cell {
     public func depth(level: Int = 3) -> UInt32 {
         return _depths[min(_depths.count - 1, level)]
     }
-
-    
 }
 
+// MARK: - Equatable
+extension Cell: Equatable {
+    /**
+     Checks cell to be euqal to another cell
+    - parameter other: other cell
+    - returns true if cells are equal
+    */
+    public static func == (lhs: Cell, rhs: Cell) -> Bool {
+        return lhs.hash() == rhs.hash()
+    }
+}
