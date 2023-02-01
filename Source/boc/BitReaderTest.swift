@@ -1,8 +1,8 @@
 import XCTest
 
-final class BitBuilderTest: XCTestCase {
+final class BitReaderTest: XCTestCase {
 
-    func testBitBuilder() throws {
+    func testBitReader() throws {
         // should read uints from builder
         for _ in 0..<1000 {
             let a = UInt32.random(in: 0..<UInt32.max)
