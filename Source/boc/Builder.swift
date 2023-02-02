@@ -42,6 +42,7 @@ class Builder {
     - parameter value: bit to write, true or positive number for 1, false or zero or negative for 0
     - returns this builder
     */
+    @discardableResult
     func storeBit(_ value: Bool) throws -> Self {
         try _bits.writeBit(value: value)
         return self
@@ -52,6 +53,7 @@ class Builder {
     - parameter src: source bits
     - returns this builder
     */
+    @discardableResult
     func storeBits(_ src: BitString) throws -> Self {
         try _bits.writeBits(src: src)
         return self
@@ -62,6 +64,7 @@ class Builder {
     - parameter src: source buffer
     - returns this builder
     */
+    @discardableResult
     func storeBuffer(_ src: Data) throws -> Self {
         try _bits.writeBuffer(src: src)
         return self
@@ -73,6 +76,7 @@ class Builder {
     - parameter bits: number of bits to write
     - returns this builder
     */
+    @discardableResult
     func storeUint(_ value: UInt32, bits: Int) throws -> Self {
         try _bits.writeUint(value: value, bits: bits)
         return self
@@ -83,6 +87,7 @@ class Builder {
     - parameter cell: cell or builder to store
     - returns this builder
     */
+    @discardableResult
     func storeRef(cell: Cell) throws -> Self {
         if _refs.count >= 4 {
             throw TonError.custom("Too many references")
@@ -92,6 +97,7 @@ class Builder {
 
         return self
     }
+    @discardableResult
     func storeRef(cell: Builder) throws -> Self {
         if _refs.count >= 4 {
             throw TonError.custom("Too many references")
