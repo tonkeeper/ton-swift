@@ -1,7 +1,7 @@
 import Foundation
 
 func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
-    let typeFactor: UInt8 = type != .ordinary ? 8 : 0
+    let typeFactor: UInt8 = type != .ordinary ? 1 : 0
     return UInt8(refs.count) + typeFactor * 8 + UInt8(level) * 32
 }
 
@@ -23,9 +23,7 @@ func getRepr(bits: BitString, refs: [Cell], level: UInt32, type: CellType) throw
     reprCursor += 1
 
     // Write bits
-    var reprArray = Array(repr)
-    try bitsToPaddedBuffer(bits: bits).copyBytes(to: &reprArray, from: 0..<bitsLen)
-    repr = Data(reprArray)
+    repr.replaceSubrange(reprCursor..<reprCursor + bitsLen, with: try bitsToPaddedBuffer(bits: bits))
     reprCursor += bitsLen
 
     // Write refs
@@ -49,9 +47,9 @@ func getRepr(bits: BitString, refs: [Cell], level: UInt32, type: CellType) throw
             childHash = c.hash(level: Int(level))
         }
         
-        reprArray = Array(repr)
-        childHash.copyBytes(to: &reprArray, from: reprCursor..<reprCursor + 32)
-        repr = Data(reprArray)
+        for i in 0..<32 {
+            repr[reprCursor + i] = childHash[i]
+        }
         
         reprCursor += 32
     }

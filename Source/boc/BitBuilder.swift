@@ -84,10 +84,10 @@ class BitBuilder {
                 throw TonError.custom("BitBuilder overflow")
             }
             
-            var bufferArray = Array(_buffer)
-            src.copyBytes(to: &bufferArray, from: _length/8..<_length/8 + src.count)
-            _buffer = Data(bufferArray)
-            
+            for i in 0..<src.count {
+                _buffer[_length / 8 + i] = src[i]
+            }
+
             _length += src.count * 8
         } else {
             for i in 0..<src.count {
@@ -102,6 +102,15 @@ class BitBuilder {
     - parameter bits: number of bits to write
     */
     public func writeUint(value: UInt32, bits: Int) throws {
+        try writeUint(value: BigInt(value), bits: bits)
+    }
+    
+    /**
+     Write uint value
+    - parameter value: value as bigint or number
+    - parameter bits: number of bits to write
+    */
+    public func writeUint(value: UInt64, bits: Int) throws {
         try writeUint(value: BigInt(value), bits: bits)
     }
     

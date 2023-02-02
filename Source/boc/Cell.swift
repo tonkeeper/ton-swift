@@ -12,6 +12,7 @@ public struct Cell {
     public let mask: LevelMask
     
     public var level: UInt32 { mask.level }
+    public var isExotic: Bool { type != .ordinary }
     
     public init(
         exotic: Bool? = nil,
@@ -105,6 +106,35 @@ public struct Cell {
     public func depth(level: Int = 3) -> UInt32 {
         return _depths[min(_depths.count - 1, level)]
     }
+    
+    /**
+     Format cell to string
+    - parameter indent: indentation
+    - returns string representation
+    */
+    func toString(indent: String? = nil) throws -> String {
+        let id = indent ?? ""
+        var t = "x"
+        if isExotic {
+            switch type {
+            case .merkleProof:
+                t = "p"
+            case .merkleUpdate:
+                t = "u"
+            case .prunedBranch:
+                t = "p"
+            default:
+                break
+            }
+        }
+        var s = id + (isExotic ? t : "x") + "{" + (try bits.toString()) + "}"
+        for i in refs {
+            s += "\n" + (try i.toString(indent: id + " "))
+        }
+        
+        return s
+    }
+
 }
 
 // MARK: - Equatable

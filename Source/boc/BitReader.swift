@@ -120,7 +120,7 @@ class BitReader {
     - parameter bits: uint bits
     - returns read value as bigint
     */
-    public func loadUintBig(bits: Int) throws  -> BigInt {
+    public func loadUintBig(bits: Int) throws  -> UInt32 {
         let loaded = try preloadUintBig(bits: bits)
         _offset += bits
         
@@ -141,7 +141,7 @@ class BitReader {
     - parameter bits: uint bits
     - returns read value as bigint
     */
-    public func preloadUintBig(bits: Int) throws -> BigInt {
+    public func preloadUintBig(bits: Int) throws -> UInt32 {
         return try _preloadUint(bits: bits, offset: _offset)
     }
     
@@ -193,13 +193,13 @@ class BitReader {
         return res
     }
     
-    private func _preloadUint(bits: Int, offset: Int) throws -> BigInt {
+    private func _preloadUint(bits: Int, offset: Int) throws -> UInt32 {
         guard bits != 0 else { return 0 }
         
-        var res = BigInt(0)
+        var res = UInt32(0)
         for i in 0..<bits {
             if try _bits.at(index: offset + i) {
-                res += 1 << BigInt(bits - i - 1)
+                res += 1 << UInt32(bits - i - 1)
             }
         }
         
