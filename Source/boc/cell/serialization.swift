@@ -96,6 +96,8 @@ func parseBoc(src: Data) throws -> Boc {
     } else if magic == 0xb5ee9c72 {
         let hasIdx = try reader.loadUint(bits: 1) == 1
         let hasCrc32c = try reader.loadUint(bits: 1) == 1
+        let hasCacheBits = try reader.loadUint(bits: 1) == 1
+        let flags = try reader.loadUint(bits: 2) // Must be 0
         let size = Int(try reader.loadUint(bits: 3))
         let offBytes = Int(try reader.loadUint(bits: 8))
         let cells = Int(try reader.loadUint(bits: size * 8))
@@ -173,7 +175,7 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     return roots
 }
 
-func writeCellToBuilder(cell: Cell, refs: [UInt32], sizeBytes: Int, to: BitBuilder) throws {
+func writeCellToBuilder(cell: Cell, refs: [UInt32], sizeBytes: Int, to: BitBuilder) throws -> BitBuilder {
     let d1 = getRefsDescriptor(refs: cell.refs, level: cell.level, type: cell.type)
     let d2 = getBitsDescriptor(bits: cell.bits)
     
@@ -184,4 +186,82 @@ func writeCellToBuilder(cell: Cell, refs: [UInt32], sizeBytes: Int, to: BitBuild
     for r in refs {
         try to.writeUint(value: r, bits: sizeBytes * 8)
     }
+    
+    return to
+}
+
+func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
+    let allCells = try topologicalSort(src: root)
+    
+    let cellsNum = allCells.count
+    let hasIdx = idx
+    let hasCrc32c = crc32
+    let hasCacheBits = false
+    let flags: UInt32 = 0
+    let sizeBytes = max(Int(ceil(Double(try bitsForNumber(src: cellsNum, mode: "uint")) / 8.0)), 1)
+    var totalCellSize: Int = 0
+    var index: [Int] = []
+    
+    for c in allCells {
+        let sz = calcCellSize(cell: c.cell, sizeBytes: sizeBytes)
+        index.append(totalCellSize)
+        totalCellSize += sz
+    }
+    
+    let offsetBytes = max(Int(ceil(Double(try bitsForNumber(src: totalCellSize, mode: "uint")) / 8.0)), 1)
+    let hasIdxFactor = hasIdx ? (cellsNum * offsetBytes) : 0
+    let hasCrc32cFactor = hasCrc32c ? 4 : 0
+    let totalSize = (
+        4 + // magic
+        1 + // flags and s_bytes
+        1 + // offset_bytes
+        3 * sizeBytes + // cells_num, roots, complete
+        offsetBytes + // full_size
+        1 * sizeBytes + // root_idx
+        hasIdxFactor +
+        totalCellSize +
+        hasCrc32cFactor
+    ) * 8
+
+    // Serialize
+    var builder = BitBuilder(size: totalSize)
+    try builder.writeUint(value: UInt32(0xb5ee9c72), bits: 32) // Magic
+    try builder.writeBit(value: hasIdx) // Has index
+    try builder.writeBit(value: hasCrc32c) // Has crc32c
+    try builder.writeBit(value: hasCacheBits) // Has cache bits
+    try builder.writeUint(value: flags, bits: 2) // Flags
+    try builder.writeUint(value: UInt32(sizeBytes), bits: 3) // Size bytes
+    try builder.writeUint(value: UInt32(offsetBytes), bits: 8) // Offset bytes
+    try builder.writeUint(value: UInt32(cellsNum), bits: sizeBytes * 8) // Cells num
+    try builder.writeUint(value: UInt32(1), bits: sizeBytes * 8) // Roots num
+    try builder.writeUint(value: UInt32(0), bits: sizeBytes * 8) // Absent num
+    try builder.writeUint(value: UInt32(totalCellSize), bits: offsetBytes * 8) // Total cell size
+    try builder.writeUint(value: UInt32(0), bits: sizeBytes * 8) // Root id == 0
+
+    if hasIdx {
+        for i in 0 ..< cellsNum {
+            try builder.writeUint(value: UInt32(index[i]), bits: offsetBytes * 8)
+        }
+    }
+
+    for i in 0 ..< cellsNum {
+        builder = try writeCellToBuilder(
+            cell: allCells[i].cell,
+            refs: allCells[i].refs,
+            sizeBytes: sizeBytes,
+            to: builder
+        )
+    }
+
+    if hasCrc32c {
+        let crc32 = crc32c(source: try builder.buffer())
+        try builder.writeBuffer(src: crc32)
+    }
+
+    let res = try builder.buffer()
+    if res.count != totalSize / 8 {
+        throw TonError.custom("Internal error")
+    }
+    
+    return res
 }
