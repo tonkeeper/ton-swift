@@ -10,7 +10,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] Bitstrings
 - [x] Cells
 - [ ] Contract
-- [ ] StateInit
+- [x] StateInit
 - [ ] CommonMsgInfo
 - [ ] Send Flags
 - [ ] Signatures
