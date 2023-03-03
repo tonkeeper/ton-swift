@@ -36,6 +36,20 @@ public class LevelMask {
     }
 }
 
+extension LevelMask: Hashable {
+    public static func == (lhs: LevelMask, rhs: LevelMask) -> Bool {
+        return lhs._mask == rhs._mask &&
+        lhs._hashIndex == rhs._hashIndex &&
+        lhs._hashCount == rhs._hashCount
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(_mask)
+        hasher.combine(_hashIndex)
+        hasher.combine(_hashCount)
+    }
+}
+
 func countSetBits(_ n: UInt32) -> UInt32 {
     var n = n - ((n >> 1) & 0x55555555)
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333)

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BitString {
+public struct BitString: Hashable {
     
     static let empty = BitString(data: .init(), offset: 0, length: 0)
     

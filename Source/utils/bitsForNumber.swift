@@ -1,6 +1,7 @@
 import Foundation
+import BigInt
 
-func bitsForNumber(src: Int, mode: String) throws -> Int {
+func bitsForNumber(src: BigInt, mode: String) throws -> Int {
     let v = src
     
     // Handle negative values
@@ -22,4 +23,8 @@ func bitsForNumber(src: Int, mode: String) throws -> Int {
     } else {
         throw TonError.custom("Invalid mode. Got \(mode)")
     }
+}
+
+func bitsForNumber(src: Int, mode: String) throws -> Int {
+    try bitsForNumber(src: BigInt(src), mode: mode)
 }

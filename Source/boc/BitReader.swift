@@ -126,6 +126,30 @@ class BitReader {
         
         return loaded
     }
+    
+    /**
+     Load int value
+    - parameter bits: int bits
+    - returns read value as bigint
+    */
+    public func loadInt(bits: Int) throws -> Int {
+        let loaded = try _preloadInt(bits: bits, offset: _offset)
+        _offset += bits
+        
+        return Int(loaded)
+    }
+    
+    /**
+     Load int value as bigint
+    - parameter bits: int bits
+    - returns read value as bigint
+    */
+    public func loadIntBig(bits: Int) throws -> BigInt {
+        let loaded = try _preloadInt(bits: bits, offset: _offset)
+        _offset += bits
+        
+        return loaded
+    }
 
     /**
      Preload uint value
@@ -172,8 +196,55 @@ class BitReader {
         
         return substring
     }
+    
+    /**
+     Load Address
+    - returns Address
+    */
+    func loadAddress() throws -> Address {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type == 2 {
+            return try _loadInternalAddress()
+        } else {
+            throw TonError.custom("Invalid address: \(type)")
+        }
+    }
+    
+    /**
+     Clone BitReader
+    */
+    func clone() -> BitReader {
+        return BitReader(bits: _bits, offset: _offset)
+    }
 
     // MARK: - Private methods
+    
+    /**
+     Preload int from specific offset
+    - parameter bits: bits to preload
+    - parameter offset: offset to start from
+    - returns read value as bigint
+    */
+    private func _preloadInt(bits: Int, offset: Int) throws -> BigInt {
+        if bits == 0 {
+            return 0
+        }
+        
+        let sign = try _bits.at(index: offset)
+        var res = BigInt(0)
+        for i in 0..<bits - 1 {
+            if try _bits.at(index: offset + 1 + i) {
+                res += BigInt(1) << BigInt(bits - i - 1 - 1)
+            }
+        }
+        
+        if sign {
+            res = res - (BigInt(1) << BigInt(bits - 1))
+        }
+        
+        return res
+    }
+
     
     private func _preloadInt64(bits: Int, offset: Int) throws -> BigInt {
         guard bits != 0 else { return 0 }
@@ -217,6 +288,27 @@ class BitReader {
         }
         
         return buf
+    }
+    
+    private func _loadInternalAddress() throws -> Address {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type != 2 {
+            throw TonError.custom("Invalid address")
+        }
+
+        // No Anycast supported
+        if try _preloadUint(bits: 1, offset: _offset + 2) != 0 {
+            throw TonError.custom("Invalid address")
+        }
+
+        // Read address
+        let wc = Int8(try _preloadInt(bits: 8, offset: _offset + 3))
+        let hash = try _preloadBuffer(bytes: 32, offset: _offset + 11)
+
+        // Update offset
+        self._offset += 267
+
+        return Address(workChain: wc, hash: hash)
     }
 
 }

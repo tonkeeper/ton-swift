@@ -113,7 +113,9 @@ class BitBuilder {
     public func writeUint(value: UInt64, bits: Int) throws {
         try writeUint(value: BigInt(value), bits: bits)
     }
-    
+    public func writeUint(value: BigUInt, bits: Int) throws {
+        try writeUint(value: BigInt(value), bits: bits)
+    }
     public func writeUint(value: BigInt, bits: Int) throws {
         // Special case for 8 bits
         if bits == 8 && _length % 8 == 0 {
@@ -176,5 +178,77 @@ class BitBuilder {
             }
         }
     }
-
+    /**
+     Write int value
+    - parameter value: value as bigint or number
+    - parameter bits: number of bits to write
+    */
+    func writeInt(_ value: Any, bits: Int) throws {
+        var v: BigInt
+        if let value = value as? BigInt {
+            v = value
+        } else if let value = value as? Int {
+            v = BigInt(value)
+        } else {
+            throw TonError.custom("Invalid value. Got \(value)")
+        }
+        if bits < 0 || !bits.isSafe {
+            throw TonError.custom("Invalid bit length. Got \(bits)")
+        }
+        
+        if bits == 0 {
+            if v != 0 {
+                throw TonError.custom("Value is not zero for \(bits) bits. Got \(v)")
+            } else {
+                return
+            }
+        }
+        
+        if bits == 1 {
+            if v != -1 && v != 0 {
+                throw TonError.custom("Value is not zero or -1 for \(bits) bits. Got \(v)")
+            } else {
+                try writeBit(value: v == -1)
+                return
+            }
+        }
+        
+        let vBits = 1 << (bits - 1)
+        if v < -vBits || v >= vBits {
+            throw TonError.custom("Value is out of range for \(bits) bits. Got \(v)")
+        }
+        
+        if v < 0 {
+            try writeBit(value: true)
+            v = (1 << (bits - 1)) + v
+        } else {
+            try writeBit(value: false)
+        }
+        
+        try writeUint(value: v, bits: bits - 1)
+    }
+    
+    /**
+     Write address
+    - parameter address: write address or address external
+    */
+    func writeAddress(address: Address?) throws {
+        if let address = address {
+            try writeUint(value: BigInt(2), bits: 2)
+            try writeUint(value: BigInt(0), bits: 1)
+            try writeInt(address.workChain, bits: 8)
+            try writeBuffer(src: address.hash)
+        } else {
+            try writeUint(value: BigInt(0), bits: 2)
+        }
+    }
+    func writeAddress(address: ExternalAddress?) throws {
+        if let address = address {
+            try writeUint(value: BigInt(1), bits: 2)
+            try writeUint(value: BigInt(address.bits), bits: 9)
+            try writeUint(value: BigInt(address.value), bits: address.bits)
+        } else {
+            try writeUint(value: BigInt(0), bits: 2)
+        }
+    }
 }

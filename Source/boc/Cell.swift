@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Cell {
+public struct Cell: Hashable {
     public static let empty = Cell()
     
     private var _hashes: [Data] = []
@@ -108,11 +108,34 @@ public struct Cell {
     }
     
     /**
+     Beging cell parsing
+    - returns a new slice
+    */
+    public func beginParse(allowExotic: Bool = false) throws -> Slice {
+        if isExotic && !allowExotic {
+            throw TonError.custom("Exotic cells cannot be parsed");
+        }
+        
+        return Slice(reader: BitReader(bits: bits), refs: refs)
+    }
+    
+    /**
+     Serializes cell to BOC
+    - parameter opts: options
+    */
+    func toBoc(idx: Bool? = nil, crc32: Bool? = nil) throws -> Data {
+        let idxValue = idx ?? false
+        let crc32Value = crc32 ?? true
+        
+        return try serializeBoc(root: self, idx: idxValue, crc32: crc32Value)
+    }
+    
+    /**
      Format cell to string
     - parameter indent: indentation
     - returns string representation
     */
-    func toString(indent: String? = nil) throws -> String {
+    public func toString(indent: String? = nil) throws -> String {
         let id = indent ?? ""
         var t = "x"
         if isExotic {
