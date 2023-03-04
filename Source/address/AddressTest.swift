@@ -4,9 +4,9 @@ final class AddressTest: XCTestCase {
 
     func testAddress() throws {
         // should parse addresses in various forms
-        var address1 = try Address.parseFriendly(source: "0QAs9VlT6S776tq3unJcP5Ogsj-ELLunLXuOb1EKcOQi4-QO")
-        var address2 = try Address.parseFriendly(source: "kQAs9VlT6S776tq3unJcP5Ogsj-ELLunLXuOb1EKcOQi47nL")
-        var address3 = Address.parseRaw(source: "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
+        let address1 = try Address.parseFriendly(source: "0QAs9VlT6S776tq3unJcP5Ogsj-ELLunLXuOb1EKcOQi4-QO")
+        let address2 = try Address.parseFriendly(source: "kQAs9VlT6S776tq3unJcP5Ogsj-ELLunLXuOb1EKcOQi47nL")
+        let address3 = Address.parseRaw(source: "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
         XCTAssertFalse(address1.isBounceable)
         XCTAssertTrue(address2.isBounceable)
         XCTAssertTrue(address1.isTestOnly)

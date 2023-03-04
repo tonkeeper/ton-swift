@@ -60,12 +60,20 @@ func parseFriendlyAddress(src: Data) throws -> FriendlyAddress {
 }
 
 public struct Address: Hashable {
-    public let workChain: Int8
+    private let _workChain: Int8
     public let hash: Data
     
     public init(workChain: Int8, hash: Data) {
-        self.workChain = workChain
+        self._workChain = workChain
         self.hash = hash
+    }
+    
+    public var workChain: UInt8 {
+        if _workChain == -1 {
+            return UInt8.max
+        } else {
+            return UInt8(_workChain)
+        }
     }
     
     public static func isAddress(_ src: Any) -> Bool {
@@ -132,7 +140,7 @@ public struct Address: Hashable {
         
         var addr = Data(count: 34)
         addr[0] = tag
-        addr[1] = UInt8(abs(workChain))
+        addr[1] = workChain
         addr[2...] = hash
         var addressWithChecksum = Data(count: 36)
         addressWithChecksum[0...] = addr
