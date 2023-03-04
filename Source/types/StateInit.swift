@@ -6,15 +6,7 @@ import BigInt
 //  code:(Maybe ^Cell) data:(Maybe ^Cell)
 //  library:(HashmapE 256 SimpleLib) = StateInit;
 
-protocol StateInitProtocol {
-    var splitDepth: UInt32? { get set }
-    var special: TickTock? { get set }
-    var code: Cell? { get set }
-    var data: Cell? { get set }
-    var libraries: Dictionary<BigUInt, SimpleLibrary>? { get set }
-}
-
-struct StateInit: StateInitProtocol {
+struct StateInit {
     var splitDepth: UInt32?
     var special: TickTock?
     var code: Cell?
