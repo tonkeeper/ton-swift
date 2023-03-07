@@ -211,6 +211,23 @@ class BitReader {
     }
     
     /**
+     Load internal address
+    - returns Address or null
+    */
+    func loadMaybeAddress() throws -> Address? {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type == 0 {
+            _offset += 2
+            return nil
+            
+        } else if type == 2 {
+            return try _loadInternalAddress()
+        } else {
+            throw TonError.custom("Invalid address")
+        }
+    }
+    
+    /**
      Clone BitReader
     */
     func clone() -> BitReader {

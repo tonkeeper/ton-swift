@@ -237,11 +237,26 @@ public class Slice {
     }
     
     /**
+     * Load string tail
+     */
+    public func loadStringTail() throws -> String {
+        return try readString(slice: self)
+    }
+    
+    /**
      Load internal Address
     - returns Address
     */
     public func loadAddress() throws -> Address {
         return try reader.loadAddress()
+    }
+    
+    /**
+     Load optional internal Address
+    - returns Address or null
+    */
+    public func loadMaybeAddress() throws -> Address? {
+        return try reader.loadMaybeAddress()
     }
     
     /**
