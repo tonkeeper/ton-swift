@@ -1,0 +1,26 @@
+PODS:
+  - BigInt (5.2.0)
+  - TonSwift (0.0.1):
+    - BigInt
+  - TonSwift/Tests (0.0.1):
+    - BigInt
+
+DEPENDENCIES:
+  - TonSwift (from `./../../ton-swift`)
+  - TonSwift/Tests (from `./../../ton-swift`)
+
+SPEC REPOS:
+  trunk:
+    - BigInt
+
+EXTERNAL SOURCES:
+  TonSwift:
+    :path: "./../../ton-swift"
+
+SPEC CHECKSUMS:
+  BigInt: f668a80089607f521586bbe29513d708491ef2f7
+  TonSwift: 3eb0047e14040b90bab57dc75d6e36623b983316
+
+PODFILE CHECKSUM: 6c26db46b95602b245788001ec17885b13a1b6df
+
+COCOAPODS: 1.11.3

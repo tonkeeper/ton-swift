@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "D8B2F182-1052-4D69-8BD1-FD5F46651EA9",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Pods\/Pods.xcodeproj",
+        "identifier" : "D51ECC661242358EFC2B4523929CB102",
+        "name" : "TonSwift-Unit-Tests"
+      }
+    }
+  ],
+  "version" : 1
+}
