@@ -22,6 +22,22 @@ The focus of the library is type safety and serialization. It does not support c
 - [ ] NFT
 - [ ] TON.DNS
 
+# Example
+To run the example project, clone the repo, and run `pod install` from the Example directory first.
+
+# Installation
+Ready for use on iOS 13+.
+
+### CocoaPods:
+[CocoaPods](https://cocoapods.org) is a dependency manager. For usage and installation instructions, visit their website. To integrate using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+pod 'TonSwift', :git => 'git@github.com:tonkeeper/ton-swift.git', :branch => 'main'
+```
+
+### Manually
+If you prefer not to use any of dependency managers, you can integrate manually. Put `Source` folder in your Xcode project. Make sure to enable `Copy items if needed` and `Create groups`.
+
 # Authors
 
 * [Sergey Kotov](kotov@tonkeeper.com)
