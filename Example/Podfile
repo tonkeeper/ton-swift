@@ -5,6 +5,6 @@ target 'ton-swift-example' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  pod 'TonSwift', :path => './../../ton-swift', :testspecs => ['Tests'] 
+  pod 'TonSwift', :path => '../', :testspecs => ['Tests'] 
 
 end
