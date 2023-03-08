@@ -89,10 +89,13 @@ fastlane/test_output
 
 iOSInjectionProject/
 Example/Pods
-Example/ton-swift-example.xcodeproj
-Example/ton-swift-example.xcworkspace
 Example/.DS_Store
 Source/address/.DS_Store
 Source/boc/utils/.DS_Store
 Source/boc/.DS_Store
 .DS_Store
+Example/ton-swift-example.xcodeproj/project.xcworkspace/xcshareddata
+Example/ton-swift-example.xcodeproj/project.xcworkspace
+Example/ton-swift-example.xcodeproj/xcshareddata
+Example/ton-swift-example.xcworkspace/xcshareddata
+*.xcworkspacedata
