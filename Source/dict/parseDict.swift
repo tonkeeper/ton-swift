@@ -12,7 +12,7 @@ func readUnaryLength(slice: Slice) throws -> UInt32 {
 
 func doParse<V>(prefix: String, slice: Slice, n: UInt32, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
     // Reading label
-    var lb0 = try slice.loadBit() ? 1 : 0
+    let lb0 = try slice.loadBit() ? 1 : 0
     var prefixLength: UInt32 = 0
     var pp = prefix
     
@@ -27,7 +27,7 @@ func doParse<V>(prefix: String, slice: Slice, n: UInt32, res: inout [BigInt: V],
             pp += try slice.loadBit() ? "1" : "0"
         }
     } else {
-        var lb1 = try slice.loadBit() ? 1 : 0
+        let lb1 = try slice.loadBit() ? 1 : 0
         if lb1 == 0 {
             // Long label detected
             prefixLength = try slice.loadUint(bits: Int(ceil(log2(Double(n + 1)))))

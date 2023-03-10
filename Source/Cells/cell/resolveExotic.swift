@@ -36,18 +36,18 @@ func resolvePruned(bits: BitString, refs: [Cell]) throws -> (type: CellType, dep
 }
 
 func resolveMerkleProof(bits: BitString, refs: [Cell]) throws -> (type: CellType, depths: [UInt32], hashes: [Data], mask: LevelMask) {
-    let merkleProof = try exoticMerkleProof(bits: bits, refs: refs)
-    var depths = [UInt32]()
-    var hashes = [Data]()
+    let _/*merkleProof*/ = try exoticMerkleProof(bits: bits, refs: refs)
+    let depths = [UInt32]()
+    let hashes = [Data]()
     let mask = LevelMask(mask: refs[0].level >> 1)
     
     return (CellType.merkleProof, depths, hashes, mask)
 }
 
 func resolveMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (type: CellType, depths: [UInt32], hashes: [Data], mask: LevelMask) {
-    let merkleUpdate = try exoticMerkleUpdate(bits: bits, refs: refs)
-    var depths = [UInt32]()
-    var hashes = [Data]()
+    let _/*merkleUpdate*/ = try exoticMerkleUpdate(bits: bits, refs: refs)
+    let depths = [UInt32]()
+    let hashes = [Data]()
     let mask = LevelMask(mask: (refs[0].level | refs[1].level) >> 1)
     
     return (CellType.merkleUpdate, depths, hashes, mask)

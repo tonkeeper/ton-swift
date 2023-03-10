@@ -192,7 +192,7 @@ class BitBuilder {
         } else {
             throw TonError.custom("Invalid value. Got \(value)")
         }
-        if bits < 0 || !bits.isSafe {
+        if bits < 0 {
             throw TonError.custom("Invalid bit length. Got \(bits)")
         }
         

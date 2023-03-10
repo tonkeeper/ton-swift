@@ -93,7 +93,7 @@ public struct BitString: Hashable {
      - returns formatted bits as a string
      */
     public func toString() throws -> String {
-        let padded = Data(try bitsToPaddedBuffer(bits: self))
+        let padded = Data(try self.bitsToPaddedBuffer())
         
         if _length % 4 == 0 {
             let s = padded[0..<(self._length + 7) / 8].hexString().uppercased()
@@ -118,6 +118,23 @@ public struct BitString: Hashable {
         }
     }
     
+    
+    public func bitsToPaddedBuffer() throws -> Data {
+        let builder = BitBuilder(size: (self.length + 7) / 8 * 8)
+        try builder.writeBits(src: self)
+
+        let padding = (self.length + 7) / 8 * 8 - self.length
+        for i in 0..<padding {
+            if i == 0 {
+                try builder.writeBit(value: true)
+            } else {
+                try builder.writeBit(value: false)
+            }
+        }
+        
+        return try builder.buffer()
+    }
+
 }
 
 // MARK: - Equatable

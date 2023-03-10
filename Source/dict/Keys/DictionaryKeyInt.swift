@@ -12,11 +12,6 @@ public struct DictionaryKeyInt: DictionaryKey {
         guard let src = src as? Int else {
             throw TonError.custom("Key is not a int")
         }
-        
-        guard src.isSafe else {
-            throw TonError.custom("Key is not a safe integer: \(src)")
-        }
-        
         return BigInt(
             try Builder()
                 .storeInt(src, bits: bits)

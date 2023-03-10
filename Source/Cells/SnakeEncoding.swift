@@ -1,5 +1,6 @@
 import Foundation
 
+/// TBD: this looks like a snake encoding - should rename accordingly
 func readBuffer(slice: Slice) throws -> Data {
     // Check consistency
     if slice.remainingBits % 8 != 0 {

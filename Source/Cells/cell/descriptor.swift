@@ -23,7 +23,7 @@ func getRepr(bits: BitString, refs: [Cell], level: UInt32, type: CellType) throw
     reprCursor += 1
 
     // Write bits
-    repr.replaceSubrange(reprCursor..<reprCursor + bitsLen, with: try bitsToPaddedBuffer(bits: bits))
+    repr.replaceSubrange(reprCursor..<reprCursor + bitsLen, with: try bits.bitsToPaddedBuffer())
     reprCursor += bitsLen
 
     // Write refs

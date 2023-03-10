@@ -2,7 +2,7 @@ import Foundation
 
 func contractAddress(workchain: Int8, stateInit: StateInit) throws -> Address {
     let hash = try Builder()
-        .store(writer: storeStateInit(src: stateInit))
+        .store(stateInit)
         .endCell()
         .hash()
     

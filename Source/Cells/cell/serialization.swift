@@ -96,8 +96,8 @@ func parseBoc(src: Data) throws -> Boc {
     } else if magic == 0xb5ee9c72 {
         let hasIdx = try reader.loadUint(bits: 1) == 1
         let hasCrc32c = try reader.loadUint(bits: 1) == 1
-        let hasCacheBits = try reader.loadUint(bits: 1) == 1
-        let flags = try reader.loadUint(bits: 2) // Must be 0
+        let _/*hasCacheBits*/ = try reader.loadUint(bits: 1) == 1
+        let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
         let size = Int(try reader.loadUint(bits: 3))
         let offBytes = Int(try reader.loadUint(bits: 8))
         let cells = Int(try reader.loadUint(bits: size * 8))
@@ -181,7 +181,7 @@ func writeCellToBuilder(cell: Cell, refs: [UInt32], sizeBytes: Int, to: BitBuild
     
     try to.writeUint(value: UInt32(d1), bits: 8)
     try to.writeUint(value: UInt32(d2), bits: 8)
-    try to.writeBuffer(src: bitsToPaddedBuffer(bits: cell.bits))
+    try to.writeBuffer(src: cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
         try to.writeUint(value: r, bits: sizeBytes * 8)
@@ -264,4 +264,66 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     }
     
     return res
+}
+
+func topologicalSort(src: Cell) throws -> [(cell: Cell, refs: [UInt32])] {
+    var pending: [Cell] = [src]
+    var allCells = [String: (cell: Cell, refs: [String])]()
+    var notPermCells = Set<String>()
+    var sorted: [String] = []
+    
+    while pending.count > 0 {
+        let cells = pending
+        pending = []
+        for cell in cells {
+            let hash = cell.hash().hexString()
+            if allCells.keys.contains(hash) {
+                continue
+            }
+            
+            notPermCells.insert(hash)
+            allCells[hash] = (cell: cell, refs: cell.refs.map { $0.hash().hexString() })
+            
+            for r in cell.refs {
+                pending.append(r)
+            }
+        }
+    }
+    
+    var tempMark = Set<String>()
+    func visit(hash: String) throws {
+        if !notPermCells.contains(hash) {
+            return
+        }
+        if tempMark.contains(hash) {
+            throw TonError.custom("Not a DAG")
+        }
+        
+        tempMark.insert(hash)
+        for c in allCells[hash]!.refs {
+            try visit(hash: c)
+        }
+        
+        sorted.insert(hash, at: 0)
+        tempMark.remove(hash)
+        notPermCells.remove(hash)
+    }
+    
+    while notPermCells.count > 0 {
+        let id = Array(notPermCells)[0]
+        try visit(hash: id)
+    }
+    
+    var indexes = [String: UInt32]()
+    for i in 0..<sorted.count {
+        indexes[sorted[i]] = UInt32(i)
+    }
+    
+    var result: [(cell: Cell, refs: [UInt32])] = []
+    for ent in sorted {
+        let rrr = allCells[ent]!
+        result.append((cell: rrr.cell, refs: rrr.refs.map { indexes[$0]! }))
+    }
+    
+    return result
 }

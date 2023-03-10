@@ -247,12 +247,9 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeWritable(writer: Writable) -> Self {
-        writer.writeTo(builder: self)
+    public func store(_ object: CellWritable) throws -> Self  {
+        try object.writeTo(builder: self)
         return self
-    }
-    public func storeWritable(writer: (Builder) throws -> Void) throws {
-        try writer(self)
     }
     
     /**
@@ -261,28 +258,14 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeMaybeWritable(writer: Writable?) throws -> Self {
-        if let writer = writer {
+    public func storeMaybe(_ object: CellWritable?) throws -> Self {
+        if let object = object {
             try storeBit(true)
-            storeWritable(writer: writer)
+            try store(object)
         } else {
             try storeBit(false)
         }
         
-        return self
-    }
-    
-    /**
-     Store object in this builder
-     - parameter writer: Writable or writer functuin
-     */
-    @discardableResult
-    public func store(writer: Writable) throws -> Self {
-        storeWritable(writer: writer)
-    }
-    @discardableResult
-    public func store(writer: (Builder) throws -> Void) throws -> Self {
-        try storeWritable(writer: writer)
         return self
     }
     
