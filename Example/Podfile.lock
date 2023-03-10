@@ -6,8 +6,8 @@ PODS:
     - BigInt
 
 DEPENDENCIES:
-  - TonSwift (from `./../../ton-swift`)
-  - TonSwift/Tests (from `./../../ton-swift`)
+  - TonSwift (from `../`)
+  - TonSwift/Tests (from `../`)
 
 SPEC REPOS:
   trunk:
@@ -15,12 +15,12 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   TonSwift:
-    :path: "./../../ton-swift"
+    :path: "../"
 
 SPEC CHECKSUMS:
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  TonSwift: 3eb0047e14040b90bab57dc75d6e36623b983316
+  TonSwift: 10a7687b59d762361f4314d05c9932859363edfa
 
-PODFILE CHECKSUM: 6c26db46b95602b245788001ec17885b13a1b6df
+PODFILE CHECKSUM: 4414c00005d2c10cd52b412b3080f767ee316ec4
 
 COCOAPODS: 1.12.0
