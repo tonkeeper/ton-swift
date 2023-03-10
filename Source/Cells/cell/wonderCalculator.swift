@@ -83,7 +83,7 @@ func wonderCalculator(type: CellType, bits: BitString, refs: [Cell]) throws -> (
         
         // Hash
         let repr = try getRepr(bits: currentBits, refs: refs, level: levelI, type: type)
-        let hash = sha256(data: repr)
+        let hash = repr.sha256()
         let destI = hashI - hashIOffset
         depths.insert(currentDepth, at: Int(destI))
         hashes.insert(hash, at: Int(destI))

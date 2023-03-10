@@ -13,8 +13,9 @@ public struct ExternalAddress {
     public func toString() -> String {
         return "External<\(bits):\(value)>"
     }
-
-    public static func isAddress(_ src: Any) -> Bool {
-        return src is ExternalAddress
+    
+    public static func mock(workchain: Int8, seed: String) throws -> Self {
+        let value = BigInt(Data(seed.utf8).sha256().hexString(), radix: 16)!        
+        return ExternalAddress(value: value, bits: try bitsForNumber(src: value, mode: .uint))
     }
 }

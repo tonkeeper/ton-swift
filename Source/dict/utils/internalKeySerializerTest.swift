@@ -17,7 +17,7 @@ final class InternalKeySerializerTest: XCTestCase {
         }
         
         // should serialize addresses
-        let cs2 = [testAddress(workchain: 0, seed: "1"), testAddress(workchain: -1, seed: "1"), testAddress(workchain: 0, seed: "2"), testAddress(workchain: 0, seed: "4")]
+        let cs2 = [Address.mock(workchain: 0, seed: "1"), Address.mock(workchain: -1, seed: "1"), Address.mock(workchain: 0, seed: "2"), Address.mock(workchain: 0, seed: "4")]
         for c in cs2 {
             XCTAssertEqual(try deserializeInternalKey(value: try serializeInternalKey(value: c)) as! Address, c)
         }

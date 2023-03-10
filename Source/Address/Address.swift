@@ -68,6 +68,11 @@ public struct Address: Hashable {
         self.hash = hash
     }
     
+    /// Generates a test address
+    public static func mock(workchain: Int8, seed: String) -> Self {
+        return Address(workChain: workchain, hash: Data(seed.utf8).sha256())
+    }
+    
     public var workChain: UInt8 {
         if _workChain == -1 {
             return UInt8.max
