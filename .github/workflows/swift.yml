@@ -18,6 +18,6 @@ jobs:
     - name: CocoaPod Install
       run: cd Example; pod install
     - name: Build
-      run: xcodebuild -workspace ton-swift-example.xcworkspace -scheme ton-swift-example -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14'
+      run: cd Example; xcodebuild -workspace ton-swift-example.xcworkspace -scheme ton-swift-example -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14'
     - name: Test
-      run: xcodebuild -workspace ton-swift-example.xcworkspace -scheme ton-swift-example -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14' test
+      run: cd Example; xcodebuild -workspace ton-swift-example.xcworkspace -scheme ton-swift-example -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14' test
