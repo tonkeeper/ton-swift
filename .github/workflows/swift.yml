@@ -16,7 +16,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pods-
     - name: CocoaPod Install
-      run: pod install
+      run: cd Example; pod install
     - name: Build
       run: xcodebuild -workspace ton-swift-example.xcworkspace -scheme ton-swift-example -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14'
     - name: Test
