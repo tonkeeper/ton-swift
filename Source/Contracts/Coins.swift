@@ -16,5 +16,3 @@ extension Coins: RawRepresentable {
         return self.amount
     }
 }
-
-

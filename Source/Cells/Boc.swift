@@ -212,7 +212,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     let hasCrc32c = crc32
     let hasCacheBits = false
     let flags: UInt32 = 0
-    let sizeBytes = max(Int(ceil(Double(try bitsForNumber(src: cellsNum, mode: .uint)) / 8.0)), 1)
+    let sizeBytes = max(Int(ceil(Double(try cellsNum.bitsCount(mode: .uint)) / 8.0)), 1)
     var totalCellSize: Int = 0
     var index: [Int] = []
     
@@ -222,7 +222,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
         totalCellSize += sz
     }
     
-    let offsetBytes = max(Int(ceil(Double(try bitsForNumber(src: totalCellSize, mode: .uint)) / 8.0)), 1)
+    let offsetBytes = max(Int(ceil(Double(try totalCellSize.bitsCount(mode: .uint)) / 8.0)), 1)
     let hasIdxFactor = hasIdx ? (cellsNum * offsetBytes) : 0
     let hasCrc32cFactor = hasCrc32c ? 4 : 0
     let totalSize = (
