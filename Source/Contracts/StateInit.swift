@@ -6,7 +6,7 @@ import BigInt
 //  code:(Maybe ^Cell) data:(Maybe ^Cell)
 //  library:(HashmapE 256 SimpleLib) = StateInit;
 
-public struct StateInit: Writable {
+public struct StateInit: Writable, Readable {
     var splitDepth: UInt32?
     var special: TickTock?
     var code: Cell?
@@ -40,22 +40,23 @@ public struct StateInit: Writable {
         try builder.storeMaybeRef(cell: self.data)
         try builder.storeDict(dict: self.libraries)
     }
-}
+    
+    static public func readFrom(slice: Slice) throws -> StateInit {
+        let splitDepth: UInt32? = try slice.loadMaybe { s in
+            try s.loadUint(bits: 5)
+        };
 
-func loadStateInit(slice: Slice) throws -> StateInit {
-    var splitDepth: UInt32?
-    if try slice.loadBit() {
-        splitDepth = try slice.loadUint(bits: 5)
+        let special: TickTock? = try slice.loadMaybe { s in
+            try TickTock.readFrom(slice: slice)
+        };
+
+        let code = try slice.loadMaybeRef()
+        let data = try slice.loadMaybeRef()
+        
+        let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeys.BigUint(bits: 256), value: SimpleLibraryValue())
+        
+        return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
     }
-    
-    let special: TickTock? = try TickTock?.readFrom(slice: slice);
-    
-    let code = try slice.loadMaybeRef()
-    let data = try slice.loadMaybeRef()
-    
-    let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeys.BigUint(bits: 256), value: SimpleLibraryValue())
-    
-    return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
 }
 
 // Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L139

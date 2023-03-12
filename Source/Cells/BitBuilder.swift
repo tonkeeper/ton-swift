@@ -236,7 +236,7 @@ class BitBuilder {
         if let address = address {
             try writeUint(value: BigInt(2), bits: 2)
             try writeUint(value: BigInt(0), bits: 1)
-            try writeInt(address.workChain, bits: 8)
+            try writeInt(address.workchain, bits: 8)
             try writeBuffer(src: address.hash)
         } else {
             try writeUint(value: BigInt(0), bits: 2)

@@ -6,7 +6,7 @@ struct ADNLAddress {
             throw TonError.custom("Invalid address")
         }
 
-        let decoded = try base32Decode(input: "f\(src)")
+        let decoded = try "f\(src)".fromBase32()
         if decoded[0] != 0x2d {
             throw TonError.custom("Invalid address")
         }
@@ -45,7 +45,7 @@ struct ADNLAddress {
         let hash = crc16(data: data)
         data = data + hash
         
-        return String(base32Encode(buffer: data).dropFirst())
+        return String(data.toBase32().dropFirst())
     }
 
 }

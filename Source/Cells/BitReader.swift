@@ -325,7 +325,7 @@ class BitReader {
         // Update offset
         self._offset += 267
 
-        return Address(workChain: wc, hash: hash)
+        return Address(workchain: wc, hash: hash)
     }
 
 }

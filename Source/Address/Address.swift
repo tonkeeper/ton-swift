@@ -3,7 +3,7 @@ import Foundation
 struct FriendlyAddress: Codable {
     let isTestOnly: Bool
     let isBounceable: Bool
-    let workChain: Int8
+    let workchain: Int8
     let hashPart: Data
 }
 
@@ -47,37 +47,37 @@ func parseFriendlyAddress(src: Data) throws -> FriendlyAddress {
 
     isBounceable = tag == bounceableTag
 
-    var workChain: Int8
+    var workchain: Int8
     if addr[1] == 0xff {
-        workChain = -1
+        workchain = -1
     } else {
-        workChain = Int8(addr[1])
+        workchain = Int8(addr[1])
     }
 
     let hashPart = addr.subdata(in: 2..<34)
 
-    return FriendlyAddress(isTestOnly: isTestOnly, isBounceable: isBounceable, workChain: workChain, hashPart: hashPart)
+    return FriendlyAddress(isTestOnly: isTestOnly, isBounceable: isBounceable, workchain: workchain, hashPart: hashPart)
 }
 
 public struct Address: Hashable {
-    private let _workChain: Int8
+    private let _workchain: Int8
     public let hash: Data
     
-    public init(workChain: Int8, hash: Data) {
-        self._workChain = workChain
+    public init(workchain: Int8, hash: Data) {
+        self._workchain = workchain
         self.hash = hash
     }
     
     /// Generates a test address
     public static func mock(workchain: Int8, seed: String) -> Self {
-        return Address(workChain: workchain, hash: Data(seed.utf8).sha256())
+        return Address(workchain: workchain, hash: Data(seed.utf8).sha256())
     }
     
-    public var workChain: UInt8 {
-        if _workChain == -1 {
+    public var workchain: UInt8 {
+        if _workchain == -1 {
             return UInt8.max
         } else {
-            return UInt8(_workChain)
+            return UInt8(_workchain)
         }
     }
     
@@ -106,31 +106,31 @@ public struct Address: Hashable {
     }
     
     public static func parseRaw(source: String) -> Address {
-        let workChain = Int8(source.split(separator: ":")[0])!
+        let workchain = Int8(source.split(separator: ":")[0])!
         let hash = Data(hex: String(source.split(separator: ":")[1]))!
         
-        return Address(workChain: workChain, hash: hash)
+        return Address(workchain: workchain, hash: hash)
     }
     
     public static func parseFriendly(source: Data) throws -> (isBounceable: Bool, isTestOnly: Bool, address: Address) {
         let r = try parseFriendlyAddress(src: source)
-        return (isBounceable: r.isBounceable, isTestOnly: r.isTestOnly, address: Address(workChain: r.workChain, hash: r.hashPart))
+        return (isBounceable: r.isBounceable, isTestOnly: r.isTestOnly, address: Address(workchain: r.workchain, hash: r.hashPart))
     }
 
     public static func parseFriendly(source: String) throws -> (isBounceable: Bool, isTestOnly: Bool, address: Address) {
         let addr = source.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/") // Convert from url-friendly to true base64
         let r = try parseFriendlyAddress(src: addr)
-        return (isBounceable: r.isBounceable, isTestOnly: r.isTestOnly, address: Address(workChain: r.workChain, hash: r.hashPart))
+        return (isBounceable: r.isBounceable, isTestOnly: r.isTestOnly, address: Address(workchain: r.workchain, hash: r.hashPart))
     }
     
     public func toRawString() -> String {
-        return "\(workChain):\(hash.hexString())"
+        return "\(workchain):\(hash.hexString())"
     }
     
     public func toRaw() -> Data {
         var addressWithChecksum = Data(count: 36)
         addressWithChecksum.replaceSubrange(0..<hash.count, with: hash)
-        addressWithChecksum.replaceSubrange(32..<36, with: [UInt8(workChain), UInt8(workChain), UInt8(workChain), UInt8(workChain)])
+        addressWithChecksum.replaceSubrange(32..<36, with: [UInt8(workchain), UInt8(workchain), UInt8(workchain), UInt8(workchain)])
         
         return addressWithChecksum
     }
@@ -145,7 +145,7 @@ public struct Address: Hashable {
         
         var addr = Data(count: 34)
         addr[0] = tag
-        addr[1] = workChain
+        addr[1] = workchain
         addr[2...] = hash
         var addressWithChecksum = Data(count: 36)
         addressWithChecksum[0...] = addr
@@ -168,7 +168,7 @@ public struct Address: Hashable {
 // MARK: - Equatable
 extension Address: Equatable {
     public static func == (lhs: Address, rhs: Address) -> Bool {
-        if lhs.workChain != rhs.workChain {
+        if lhs.workchain != rhs.workchain {
             return false
         }
         
