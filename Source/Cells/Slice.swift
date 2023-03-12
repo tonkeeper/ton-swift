@@ -61,6 +61,18 @@ public class Slice {
     }
     
     /**
+     Load optional reference
+     - returns: Cell or nil
+     */
+    public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
+        if try loadBit() {
+            return try closure(self)
+        } else {
+            return nil
+        }
+    }
+    
+    /**
      Load maybe boolean
     - returns true or false depending on the bit value or null
     */

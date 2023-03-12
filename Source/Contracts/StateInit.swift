@@ -6,14 +6,22 @@ import BigInt
 //  code:(Maybe ^Cell) data:(Maybe ^Cell)
 //  library:(HashmapE 256 SimpleLib) = StateInit;
 
-struct StateInit: CellWritable {
+public struct StateInit: Writable {
     var splitDepth: UInt32?
     var special: TickTock?
     var code: Cell?
     var data: Cell?
     var libraries: Dictionary<BigUInt, SimpleLibrary>?
+
+    init(splitDepth: UInt32? = nil, special: TickTock? = nil, code: Cell? = nil, data: Cell? = nil, libraries: Dictionary<BigUInt, SimpleLibrary>? = nil) {
+        self.splitDepth = splitDepth;
+        self.special = special;
+        self.code = code;
+        self.data = data;
+        self.libraries = libraries;
+    }
     
-    func writeTo(builder: Builder) throws {
+    public func writeTo(builder: Builder) throws {
         if let splitDepth = self.splitDepth {
             try builder.storeBit(true)
             try builder.storeUint(splitDepth, bits: 5)
@@ -40,10 +48,7 @@ func loadStateInit(slice: Slice) throws -> StateInit {
         splitDepth = try slice.loadUint(bits: 5)
     }
     
-    var special: TickTock?
-    if try slice.loadBit() {
-        special = try loadTickTock(slice: slice)
-    }
+    let special: TickTock? = try TickTock?.readFrom(slice: slice);
     
     let code = try slice.loadMaybeRef()
     let data = try slice.loadMaybeRef()
@@ -51,4 +56,24 @@ func loadStateInit(slice: Slice) throws -> StateInit {
     let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeys.BigUint(bits: 256), value: SimpleLibraryValue())
     
     return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
+}
+
+// Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L139
+// tick_tock$_ tick:Bool tock:Bool = TickTock;
+
+struct TickTock: Writable, Readable {
+    var tick: Bool
+    var tock: Bool
+    
+    func writeTo(builder: Builder) throws {
+        try builder.storeBit(self.tick)
+        try builder.storeBit(self.tock)
+    }
+    
+    static func readFrom(slice: Slice) throws -> TickTock {
+        return TickTock(
+            tick: try slice.loadBit(),
+            tock: try slice.loadBit()
+        )
+    }
 }

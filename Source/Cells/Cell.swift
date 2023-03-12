@@ -1,5 +1,12 @@
 import Foundation
 
+public enum CellType: Int {
+    case ordinary = -1
+    case prunedBranch = 1
+    case merkleProof = 3
+    case merkleUpdate = 4
+}
+
 public struct Cell: Hashable {
     public static let empty = Cell()
     

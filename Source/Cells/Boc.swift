@@ -1,5 +1,6 @@
 import Foundation
 
+/// BoC = Bag-of-Cells, data structure for efficient storage and transmission of a collection of cells.
 struct Boc {
     let size: Int
     let offBytes: Int
@@ -10,6 +11,16 @@ struct Boc {
     let index: Data?
     let cellData: Data
     let root: [UInt32]
+}
+
+func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
+    let typeFactor: UInt8 = type != .ordinary ? 1 : 0
+    return UInt8(refs.count) + typeFactor * 8 + UInt8(level) * 32
+}
+
+func getBitsDescriptor(bits: BitString) -> UInt8 {
+    let len = bits.length
+    return UInt8(ceil(Double(len) / 8) + floor(Double(len) / 8))
 }
 
 func readCell(reader: BitReader, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt32]) {

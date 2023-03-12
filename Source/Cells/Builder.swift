@@ -247,7 +247,7 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func store(_ object: CellWritable) throws -> Self  {
+    public func store(_ object: Writable) throws -> Self  {
         try object.writeTo(builder: self)
         return self
     }
@@ -258,7 +258,7 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeMaybe(_ object: CellWritable?) throws -> Self {
+    public func storeMaybe(_ object: Writable?) throws -> Self {
         if let object = object {
             try storeBit(true)
             try store(object)
