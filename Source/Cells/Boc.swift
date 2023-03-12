@@ -12,8 +12,74 @@ struct Boc {
     let cellData: Data
     let root: [UInt32]
     
-    
-    
+    init(data: Data) throws {
+        let reader = BitReader(bits: BitString(data: data, offset: 0, length: data.count * 8))
+        let magic = try reader.loadUint(bits: 32)
+        if magic == 0x68ff65f3 {
+            size = Int(try reader.loadUint(bits: 8))
+            offBytes = Int(try reader.loadUint(bits: 8))
+            cells = Int(try reader.loadUint(bits: size * 8))
+            roots = try reader.loadUint(bits: size * 8) // Must be 1
+            absent = try reader.loadUint(bits: size * 8)
+            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
+            index = try reader.loadBuffer(bytes: cells * offBytes)
+            cellData = try reader.loadBuffer(bytes: totalCellSize)
+            root = [0]
+            
+        } else if magic == 0xacc3a728 {
+            size = Int(try reader.loadUint(bits: 8))
+            offBytes = Int(try reader.loadUint(bits: 8))
+            cells = Int(try reader.loadUint(bits: size * 8))
+            roots = try reader.loadUint(bits: size * 8) // Must be 1
+            absent = try reader.loadUint(bits: size * 8)
+            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
+            index = try reader.loadBuffer(bytes: cells * offBytes)
+            cellData = try reader.loadBuffer(bytes: totalCellSize)
+            let crc32 = try reader.loadBuffer(bytes: 4)
+            
+            if data.subdata(in: 0..<data.count-4).crc32c() != crc32 {
+                throw TonError.custom("Invalid CRC32C")
+            }
+            root = [0]
+            
+        } else if magic == 0xb5ee9c72 {
+            let hasIdx = try reader.loadUint(bits: 1) == 1
+            let hasCrc32c = try reader.loadUint(bits: 1) == 1
+            let _/*hasCacheBits*/ = try reader.loadUint(bits: 1) == 1
+            let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
+            size = Int(try reader.loadUint(bits: 3))
+            offBytes = Int(try reader.loadUint(bits: 8))
+            cells = Int(try reader.loadUint(bits: size * 8))
+            roots = try reader.loadUint(bits: size * 8)
+            absent = try reader.loadUint(bits: size * 8)
+            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
+            var root: [UInt32] = []
+            
+            for _ in 0..<roots {
+                root.append(try reader.loadUint(bits: size * 8))
+            }
+            
+            self.root = root
+            
+            if hasIdx {
+                index = try reader.loadBuffer(bytes: cells * offBytes)
+            } else {
+                index = nil
+            }
+            
+            cellData = try reader.loadBuffer(bytes: totalCellSize)
+            if hasCrc32c {
+                let crc32 = try reader.loadBuffer(bytes: 4)
+                
+                if data.subdata(in: 0..<(data.count - 4)).crc32c() != crc32 {
+                    throw TonError.custom("Invalid CRC32C")
+                }
+            }
+
+        } else {
+            throw TonError.custom("Invalid magic")
+        }
+    }
 }
 
 func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
@@ -56,106 +122,8 @@ func calcCellSize(cell: Cell, sizeBytes: Int) -> Int {
     return 2 /* D1+D2 */ + Int(ceil(Double(cell.bits.length) / 8.0)) + cell.refs.count * sizeBytes
 }
 
-func parseBoc(src: Data) throws -> Boc {
-    let reader = BitReader(bits: BitString(data: src, offset: 0, length: src.count * 8))
-    let magic = try reader.loadUint(bits: 32)
-    if magic == 0x68ff65f3 {
-        let size = Int(try reader.loadUint(bits: 8))
-        let offBytes = Int(try reader.loadUint(bits: 8))
-        let cells = Int(try reader.loadUint(bits: size * 8))
-        let roots = try reader.loadUint(bits: size * 8) // Must be 1
-        let absent = try reader.loadUint(bits: size * 8)
-        let totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-        let index = try reader.loadBuffer(bytes: cells * offBytes)
-        let cellData = try reader.loadBuffer(bytes: totalCellSize)
-        
-        return Boc(
-            size: size,
-            offBytes: offBytes,
-            cells: cells,
-            roots: roots,
-            absent: absent,
-            totalCellSize: totalCellSize,
-            index: index,
-            cellData: cellData,
-            root: [0])
-        
-    } else if magic == 0xacc3a728 {
-        let size = Int(try reader.loadUint(bits: 8))
-        let offBytes = Int(try reader.loadUint(bits: 8))
-        let cells = Int(try reader.loadUint(bits: size * 8))
-        let roots = try reader.loadUint(bits: size * 8) // Must be 1
-        let absent = try reader.loadUint(bits: size * 8)
-        let totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-        let index = try reader.loadBuffer(bytes: cells * offBytes)
-        let cellData = try reader.loadBuffer(bytes: totalCellSize)
-        let crc32 = try reader.loadBuffer(bytes: 4)
-        
-        // Swift does not have a built-in crc32c function, you will need to use a library or implement your own
-        if src.subdata(in: 0..<src.count-4).crc32c() != crc32 {
-            throw TonError.custom("Invalid CRC32C")
-        }
-        
-        return Boc(
-            size: size,
-            offBytes: offBytes,
-            cells: cells,
-            roots: roots,
-            absent: absent,
-            totalCellSize: totalCellSize,
-            index: index,
-            cellData: cellData,
-            root: [0])
-        
-    } else if magic == 0xb5ee9c72 {
-        let hasIdx = try reader.loadUint(bits: 1) == 1
-        let hasCrc32c = try reader.loadUint(bits: 1) == 1
-        let _/*hasCacheBits*/ = try reader.loadUint(bits: 1) == 1
-        let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
-        let size = Int(try reader.loadUint(bits: 3))
-        let offBytes = Int(try reader.loadUint(bits: 8))
-        let cells = Int(try reader.loadUint(bits: size * 8))
-        let roots = try reader.loadUint(bits: size * 8)
-        let absent = try reader.loadUint(bits: size * 8)
-        let totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-        var root: [UInt32] = []
-        
-        for _ in 0..<roots {
-            root.append(try reader.loadUint(bits: size * 8))
-        }
-        
-        var index: Data? = nil
-        if hasIdx {
-            index = try reader.loadBuffer(bytes: cells * offBytes)
-        }
-        
-        let cellData = try reader.loadBuffer(bytes: totalCellSize)
-        if hasCrc32c {
-            let crc32 = try reader.loadBuffer(bytes: 4)
-            
-            if src.subdata(in: 0..<(src.count - 4)).crc32c() != crc32 {
-                throw TonError.custom("Invalid CRC32C")
-            }
-        }
-        
-        return Boc(
-            size: size,
-            offBytes: offBytes,
-            cells: cells,
-            roots: roots,
-            absent: absent,
-            totalCellSize: totalCellSize,
-            index: index,
-            cellData: cellData,
-            root: [0])
-        
-    } else {
-        throw TonError.custom("Invalid magic")
-    }
-}
-
 func deserializeBoc(src: Data) throws -> [Cell] {
-    let boc = try parseBoc(src: src)
+    let boc = try Boc(data: src)
     let reader = BitReader(bits: BitString(data: boc.cellData, offset: 0, length: boc.cellData.count * 8))
     
     var cells: [(bits: BitString, refs: [UInt32], exotic: Bool, result: Cell?)] = []
