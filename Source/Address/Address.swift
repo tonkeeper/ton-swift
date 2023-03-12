@@ -27,7 +27,7 @@ func parseFriendlyAddress(src: Data) throws -> FriendlyAddress {
     
     let addr = src.subdata(in: 0..<34)
     let crc = src.subdata(in: 34..<36)
-    let calcedCrc = crc16(data: addr)
+    let calcedCrc = addr.crc16()
     
     if calcedCrc[0] != crc[0] || calcedCrc[1] != crc[1] {
         throw TonError.custom("Invalid checksum: \(src)")
@@ -149,7 +149,7 @@ public struct Address: Hashable {
         addr[2...] = hash
         var addressWithChecksum = Data(count: 36)
         addressWithChecksum[0...] = addr
-        addressWithChecksum[34...] = crc16(data: addr)
+        addressWithChecksum[34...] = addr.crc16()
         
         return addressWithChecksum
     }

@@ -11,6 +11,9 @@ struct Boc {
     let index: Data?
     let cellData: Data
     let root: [UInt32]
+    
+    
+    
 }
 
 func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
@@ -89,7 +92,7 @@ func parseBoc(src: Data) throws -> Boc {
         let crc32 = try reader.loadBuffer(bytes: 4)
         
         // Swift does not have a built-in crc32c function, you will need to use a library or implement your own
-        if crc32c(source: src.subdata(in: 0..<src.count-4)) != crc32 {
+        if src.subdata(in: 0..<src.count-4).crc32c() != crc32 {
             throw TonError.custom("Invalid CRC32C")
         }
         
@@ -130,7 +133,7 @@ func parseBoc(src: Data) throws -> Boc {
         if hasCrc32c {
             let crc32 = try reader.loadBuffer(bytes: 4)
             
-            if crc32c(source: src.subdata(in: 0..<(src.count - 4))) != crc32 {
+            if src.subdata(in: 0..<(src.count - 4)).crc32c() != crc32 {
                 throw TonError.custom("Invalid CRC32C")
             }
         }
@@ -265,7 +268,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     }
 
     if hasCrc32c {
-        let crc32 = crc32c(source: try builder.buffer())
+        let crc32 = (try builder.buffer()).crc32c()
         try builder.writeBuffer(src: crc32)
     }
 

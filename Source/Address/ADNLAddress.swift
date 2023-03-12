@@ -12,7 +12,7 @@ struct ADNLAddress {
         }
 
         let gotHash = decoded[33...].bytes
-        let hash = crc16(data: decoded[0..<33].bytes)
+        let hash = decoded[0..<33].bytes.crc16()
         if !hash.bytes.elementsEqual(gotHash) {
             throw TonError.custom("Invalid address")
         }
@@ -42,7 +42,7 @@ struct ADNLAddress {
 
     func toString() -> String {
         var data = Data([0x2D]) + self.address
-        let hash = crc16(data: data)
+        let hash = data.crc16()
         data = data + hash
         
         return String(data.toBase32().dropFirst())
