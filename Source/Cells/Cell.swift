@@ -117,11 +117,8 @@ public struct Cell: Hashable {
      Serializes cell to BOC
     - parameter opts: options
     */
-    func toBoc(idx: Bool? = nil, crc32: Bool? = nil) throws -> Data {
-        let idxValue = idx ?? false
-        let crc32Value = crc32 ?? true
-        
-        return try serializeBoc(root: self, idx: idxValue, crc32: crc32Value)
+    func toBoc(idx: Bool = false, crc32: Bool = true) throws -> Data {
+        return try serializeBoc(root: self, idx: idx, crc32: crc32)
     }
     
     /**
@@ -145,7 +142,7 @@ public struct Cell: Hashable {
         }
         var s = indent + (isExotic ? t : "x") + "{" + (try bits.toString()) + "}"
         for i in refs {
-            s += "\n" + (try i.toString(indent: id + " "))
+            s += "\n" + (try i.toString(indent: indent + " "))
         }
         
         return s

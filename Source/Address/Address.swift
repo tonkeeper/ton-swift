@@ -7,6 +7,9 @@ struct FriendlyAddress: Codable {
     let hashPart: Data
 }
 
+/// By default, addresses are bounceable for safety of TON transfers.
+public let BounceableDefault = true;
+
 let bounceableTag: UInt8 = 0x11
 let nonBounceableTag: UInt8 = 0x51
 let testFlag: UInt8 = 0x80
@@ -135,9 +138,7 @@ public struct Address: Hashable {
         return addressWithChecksum
     }
     
-    public func toStringBuffer(testOnly: Bool? = nil, bounceable: Bool? = nil) -> Data {
-        let testOnly = testOnly ?? false
-        let bounceable = bounceable ?? true
+    public func toStringBuffer(testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> Data {
         var tag = bounceable ? bounceableTag : nonBounceableTag
         if testOnly {
             tag |= testFlag
@@ -154,8 +155,7 @@ public struct Address: Hashable {
         return addressWithChecksum
     }
     
-    public func toString(urlSafe: Bool? = nil, testOnly: Bool? = nil, bounceable: Bool? = nil) -> String {
-        let urlSafe = urlSafe ?? true
+    public func toString(urlSafe: Bool = true, testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> String {
         let buffer = toStringBuffer(testOnly: testOnly, bounceable: bounceable)
         if urlSafe {
             return buffer.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
