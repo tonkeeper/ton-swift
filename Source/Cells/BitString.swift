@@ -2,7 +2,7 @@ import Foundation
 
 public struct BitString: Hashable {
     
-    public static let empty = BitString(data: .init(), offset: 0, length: 0)
+    public static let empty = BitString(data: .init(), unchecked: (offset: 0, length: 0))
     
     private let _offset: Int
     private let _length: Int
@@ -14,16 +14,45 @@ public struct BitString: Hashable {
     public var length: Int { _length }
     
     /**
-     Constructing BitString from a buffer
+     Constructing BitString from a buffer with specified offset and length without checking consistency.
      
      - parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
-     - parameter offset: offset in bits from the start of the buffer
-     - parameter length: length of the bitstring in bits
+     - parameter `unchecked.offset`: offset in bits from the start of the buffer
+     - parameter `unchecked.length`: length of the bitstring in bits
      */
-    public init(data: Data, offset: Int, length: Int) {
-        self._offset = max(0, offset)
-        self._length = length
+    public init(data: Data, offset: Int, length: Int) throws {
+        guard offset >= 0 else {
+            throw TonError.custom("Offset cannot be negative")
+        }
+        guard length >= 0 else {
+            throw TonError.custom("Length cannot be negative")
+        }
+        guard (offset + length) > data.count*8 else {
+            throw TonError.custom("Offset and length out of bounds for the data")
+        }
         self._data = data
+        self._offset = offset
+        self._length = length
+    }
+    
+    /**
+     Constructing BitString from a buffer with specified offset and length without checking consistency.
+     
+     - parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
+     - parameter `unchecked.offset`: offset in bits from the start of the buffer
+     - parameter `unchecked.length`: length of the bitstring in bits
+     */
+    public init(data: Data, unchecked: (offset: Int, length: Int)) {
+        self._data = data
+        self._offset = unchecked.offset
+        self._length = unchecked.length
+    }
+    
+    /// Constructs BitString from a buffer of data
+    public init(data: Data) {
+        self._data = data
+        self._offset = 0
+        self._length = data.count*8
     }
 
     /**
@@ -59,7 +88,7 @@ public struct BitString: Hashable {
         
         try checkOffset(offset: offset, length: length)
         
-        return BitString(data: _data, offset: _offset + offset, length: length)
+        return BitString(data: _data, unchecked:(offset: _offset + offset, length: length))
     }
     
     /**

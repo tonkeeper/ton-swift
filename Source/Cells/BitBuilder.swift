@@ -58,7 +58,7 @@ class BitBuilder {
      - returns result bit string
      */
     public func build() throws -> BitString {
-        return BitString(data: _buffer, offset: 0, length: _length)
+        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
     /**
