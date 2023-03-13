@@ -12,7 +12,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] Contract
 - [x] StateInit
 - [ ] CommonMsgInfo
-- [ ] Send Flags
+- [x] Send Flags
 - [ ] Signatures
 - [ ] Wallet V3R1, V3R2
 - [ ] Wallet V4
