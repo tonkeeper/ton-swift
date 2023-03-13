@@ -50,6 +50,11 @@ public class Slice {
         return try loadBit()
     }
     
+    /// Loads type T that implements interface Readable
+    public func loadType<T: Readable>() throws -> T {
+        return try T.readFrom(slice: self)
+    }
+    
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
         if try loadBit() {
