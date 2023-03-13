@@ -15,7 +15,7 @@ public struct DictionaryKeyUInt: DictionaryKey {
 
         return BigInt(
             try Builder()
-                .storeUint(src, bits: bits)
+                .storeUint(UInt64(src), bits: bits)
                 .endCell()
                 .beginParse()
                 .loadUintBig(bits: bits)

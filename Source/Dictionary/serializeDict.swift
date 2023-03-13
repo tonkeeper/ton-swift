@@ -131,7 +131,7 @@ func writeLabelLong(src: String, keyLength: Int, to: Builder) throws -> Builder 
     
     // Length
     let length = Int(ceil(log2(Double(keyLength + 1))))
-    try to.storeUint(UInt32(src.count), bits: length)
+    try to.storeUint(UInt64(src.count), bits: length)
     
     // Value
     for char in src {
@@ -153,7 +153,7 @@ func writeLabelSame(value: Int, length: Int, keyLength: Int, to: Builder) throws
     
     // Length
     let lenLen = Int(ceil(log2(Double(keyLength + 1))))
-    try to.storeUint(UInt32(length), bits: lenLen)
+    try to.storeUint(UInt64(length), bits: lenLen)
 }
 
 func labelSameLength(keyLength: Int) -> Int {

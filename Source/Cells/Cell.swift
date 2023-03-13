@@ -157,8 +157,6 @@ extension Cell: Equatable {
     - returns true if cells are equal
     */
     public static func == (lhs: Cell, rhs: Cell) -> Bool {
-        print("!!!lhs.hash()", lhs.hash().hexString())
-        print("!!!rhs.hash()", rhs.hash().hexString())
         return lhs.hash() == rhs.hash()
     }
 }
@@ -388,7 +386,7 @@ func exoticPruned(bits: BitString, refs: [Cell]) throws -> ExoticPruned {
         // so we need to hardcode it equal to 1
         mask = LevelMask(mask: 1)
     } else {
-        let level = try reader.loadUint(bits: 8)
+        let level = UInt32(try reader.loadUint(bits: 8))
         mask = LevelMask(mask: level)
         if mask.level < 1 || mask.level > 3 {
             throw TonError.custom("Pruned Branch cell level must be >= 1 and <= 3, got \(mask.level)/\(mask.value)");
@@ -407,7 +405,7 @@ func exoticPruned(bits: BitString, refs: [Cell]) throws -> ExoticPruned {
     var depths: [UInt32] = []
     for _ in 0..<mask.level {
         let hash = try reader.loadBuffer(bytes: 32)
-        let depth = try reader.loadUint(bits: 16)
+        let depth = UInt32(try reader.loadUint(bits: 16))
         
         hashes.append(hash)
         depths.append(depth)
@@ -470,8 +468,8 @@ func exoticMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (proofDepth1: U
 
     let proofHash1 = try reader.loadBuffer(bytes: 32)
     let proofHash2 = try reader.loadBuffer(bytes: 32)
-    let proofDepth1 = try reader.loadUint(bits: 16)
-    let proofDepth2 = try reader.loadUint(bits: 16)
+    let proofDepth1 = UInt32(try reader.loadUint(bits: 16))
+    let proofDepth2 = UInt32(try reader.loadUint(bits: 16))
 
     if proofDepth1 != refs[0].depth(level: 0) {
         throw TonError.custom("Merkle Update cell ref depth must be exactly \(proofDepth1), got \(refs[0].depth(level: 0))")
@@ -514,7 +512,7 @@ func exoticMerkleProof(bits: BitString, refs: [Cell]) throws -> (proofDepth: UIn
 
     // Check data
     let proofHash = try reader.loadBuffer(bytes: 32)
-    let proofDepth = try reader.loadUint(bits: 16)
+    let proofDepth = UInt32(try reader.loadUint(bits: 16))
     let refHash = refs[0].hash(level: 0)
     let refDepth = refs[0].depth(level: 0)
 

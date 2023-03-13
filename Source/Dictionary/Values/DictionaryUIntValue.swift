@@ -12,7 +12,7 @@ public struct DictionaryUIntValue: DictionaryValue {
             throw TonError.custom("Wrong src type. Expected uint32")
         }
         
-        try builder.storeUint(src, bits: bits)
+        try builder.storeUint(UInt64(src), bits: bits)
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {

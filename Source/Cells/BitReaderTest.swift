@@ -5,8 +5,8 @@ final class BitReaderTest: XCTestCase {
     func testBitReader() throws {
         // should read uints from builder
         for _ in 0..<1000 {
-            let a = UInt32.random(in: 0..<UInt32.max)
-            let b = UInt32.random(in: 0..<UInt32.max)
+            let a = UInt64.random(in: 0..<10000000)
+            let b = UInt64.random(in: 0..<10000000)
             let builder = BitBuilder()
             try builder.writeUint(value: a, bits: 48)
             try builder.writeUint(value: b, bits: 48)

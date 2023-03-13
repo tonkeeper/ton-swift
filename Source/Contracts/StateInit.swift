@@ -24,7 +24,7 @@ public struct StateInit: Writable, Readable {
     public func writeTo(builder: Builder) throws {
         if let splitDepth = self.splitDepth {
             try builder.storeBit(true)
-            try builder.storeUint(splitDepth, bits: 5)
+            try builder.storeUint(UInt64(splitDepth), bits: 5)
         } else {
             try builder.storeBit(false)
         }
@@ -43,7 +43,7 @@ public struct StateInit: Writable, Readable {
     
     static public func readFrom(slice: Slice) throws -> StateInit {
         let splitDepth: UInt32? = try slice.loadMaybe { s in
-            try s.loadUint(bits: 5)
+            UInt32(try s.loadUint(bits: 5))
         };
 
         let special: TickTock? = try slice.loadMaybe { s in

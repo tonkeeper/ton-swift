@@ -262,7 +262,7 @@ class BitBuilder {
     - parameter value: value to write as bigint or number
     - parameter bits: header bits to write size
     */
-    func writeVarUint(value: UInt32, bits: Int) throws {
+    func writeVarUint(value: UInt64, bits: Int) throws {
         try writeVarUint(value: BigUInt(value), bits: bits)
     }
     func writeVarUint(value: BigUInt, bits: Int) throws {
@@ -277,7 +277,7 @@ class BitBuilder {
         // Corner case for zero
         if v == 0 {
             // Write zero size
-            try writeUint(value: UInt32(0), bits: bits)
+            try writeUint(value: UInt64(0), bits: bits)
             return
         }
 

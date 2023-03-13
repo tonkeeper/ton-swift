@@ -11,16 +11,16 @@ struct Boc {
     let size: Int
     let offBytes: Int
     let cells: Int
-    let rootsCount: UInt32
-    let absent: UInt32
+    let rootsCount: UInt64
+    let absent: UInt64
     let totalCellSize: Int
     let index: Data?
     let cellData: Data
-    let rootIndices: [UInt32]
+    let rootIndices: [UInt64]
     
     init(data: Data) throws {
         let reader = BitReader(bits: BitString(data: data, unchecked:(offset: 0, length: data.count * 8)))
-        guard let magic = BocMagic(rawValue: try reader.loadUint(bits: 32)) else {
+        guard let magic = BocMagic(rawValue: UInt32(try reader.loadUint(bits: 32))) else {
             throw TonError.custom("Invalid magic")
         }
         switch magic {
@@ -52,7 +52,7 @@ struct Boc {
                 rootsCount = try reader.loadUint(bits: size * 8)
                 absent = try reader.loadUint(bits: size * 8)
                 totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-                var rootIndices: [UInt32] = []
+                var rootIndices: [UInt64] = []
                 
                 for _ in 0..<rootsCount {
                     rootIndices.append(try reader.loadUint(bits: size * 8))
@@ -88,7 +88,7 @@ func getBitsDescriptor(bits: BitString) -> UInt8 {
     return UInt8(ceil(Double(len) / 8) + floor(Double(len) / 8))
 }
 
-func readCell(reader: BitReader, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt32]) {
+func readCell(reader: BitReader, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt64]) {
     let d1 = try reader.loadUint(bits: 8)
     let refsCount = d1 % 8
     let exotic = d1 & 8 != 0
@@ -106,7 +106,7 @@ func readCell(reader: BitReader, sizeBytes: Int) throws -> (exotic: Bool, bits: 
         }
     }
     
-    var refs: [UInt32] = []
+    var refs: [UInt64] = []
     for _ in 0..<refsCount {
         refs.append(try reader.loadUint(bits: sizeBytes * 8))
     }
@@ -122,7 +122,7 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     let boc = try Boc(data: src)
     let reader = BitReader(bits: BitString(data: boc.cellData, unchecked:(offset: 0, length: boc.cellData.count * 8)))
     
-    var cells: [(bits: BitString, refs: [UInt32], exotic: Bool, result: Cell?)] = []
+    var cells: [(bits: BitString, refs: [UInt64], exotic: Bool, result: Cell?)] = []
     for _ in 0..<boc.cells {
         let cell = try readCell(reader: reader, sizeBytes: boc.size)
         cells.append((cell.bits, cell.refs, cell.exotic, nil))
@@ -153,12 +153,12 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     return roots
 }
 
-func writeCellToBuilder(cell: Cell, refs: [UInt32], sizeBytes: Int, to: BitBuilder) throws -> BitBuilder {
+func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: BitBuilder) throws -> BitBuilder {
     let d1 = getRefsDescriptor(refs: cell.refs, level: cell.level, type: cell.type)
     let d2 = getBitsDescriptor(bits: cell.bits)
     
-    try to.writeUint(value: UInt32(d1), bits: 8)
-    try to.writeUint(value: UInt32(d2), bits: 8)
+    try to.writeUint(value: UInt64(d1), bits: 8)
+    try to.writeUint(value: UInt64(d2), bits: 8)
     try to.writeBuffer(src: cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
@@ -244,7 +244,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     return res
 }
 
-func topologicalSort(src: Cell) throws -> [(cell: Cell, refs: [UInt32])] {
+func topologicalSort(src: Cell) throws -> [(cell: Cell, refs: [UInt64])] {
     var pending: [Cell] = [src]
     var allCells = [String: (cell: Cell, refs: [String])]()
     var notPermCells = Set<String>()
@@ -292,12 +292,12 @@ func topologicalSort(src: Cell) throws -> [(cell: Cell, refs: [UInt32])] {
         try visit(hash: id)
     }
     
-    var indexes = [String: UInt32]()
+    var indexes = [String: UInt64]()
     for i in 0..<sorted.count {
-        indexes[sorted[i]] = UInt32(i)
+        indexes[sorted[i]] = UInt64(i)
     }
     
-    var result: [(cell: Cell, refs: [UInt32])] = []
+    var result: [(cell: Cell, refs: [UInt64])] = []
     for ent in sorted {
         let rrr = allCells[ent]!
         result.append((cell: rrr.cell, refs: rrr.refs.map { indexes[$0]! }))

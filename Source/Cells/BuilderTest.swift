@@ -5,8 +5,8 @@ final class BuilderTest: XCTestCase {
     func testBuilder() throws {
         // should read uints from builder
         for _ in 0..<1000 {
-            let a = UInt32.random(in: 0..<UInt32.max)
-            let b = UInt32.random(in: 0..<UInt32.max)
+            let a = UInt64.random(in: 0..<10000000)
+            let b = UInt64.random(in: 0..<10000000)
             let builder = Builder()
             try builder.storeUint(a, bits: 48)
             try builder.storeUint(b, bits: 48)

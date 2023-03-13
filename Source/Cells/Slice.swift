@@ -110,7 +110,7 @@ public class Slice {
     - parameter bits: number of bits to read
     - returns uint value
     */
-    public func loadUint(bits: Int) throws -> UInt32 {
+    public func loadUint(bits: Int) throws -> UInt64 {
         return try reader.loadUint(bits: bits)
     }
     
@@ -119,7 +119,7 @@ public class Slice {
     - parameter bits: number of bits to read
     - returns uint value
     */
-    public func loadUintBig(bits: Int) throws -> UInt32 {
+    public func loadUintBig(bits: Int) throws -> BigUInt {
         return try reader.loadUintBig(bits: bits)
     }
     
@@ -128,7 +128,7 @@ public class Slice {
     - parameter bits: number of bits to read
     - returns uint value
     */
-    public func preloadUint(bits: Int) throws -> UInt32 {
+    public func preloadUint(bits: Int) throws -> UInt64 {
         return try reader.preloadUint(bits: bits)
     }
     
@@ -137,7 +137,7 @@ public class Slice {
     - parameter bits number of bits to read
     - returns uint value
      */
-    public func preloadUintBig(bits: Int) throws -> UInt32 {
+    public func preloadUintBig(bits: Int) throws -> BigUInt {
         return try reader.preloadUintBig(bits: bits)
     }
     
@@ -146,7 +146,7 @@ public class Slice {
     - parameter bits number of bits to read
     - returns uint value or null
      */
-    public func loadMaybeUint(bits: Int) throws -> UInt32? {
+    public func loadMaybeUint(bits: Int) throws -> UInt64? {
         if try loadBit() {
             return try loadUint(bits: bits)
         } else {
@@ -159,7 +159,7 @@ public class Slice {
     - parameter bits number of bits to read
     - returns uint value or null
      */
-    public func loadMaybeUintBig(bits: Int) throws -> UInt32? {
+    public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
         if try loadBit() {
             return try loadUintBig(bits: bits)
         } else {
@@ -245,7 +245,7 @@ public class Slice {
     - parameter bits: number of bits to read in header
     - returns varuint value
     */
-    func loadVarUint(bits: Int) throws -> UInt32 {
+    func loadVarUint(bits: Int) throws -> UInt64 {
         return try reader.loadVarUint(bits: bits)
     }
     
@@ -263,7 +263,7 @@ public class Slice {
     - parameter bits: number of bits to read in header
     - returns varuint value
     */
-    func preloadVarUint(bits: Int) throws -> UInt32 {
+    func preloadVarUint(bits: Int) throws -> UInt64 {
         return try reader.preloadVarUint(bits: bits)
     }
     

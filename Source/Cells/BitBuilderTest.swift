@@ -10,7 +10,7 @@ final class BitBuilderTest: XCTestCase {
     }
     
     private func testWriteUint() throws {
-        let cases: [(UInt32, Int, String)] = [
+        let cases: [(UInt64, Int, String)] = [
             (10290, 29, "00014194_"),
             (41732, 27, "0014609_"),
             (62757, 22, "03D496_"),

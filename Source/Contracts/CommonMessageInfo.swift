@@ -31,7 +31,7 @@ public struct CommonMessageInfoInternal {
     let value: CurrencyCollection
     let ihrFee: Coins
     let forwardFee: Coins
-    let createdLt: UInt32
+    let createdLt: UInt64
     let createdAt: UInt32
 }
 
@@ -44,7 +44,7 @@ public struct CommonMessageInfoExternalIn {
 public struct CommonMessageInfoExternalOut {
     let src: Address
     let dest: ExternalAddress?
-    let createdLt: UInt32
+    let createdLt: UInt64
     let createdAt: UInt32
 }
 
@@ -56,7 +56,6 @@ public enum CommonMessageInfo: Readable, Writable {
     public static func readFrom(slice: Slice) throws -> CommonMessageInfo {
         // Internal message
         if !(try slice.loadBit()) {
-            print("READING INTERNAL")
             let ihrDisabled = try slice.loadBit()
             let bounce = try slice.loadBit()
             let bounced = try slice.loadBit()
@@ -65,8 +64,8 @@ public enum CommonMessageInfo: Readable, Writable {
             let value = try loadCurrencyCollection(slice: slice)
             let ihrFee = try slice.loadCoins()
             let forwardFee = try slice.loadCoins()
-            let createdLt = try slice.loadUintBig(bits: 64)
-            let createdAt = try slice.loadUint(bits: 32)
+            let createdLt = try slice.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.loadUint(bits: 32))
             
             return CommonMessageInfo.internalInfo(
                 info: .init(
@@ -101,8 +100,8 @@ public enum CommonMessageInfo: Readable, Writable {
             // External Out mesage
             let src = try slice.loadAddress()
             let dest = try slice.loadMaybeExternalAddress()
-            let createdLt = try slice.loadUintBig(bits: 64)
-            let createdAt = try slice.loadUint(bits: 32)
+            let createdLt = try slice.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.loadUint(bits: 32))
             
             return CommonMessageInfo.externalOutInfo(
                 info: .init(
@@ -128,7 +127,7 @@ public enum CommonMessageInfo: Readable, Writable {
             try builder.storeCoins(coins: info.ihrFee)
             try builder.storeCoins(coins: info.forwardFee)
             try builder.storeUint(info.createdLt, bits: 64)
-            try builder.storeUint(info.createdAt, bits: 32)
+            try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
             try builder.storeBit(true)
@@ -136,7 +135,7 @@ public enum CommonMessageInfo: Readable, Writable {
             try builder.storeAddress(address: info.src)
             try builder.storeAddress(address: info.dest)
             try builder.storeUint(info.createdLt, bits: 64)
-            try builder.storeUint(info.createdAt, bits: 32)
+            try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalInInfo(let info):
             try builder.storeBit(true)

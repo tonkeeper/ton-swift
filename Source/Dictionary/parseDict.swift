@@ -1,8 +1,8 @@
 import Foundation
 import BigInt
 
-func readUnaryLength(slice: Slice) throws -> UInt32 {
-    var res: UInt32 = 0
+func readUnaryLength(slice: Slice) throws -> UInt64 {
+    var res: UInt64 = 0
     while try slice.loadBit() {
         res += 1
     }
@@ -10,10 +10,10 @@ func readUnaryLength(slice: Slice) throws -> UInt32 {
     return res
 }
 
-func doParse<V>(prefix: String, slice: Slice, n: UInt32, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
+func doParse<V>(prefix: String, slice: Slice, n: UInt64, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
     // Reading label
     let lb0 = try slice.loadBit() ? 1 : 0
-    var prefixLength: UInt32 = 0
+    var prefixLength: UInt64 = 0
     var pp = prefix
     
     if lb0 == 0 {
@@ -59,7 +59,7 @@ func doParse<V>(prefix: String, slice: Slice, n: UInt32, res: inout [BigInt: V],
     }
 }
 
-func parseDict<V>(sc: Slice?, keySize: UInt32, extractor: @escaping (Slice) throws -> V) throws -> [BigInt: V] {
+func parseDict<V>(sc: Slice?, keySize: UInt64, extractor: @escaping (Slice) throws -> V) throws -> [BigInt: V] {
     var res = [BigInt: V]()
     if let sc = sc {
         try doParse(prefix: "", slice: sc, n: keySize, res: &res, extractor: extractor)

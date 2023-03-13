@@ -100,7 +100,7 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeUint(_ value: UInt32, bits: Int) throws -> Self {
+    public func storeUint(_ value: UInt64, bits: Int) throws -> Self {
         try _bits.writeUint(value: value, bits: bits)
         return self
     }
@@ -122,7 +122,7 @@ public class Builder {
     - returns this builder
     */
     @discardableResult
-    public func storeVarUint(value: UInt32, bits: Int) throws -> Self {
+    public func storeVarUint(value: UInt64, bits: Int) throws -> Self {
         try _bits.writeVarUint(value: value, bits: bits)
         return self
     }
