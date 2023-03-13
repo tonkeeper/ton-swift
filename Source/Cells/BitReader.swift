@@ -281,13 +281,6 @@ class BitReader {
             throw TonError.custom("Invalid address")
         }
     }
-    
-    /**
-     Clone BitReader
-    */
-    func clone() -> BitReader {
-        return BitReader(bits: _bits, offset: _offset)
-    }
 
     // MARK: - Private methods
     
