@@ -29,7 +29,7 @@ class BitBuilder {
         }
         
         if value > 0 {
-            _buffer[_length / 8] |= 1 << (7 - (_length % 8));
+            _buffer[_length / 8] |= 1 << (7 - (_length % 8))
         }
         
         _length += 1
@@ -101,16 +101,10 @@ class BitBuilder {
     - parameter value: value as bigint or number
     - parameter bits: number of bits to write
     */
-    public func writeUint(value: UInt32, bits: Int) throws {
+    public func writeUint(value: UInt64, bits: Int) throws {
         try writeUint(value: BigInt(value), bits: bits)
     }
-    
-    /**
-     Write uint value
-    - parameter value: value as bigint or number
-    - parameter bits: number of bits to write
-    */
-    public func writeUint(value: UInt64, bits: Int) throws {
+    public func writeUint(value: UInt32, bits: Int) throws {
         try writeUint(value: BigInt(value), bits: bits)
     }
     public func writeUint(value: BigUInt, bits: Int) throws {
@@ -156,7 +150,7 @@ class BitBuilder {
         var v = value
         
         // Check input
-        let vBits = (1 << BigInt(bits))
+        let vBits = (BigInt(1) << BigInt(bits))
         if v < 0 || v >= vBits {
             throw TonError.custom("BitLength is too small for a value \(value). Got \(bits)")
         }
@@ -178,6 +172,7 @@ class BitBuilder {
             }
         }
     }
+    
     /**
      Write int value
     - parameter value: value as bigint or number
@@ -188,6 +183,8 @@ class BitBuilder {
         if let value = value as? BigInt {
             v = value
         } else if let value = value as? Int {
+            v = BigInt(value)
+        } else if let value = value as? any BinaryInteger {
             v = BigInt(value)
         } else {
             throw TonError.custom("Invalid value. Got \(value)")
@@ -229,6 +226,14 @@ class BitBuilder {
     }
     
     /**
+     Write coins in var uint format
+     - parameter amount: amount to write
+    */
+    func writeCoins(coins: Coins) throws {
+        try writeVarUint(value: coins.amount, bits: 4)
+    }
+    
+    /**
      Write address
     - parameter address: write address or address external
     */
@@ -251,4 +256,40 @@ class BitBuilder {
             try writeUint(value: BigInt(0), bits: 2)
         }
     }
+    
+    /**
+     Wrtie var uint value, used for serializing coins
+    - parameter value: value to write as bigint or number
+    - parameter bits: header bits to write size
+    */
+    func writeVarUint(value: UInt32, bits: Int) throws {
+        try writeVarUint(value: BigUInt(value), bits: bits)
+    }
+    func writeVarUint(value: BigUInt, bits: Int) throws {
+        let v = BigUInt(value)
+        if bits < 0 {
+            throw TonError.custom("Invalid bit length. Got \(bits)")
+        }
+        if v < 0 {
+            throw TonError.custom("Value is negative. Got \(value)")
+        }
+
+        // Corner case for zero
+        if v == 0 {
+            // Write zero size
+            try writeUint(value: UInt32(0), bits: bits)
+            return
+        }
+
+        // Calculate size
+        let sizeBytes = Int(ceil(Double(v.bitWidth) / 8.0))
+        let sizeBits = sizeBytes * 8
+
+        // Write size
+        try writeUint(value: UInt32(sizeBytes), bits: bits)
+
+        // Write number
+        try writeUint(value: v, bits: sizeBits)
+    }
+
 }

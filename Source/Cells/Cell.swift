@@ -157,6 +157,8 @@ extension Cell: Equatable {
     - returns true if cells are equal
     */
     public static func == (lhs: Cell, rhs: Cell) -> Bool {
+        print("!!!lhs.hash()", lhs.hash().hexString())
+        print("!!!rhs.hash()", rhs.hash().hexString())
         return lhs.hash() == rhs.hash()
     }
 }

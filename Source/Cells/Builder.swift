@@ -116,18 +116,63 @@ public class Builder {
     }
     
     /**
+     Store varuint value
+    - parameter value: value as bigint or number
+    - parameter bits: number of bits to write to header
+    - returns this builder
+    */
+    @discardableResult
+    public func storeVarUint(value: UInt32, bits: Int) throws -> Self {
+        try _bits.writeVarUint(value: value, bits: bits)
+        return self
+    }
+    @discardableResult
+    public func storeVarUint(value: BigUInt, bits: Int) throws -> Self {
+        try _bits.writeVarUint(value: value, bits: bits)
+        return self
+    }
+    
+    /**
      Store address
      - parameter address: address to store
      - returns this builder
      */
     @discardableResult
-    public func storeAddress(address: Address) throws -> Self {
+    public func storeAddress(address: Address?) throws -> Self {
         try _bits.writeAddress(address: address)
         return self
     }
     @discardableResult
-    public func storeAddress(address: ExternalAddress) throws -> Self {
+    public func storeAddress(address: ExternalAddress?) throws -> Self {
         try _bits.writeAddress(address: address)
+        return self
+    }
+    
+    /**
+     * Store coins value
+     * @param amount amount of coins
+     * @returns this builder
+     */
+    @discardableResult
+    public func storeCoins(coins: Coins) throws -> Self {
+        try _bits.writeCoins(coins: coins)
+        return self
+    }
+    
+    /**
+     * Store maybe coins value
+     * @param amount amount of coins, null or undefined
+     * @returns this builder
+     */
+    @discardableResult
+    public func storeMaybeCoins(coins: Coins?) throws -> Self {
+        if let coins {
+            try storeBit(true)
+            try storeCoins(coins: coins)
+        } else {
+            try storeBit(false)
+        }
+        
         return self
     }
     
@@ -191,6 +236,7 @@ public class Builder {
      */
     public func storeSlice(src: Slice) throws {
         let c = src.clone()
+        dump(c)
         if c.remainingBits > 0 {
             try storeBits(c.loadBits(bits: c.remainingBits))
         }
@@ -211,34 +257,6 @@ public class Builder {
         } else {
             try storeBit(false)
         }
-    }
-    
-    /**
-     Store builder
-     - parameter src: builder to store
-     - returns this builder
-     */
-    @discardableResult
-    public func storeBuilder(_ src: Builder) throws -> Self {
-        try storeSlice(src: try src.endCell().beginParse())
-        return self
-    }
-    
-    /**
-     Store builder if not null
-     - parameter src: builder to store
-     - returns this builder
-     */
-    @discardableResult
-    public func storeMaybeBuilder(src: Builder?) throws -> Self {
-        if let src = src {
-            try storeBit(true)
-            try storeBuilder(src)
-        } else {
-            try storeBit(false)
-        }
-        
-        return self
     }
     
     /**
@@ -310,5 +328,12 @@ public class Builder {
     */
     public func asCell() throws -> Cell {
         return try endCell()
+    }
+}
+
+// MARK: - Writable
+extension Builder: Writable {
+    public func writeTo(builder: Builder) throws {
+//        try storeSlice(src: try builder.endCell().beginParse())
     }
 }

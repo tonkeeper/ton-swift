@@ -229,10 +229,74 @@ public class Slice {
     }
     
     /**
-     * Load string tail
-     */
+     Load string tail
+    */
     public func loadStringTail() throws -> String {
         return try readString(slice: self)
+    }
+    
+    /**
+     Load varuint
+    - parameter bits: number of bits to read in header
+    - returns varuint value
+    */
+    func loadVarUint(bits: Int) throws -> UInt32 {
+        return try reader.loadVarUint(bits: bits)
+    }
+    
+    /**
+     Load varuint
+    - parameter bits: number of bits to read in header
+    - returns varuint value
+    */
+    func loadVarUintBig(bits: Int) throws -> BigUInt {
+        return try reader.loadVarUintBig(bits: bits)
+    }
+    
+    /**
+     Preload varuint
+    - parameter bits: number of bits to read in header
+    - returns varuint value
+    */
+    func preloadVarUint(bits: Int) throws -> UInt32 {
+        return try reader.preloadVarUint(bits: bits)
+    }
+    
+    /**
+     Preload varuint
+    - parameter bits: number of bits to read in header
+    - returns varuint value
+    */
+    func preloadVarUintBig(bits: Int) throws -> BigUInt {
+        return try reader.preloadVarUintBig(bits: bits)
+    }
+    
+    /**
+     Load coins
+    - returns coins value
+    */
+    public func loadCoins() throws -> Coins {
+        return try reader.loadCoins()
+    }
+    
+    /**
+     Preload coins
+    - returns coins value
+    */
+    public func preloadCoins() throws -> Coins {
+        return try reader.preloadCoins()
+    }
+    
+    /**
+     Load maybe coins
+    - returns coins value or null
+    */
+    public func loadMaybeCoins() throws -> Coins? {
+        if try reader.loadBit() {
+            return try loadCoins()
+        }
+        
+        return nil
     }
     
     /**
@@ -249,6 +313,22 @@ public class Slice {
     */
     public func loadMaybeAddress() throws -> Address? {
         return try reader.loadMaybeAddress()
+    }
+    
+    /**
+     * Load external address
+     * @returns ExternalAddress
+     */
+    public func loadExternalAddress() throws -> ExternalAddress {
+        return try reader.loadExternalAddress()
+    }
+    
+    /**
+     * Load optional external address
+     * @returns ExternalAddress or null
+     */
+    public func loadMaybeExternalAddress() throws -> ExternalAddress? {
+        return try reader.loadMaybeExternalAddress()
     }
     
     /**

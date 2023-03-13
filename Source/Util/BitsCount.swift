@@ -2,8 +2,8 @@ import Foundation
 import BigInt
 
 public enum BitsMode {
-    case int;
-    case uint;
+    case int
+    case uint
 }
 
 extension BigInt {
@@ -15,15 +15,15 @@ extension BigInt {
             if v == 0 || v == -1 {
                 return 1
             }
-
+            
             let v2 = v > 0 ? v : -v
-            return (String(v2, radix: 2).count + 1) // Sign bit
+            return v2.bitWidth + 1 // Sign bit
         case .uint:
             if v < 0 {
                 throw TonError.custom("Value is negative. Got \(self)")
             }
             
-            return (String(v, radix: 2).count)
+            return v.bitWidth
         }
     }
 }

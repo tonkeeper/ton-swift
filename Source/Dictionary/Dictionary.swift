@@ -52,6 +52,10 @@ public enum DictionaryValues {
         return createBigUintValue(bits: bits)
     }
     
+    public static func BigVarUint(bits: Int) -> DictionaryValue {
+        return createBigVarUintValue(bits: bits)
+    }
+    
     public static func Uint(bits: Int) -> DictionaryValue {
         return createUintValue(bits: bits)
     }
@@ -291,6 +295,10 @@ public func createUintValue(bits: Int) -> DictionaryUIntValue {
 
 public func createBigUintValue(bits: Int) -> DictionaryBigUIntValue {
     return DictionaryBigUIntValue(bits: bits)
+}
+
+public func createBigVarUintValue(bits: Int) -> DictionaryBigVarUIntValue {
+    return DictionaryBigVarUIntValue(bits: bits)
 }
 
 public func createBooleanValue() -> DictionaryBoolValue {

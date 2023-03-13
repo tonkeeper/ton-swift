@@ -167,6 +167,62 @@ class BitReader {
     }
     
     /**
+     Load varuint value
+    - parameter bits: number of bits to read the size
+    - returns read value as bigint
+    */
+    func loadVarUint(bits: Int) throws -> UInt32 {
+        let size = Int(try loadUint(bits: bits))
+        return try loadUintBig(bits: size * 8)
+    }
+
+    /**
+     Load varuint value
+    - parameter bits: number of bits to read the size
+    - returns read value as bigint
+    */
+    func loadVarUintBig(bits: Int) throws -> BigUInt {
+        let size = Int(try loadUint(bits: bits))
+        return BigUInt(try loadUintBig(bits: size * 8))
+    }
+
+    /**
+     Preload varuint value
+    - parameter bits: number of bits to read the size
+    - returns read value as bigint
+    */
+    func preloadVarUint(bits: Int) throws -> UInt32 {
+        let size = Int(try _preloadUint(bits: bits, offset: _offset))
+        return try _preloadUint(bits: size * 8, offset: _offset + bits)
+    }
+
+    /**
+     Preload varuint value
+    - parameter bits: number of bits to read the size
+    - returns read value as bigint
+    */
+    func preloadVarUintBig(bits: Int) throws -> BigUInt {
+        let size = Int(try _preloadUint(bits: bits, offset: _offset))
+        return BigUInt(try _preloadUint(bits: size * 8, offset: _offset + bits))
+    }
+    
+    /**
+     Load coins value
+    - returns read value as bigint
+    */
+    func loadCoins() throws -> Coins {
+        return Coins(amount: try loadVarUintBig(bits: 4))
+    }
+    
+    /**
+     Preload coins value
+    - returns read value as bigint
+    */
+    func preloadCoins() throws -> Coins {
+        return Coins(amount: try preloadVarUintBig(bits: 4))
+    }
+    
+    /**
      Load Address
     - returns Address
     */
@@ -181,7 +237,7 @@ class BitReader {
     
     /**
      Load internal address
-    - returns Address or null
+    - returns Address or nil
     */
     func loadMaybeAddress() throws -> Address? {
         let type = try _preloadUint(bits: 2, offset: _offset)
@@ -196,6 +252,42 @@ class BitReader {
         }
     }
     
+    /**
+     Load external address
+    - returns ExternalAddress
+    */
+    func loadExternalAddress() throws -> ExternalAddress {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type == 1 {
+            return try _loadExternalAddress()
+        } else {
+            throw TonError.custom("Invalid address")
+        }
+    }
+    
+    /**
+     Load external address
+    - returns ExternalAddress or nil
+    */
+    func loadMaybeExternalAddress() throws -> ExternalAddress? {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type == 0 {
+            _offset += 2;
+            return nil
+            
+        } else if type == 1 {
+            return try _loadExternalAddress()
+        } else {
+            throw TonError.custom("Invalid address")
+        }
+    }
+    
+    /**
+     Clone BitReader
+    */
+    func clone() -> BitReader {
+        return BitReader(bits: _bits, offset: _offset)
+    }
 
     // MARK: - Private methods
     
@@ -290,5 +382,22 @@ class BitReader {
 
         return Address(workchain: wc, hash: hash)
     }
-
+    
+    private func _loadExternalAddress() throws -> ExternalAddress {
+        let type = try _preloadUint(bits: 2, offset: _offset)
+        if type != 1 {
+            throw TonError.custom("Invalid address")
+        }
+        
+        // Load length
+        let bits = Int(try _preloadUint(bits: 9, offset: _offset + 2))
+        
+        // Load address
+        let value = BigInt(try _preloadUint(bits: bits, offset: _offset + 11))
+        
+        // Update offset
+        _offset += 11 + bits
+        
+        return ExternalAddress(value: value, bits: bits)
+    }
 }
