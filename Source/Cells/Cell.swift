@@ -259,7 +259,7 @@ fileprivate struct BasicCell: Hashable {
                 if !(levelI != 0 && type != .prunedBranch) {
                     throw TonError.custom("Invalid: \(levelI), \(type)")
                 }
-                currentBits = BitString(data: hashes[Int(hashI - hashIOffset) - 1], offset: 0, length: 256)
+                currentBits = BitString(data: hashes[Int(hashI - hashIOffset) - 1], unchecked: (offset: 0, length: 256))
             }
             
             // Depth

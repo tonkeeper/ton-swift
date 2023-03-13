@@ -6,7 +6,7 @@ final class CellTest: XCTestCase {
         // should construct
         let cell = try Cell()
         XCTAssertEqual(cell.type, CellType.ordinary)
-        XCTAssertEqual(cell.bits, BitString(data: .init(), offset: 0, length: 0))
+        XCTAssertEqual(cell.bits, BitString(data: .init(), unchecked:(offset: 0, length: 0)))
         XCTAssertEqual(cell.refs, [])
     }
     

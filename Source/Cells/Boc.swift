@@ -19,7 +19,7 @@ struct Boc {
     let rootIndices: [UInt32]
     
     init(data: Data) throws {
-        let reader = BitReader(bits: BitString(data: data, offset: 0, length: data.count * 8))
+        let reader = BitReader(bits: BitString(data: data, unchecked:(offset: 0, length: data.count * 8)))
         guard let magic = BocMagic(rawValue: try reader.loadUint(bits: 32)) else {
             throw TonError.custom("Invalid magic")
         }
@@ -120,7 +120,7 @@ func calcCellSize(cell: Cell, sizeBytes: Int) -> Int {
 
 func deserializeBoc(src: Data) throws -> [Cell] {
     let boc = try Boc(data: src)
-    let reader = BitReader(bits: BitString(data: boc.cellData, offset: 0, length: boc.cellData.count * 8))
+    let reader = BitReader(bits: BitString(data: boc.cellData, unchecked:(offset: 0, length: boc.cellData.count * 8)))
     
     var cells: [(bits: BitString, refs: [UInt32], exotic: Bool, result: Cell?)] = []
     for _ in 0..<boc.cells {
