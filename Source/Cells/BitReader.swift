@@ -4,24 +4,22 @@ import BigInt
 class BitReader {
     private var _bits: BitString
     private var _offset: Int
-    private var _checkpoints: [Int] = []
-    
-    /**
-     Number of bits remaining
-    */
-    public var remaining: Int { _bits.length - _offset }
     
     public init(bits: BitString, offset: Int = 0) {
         _bits = bits
         _offset = offset
     }
 
+    /// Number of bits remaining
+    public var remaining: Int { _bits.length - _offset }
+
+    func clone() -> BitReader {
+        return BitReader(bits: _bits, offset: _offset)
+    }
+
     // MARK: - Public methods
     
-    /**
-     Skip bits
-     - parameter bits: number of bits to skip
-     */
+    /// Advances cursor by the specified numbe rof bits.
     public func skip(_ bits: Int) throws {
         if bits < 0 || _offset + bits > _bits.length {
             throw TonError.custom("Index \(_offset + bits) is out of bounds")
@@ -30,25 +28,7 @@ class BitReader {
         _offset += bits
     }
 
-    /**
-     Reset to the beginning or latest checkpoint
-    */
-    public func reset() {
-        _offset = _checkpoints.count > 0 ? _checkpoints.popLast()! : 0
-    }
-
-    /**
-     Save checkpoint
-    */
-    public func save() {
-        _checkpoints.append(_offset)
-    }
-
-    /**
-     Load a single bit
-     
-    - returns true if the bit is set, false otherwise
-    */
+    /// Load a single bit.
     public func loadBit() throws -> Bool {
         let r = try _bits.at(index: _offset)
         _offset += 1
@@ -56,19 +36,12 @@ class BitReader {
         return r
     }
 
-    /**
-     Preload bit
-    - returns true if the bit is set, false otherwise
-    */
+    /// Preload a single bit without advancing the cursor.
     public func preloadBit() throws -> Bool {
         return try _bits.at(index: _offset)
     }
 
-    /**
-     Load bit string
-    - parameter bits: number of bits to read
-    - returns new bitstring
-    */
+    /// Loads the specified number of bits in a `BitString`.
     public func loadBits(_ bits: Int) throws -> BitString {
         let r = try _bits.substring(offset: _offset, length: bits)
         _offset += bits
@@ -76,11 +49,7 @@ class BitReader {
         return r
     }
 
-    /**
-     Preload bit string
-     - parameter bits: number of bits to read
-     - returns new bitstring
-    */
+    /// Preloads the specified number of bits in a `BitString` without advancing the cursor.
     public func preloadBits(_ bits: Int) throws -> BitString {
         return try _bits.substring(offset: _offset, length: bits)
     }
@@ -227,12 +196,6 @@ class BitReader {
         }
     }
     
-    /**
-     Clone BitReader
-    */
-    func clone() -> BitReader {
-        return BitReader(bits: _bits, offset: _offset)
-    }
 
     // MARK: - Private methods
     

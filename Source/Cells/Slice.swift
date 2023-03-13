@@ -36,34 +36,21 @@ public class Slice {
         return self
     }
     
-    /**
-     Load a single bit
-    - returns true or false depending on the bit value
-    */
+    /// Loads a single bit.
     public func loadBit() throws -> Bool {
         return try reader.loadBit()
     }
     
-    /**
-     Preload a signle bit
-    - returns true or false depending on the bit value
-    */
+    /// Preloads a single bit without advancing the cursor.
     public func preloadBit() throws -> Bool {
         return try reader.preloadBit()
     }
     
-    /**
-     Load a boolean
-    - returns true or false depending on the bit value
-    */
     public func loadBoolean() throws -> Bool {
         return try loadBit()
     }
     
-    /**
-     Load optional reference
-     - returns: Cell or nil
-     */
+    /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
         if try loadBit() {
             return try closure(self)
@@ -71,11 +58,8 @@ public class Slice {
             return nil
         }
     }
-    
-    /**
-     Load maybe boolean
-    - returns true or false depending on the bit value or null
-    */
+
+    /// Loads an optional boolean.
     public func loadMaybeBoolean() throws -> Bool? {
         if try loadBit() {
             return try loadBoolean()
@@ -84,11 +68,7 @@ public class Slice {
         }
     }
     
-    /**
-     Load bits as a new BitString
-    - parameter bits: number of bits to read
-    - returns new BitString
-    */
+    /// Load the number of bits as a new BitString.
     public func loadBits(bits: Int) throws -> BitString {
         return try reader.loadBits(bits)
     }
