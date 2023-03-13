@@ -2,7 +2,7 @@ import Foundation
 
 public struct BitString: Hashable {
     
-    static let empty = BitString(data: .init(), offset: 0, length: 0)
+    public static let empty = BitString(data: .init(), offset: 0, length: 0)
     
     private let _offset: Int
     private let _length: Int

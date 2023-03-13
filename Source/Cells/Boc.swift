@@ -1,83 +1,79 @@
 import Foundation
 
+enum BocMagic: UInt32 {
+    case V1 = 0x68ff65f3
+    case V2 = 0xacc3a728
+    case V3 = 0xb5ee9c72
+}
+
 /// BoC = Bag-of-Cells, data structure for efficient storage and transmission of a collection of cells.
 struct Boc {
     let size: Int
     let offBytes: Int
     let cells: Int
-    let roots: UInt32
+    let rootsCount: UInt32
     let absent: UInt32
     let totalCellSize: Int
     let index: Data?
     let cellData: Data
-    let root: [UInt32]
+    let rootIndices: [UInt32]
     
     init(data: Data) throws {
         let reader = BitReader(bits: BitString(data: data, offset: 0, length: data.count * 8))
-        let magic = try reader.loadUint(bits: 32)
-        if magic == 0x68ff65f3 {
-            size = Int(try reader.loadUint(bits: 8))
-            offBytes = Int(try reader.loadUint(bits: 8))
-            cells = Int(try reader.loadUint(bits: size * 8))
-            roots = try reader.loadUint(bits: size * 8) // Must be 1
-            absent = try reader.loadUint(bits: size * 8)
-            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-            index = try reader.loadBuffer(bytes: cells * offBytes)
-            cellData = try reader.loadBuffer(bytes: totalCellSize)
-            root = [0]
-            
-        } else if magic == 0xacc3a728 {
-            size = Int(try reader.loadUint(bits: 8))
-            offBytes = Int(try reader.loadUint(bits: 8))
-            cells = Int(try reader.loadUint(bits: size * 8))
-            roots = try reader.loadUint(bits: size * 8) // Must be 1
-            absent = try reader.loadUint(bits: size * 8)
-            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-            index = try reader.loadBuffer(bytes: cells * offBytes)
-            cellData = try reader.loadBuffer(bytes: totalCellSize)
-            let crc32 = try reader.loadBuffer(bytes: 4)
-            
-            if data.subdata(in: 0..<data.count-4).crc32c() != crc32 {
-                throw TonError.custom("Invalid CRC32C")
-            }
-            root = [0]
-            
-        } else if magic == 0xb5ee9c72 {
-            let hasIdx = try reader.loadUint(bits: 1) == 1
-            let hasCrc32c = try reader.loadUint(bits: 1) == 1
-            let _/*hasCacheBits*/ = try reader.loadUint(bits: 1) == 1
-            let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
-            size = Int(try reader.loadUint(bits: 3))
-            offBytes = Int(try reader.loadUint(bits: 8))
-            cells = Int(try reader.loadUint(bits: size * 8))
-            roots = try reader.loadUint(bits: size * 8)
-            absent = try reader.loadUint(bits: size * 8)
-            totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-            var root: [UInt32] = []
-            
-            for _ in 0..<roots {
-                root.append(try reader.loadUint(bits: size * 8))
-            }
-            
-            self.root = root
-            
-            if hasIdx {
-                index = try reader.loadBuffer(bytes: cells * offBytes)
-            } else {
-                index = nil
-            }
-            
-            cellData = try reader.loadBuffer(bytes: totalCellSize)
-            if hasCrc32c {
-                let crc32 = try reader.loadBuffer(bytes: 4)
-                
-                if data.subdata(in: 0..<(data.count - 4)).crc32c() != crc32 {
-                    throw TonError.custom("Invalid CRC32C")
-                }
-            }
-
-        } else {
+        guard let magic = BocMagic(rawValue: try reader.loadUint(bits: 32)) else {
             throw TonError.custom("Invalid magic")
+        }
+        switch magic {
+            case .V1, .V2:
+                size = Int(try reader.loadUint(bits: 8))
+                offBytes = Int(try reader.loadUint(bits: 8))
+                cells = Int(try reader.loadUint(bits: size * 8))
+                rootsCount = try reader.loadUint(bits: size * 8) // Must be 1
+                absent = try reader.loadUint(bits: size * 8)
+                totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
+                index = try reader.loadBuffer(bytes: cells * offBytes)
+                cellData = try reader.loadBuffer(bytes: totalCellSize)
+                rootIndices = [0]
+            
+                if magic == BocMagic.V2 {
+                    let crc32 = try reader.loadBuffer(bytes: 4)
+                    if data.subdata(in: 0..<data.count-4).crc32c() != crc32 {
+                        throw TonError.custom("Invalid CRC32C")
+                    }
+                }
+            case .V3:
+                let hasIdx = try reader.loadBit()
+                let hasCrc32c = try reader.loadBit()
+                let _/*hasCacheBits*/ = try reader.loadBit()
+                let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
+                size = Int(try reader.loadUint(bits: 3))
+                offBytes = Int(try reader.loadUint(bits: 8))
+                cells = Int(try reader.loadUint(bits: size * 8))
+                rootsCount = try reader.loadUint(bits: size * 8)
+                absent = try reader.loadUint(bits: size * 8)
+                totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
+                var rootIndices: [UInt32] = []
+                
+                for _ in 0..<rootsCount {
+                    rootIndices.append(try reader.loadUint(bits: size * 8))
+                }
+                
+                self.rootIndices = rootIndices
+                
+                if hasIdx {
+                    index = try reader.loadBuffer(bytes: cells * offBytes)
+                } else {
+                    index = nil
+                }
+                
+                cellData = try reader.loadBuffer(bytes: totalCellSize)
+                if hasCrc32c {
+                    let crc32 = try reader.loadBuffer(bytes: 4)
+                    
+                    if data.subdata(in: 0..<(data.count - 4)).crc32c() != crc32 {
+                        throw TonError.custom("Invalid CRC32C")
+                    }
+                }
         }
     }
 }
@@ -150,8 +146,8 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     }
 
     var roots: [Cell] = []
-    for i in 0..<boc.root.count {
-        roots.append(cells[Int(boc.root[i])].result!)
+    for i in 0..<boc.rootIndices.count {
+        roots.append(cells[Int(boc.rootIndices[i])].result!)
     }
 
     return roots
