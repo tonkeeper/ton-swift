@@ -21,7 +21,7 @@ final class DictionaryTest: XCTestCase {
             .storeRef(cell: try storeBits(builder: Builder(), src: "1011111011111101111100100001"))
             .endCell()
         
-        let dict: Dictionary<UInt32, UInt32> = try Dictionary.load(
+        let dict: Dictionary<UInt64, UInt64> = try Dictionary.load(
             key: DictionaryKeys.Uint(bits: 16),
             value: DictionaryValues.Uint(bits: 16),
             sc: try root.beginParse()
@@ -30,7 +30,7 @@ final class DictionaryTest: XCTestCase {
         XCTAssertEqual(try dict.get(key: 17), 289)
         XCTAssertEqual(try dict.get(key: 239), 57121)
         
-        let fromEmpty = Dictionary<UInt32, UInt32>.empty()
+        let fromEmpty = Dictionary<UInt64, UInt64>.empty()
         try fromEmpty.set(key: 13, value: 169)
         try fromEmpty.set(key: 17, value: 289)
         try fromEmpty.set(key: 239, value: 57121)

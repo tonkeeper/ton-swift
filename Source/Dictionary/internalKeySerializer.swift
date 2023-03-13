@@ -4,6 +4,8 @@ import BigInt
 func serializeInternalKey(value: Any) throws -> String {
     if let value = value as? UInt32 {
         return "u:\(value)"
+    } else if let value = value as? UInt64 {
+        return "u:\(value)"
     } else if let value = value as? Int {
         return "n:\(value)"
     } else if let value = value as? BigInt {
