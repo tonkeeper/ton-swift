@@ -129,8 +129,7 @@ public struct Cell: Hashable {
     - parameter indent: indentation
     - returns string representation
     */
-    public func toString(indent: String? = nil) throws -> String {
-        let id = indent ?? ""
+    public func toString(indent: String = "") throws -> String {
         var t = "x"
         if isExotic {
             switch type {
@@ -144,7 +143,7 @@ public struct Cell: Hashable {
                 break
             }
         }
-        var s = id + (isExotic ? t : "x") + "{" + (try bits.toString()) + "}"
+        var s = indent + (isExotic ? t : "x") + "{" + (try bits.toString()) + "}"
         for i in refs {
             s += "\n" + (try i.toString(indent: id + " "))
         }
