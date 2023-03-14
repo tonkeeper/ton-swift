@@ -64,24 +64,16 @@ public class BitReader {
         return try _bits.substring(offset: _offset, length: bits)
     }
 
-    /**
-     Load buffer
-     - parameter bytes: number of bytes
-     - returns new buffer
-    */
-    public func loadBuffer(bytes: Int) throws -> Data {
+    /// Loads whole number of bytes and returns standard `Data` object.
+    public func loadBytes(_ bytes: Int) throws -> Data {
         let buf = try _preloadBuffer(bytes: bytes, offset: _offset)
         _offset += bytes * 8
         
         return buf
     }
 
-    /**
-     Preload buffer
-    - parameter bytes: number of bytes
-    - returns new buffer
-    */
-    public func preloadBuffer(bytes: Int) throws -> Data {
+    /// Preloads whole number of bytes and returns standard `Data` object without advancing the cursor.
+    public func preloadBytes(_ bytes: Int) throws -> Data {
         return try _preloadBuffer(bytes: bytes, offset: _offset)
     }
 

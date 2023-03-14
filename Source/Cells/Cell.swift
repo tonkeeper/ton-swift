@@ -404,7 +404,7 @@ func exoticPruned(bits: BitString, refs: [Cell]) throws -> ExoticPruned {
     var hashes: [Data] = []
     var depths: [UInt32] = []
     for _ in 0..<mask.level {
-        let hash = try reader.loadBuffer(bytes: 32)
+        let hash = try reader.loadBytes(32)
         let depth = UInt32(try reader.loadUint(bits: 16))
         
         hashes.append(hash)
@@ -466,8 +466,8 @@ func exoticMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (proofDepth1: U
         throw TonError.custom("Merkle Update cell type must be exactly 4, got \(type)")
     }
 
-    let proofHash1 = try reader.loadBuffer(bytes: 32)
-    let proofHash2 = try reader.loadBuffer(bytes: 32)
+    let proofHash1 = try reader.loadBytes(32)
+    let proofHash2 = try reader.loadBytes(32)
     let proofDepth1 = UInt32(try reader.loadUint(bits: 16))
     let proofDepth2 = UInt32(try reader.loadUint(bits: 16))
 
@@ -511,7 +511,7 @@ func exoticMerkleProof(bits: BitString, refs: [Cell]) throws -> (proofDepth: UIn
     }
 
     // Check data
-    let proofHash = try reader.loadBuffer(bytes: 32)
+    let proofHash = try reader.loadBytes(32)
     let proofDepth = UInt32(try reader.loadUint(bits: 16))
     let refHash = refs[0].hash(level: 0)
     let refDepth = refs[0].depth(level: 0)

@@ -25,7 +25,7 @@ func readSnakeData(slice: Slice) throws -> Data {
     if slice.remainingBits == 0 {
         res = Data()
     } else {
-        res = try slice.bits.loadBuffer(bytes: slice.remainingBits / 8)
+        res = try slice.bits.loadBytes(slice.remainingBits / 8)
     }
 
     // Read tail

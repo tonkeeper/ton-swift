@@ -31,12 +31,12 @@ struct Boc {
                 rootsCount = try reader.loadUint(bits: size * 8) // Must be 1
                 absent = try reader.loadUint(bits: size * 8)
                 totalCellSize = Int(try reader.loadUint(bits: offBytes * 8))
-                index = try reader.loadBuffer(bytes: cells * offBytes)
-                cellData = try reader.loadBuffer(bytes: totalCellSize)
+                index = try reader.loadBytes(cells * offBytes)
+                cellData = try reader.loadBytes(totalCellSize)
                 rootIndices = [0]
             
                 if magic == BocMagic.V2 {
-                    let crc32 = try reader.loadBuffer(bytes: 4)
+                    let crc32 = try reader.loadBytes(4)
                     if data.subdata(in: 0..<data.count-4).crc32c() != crc32 {
                         throw TonError.custom("Invalid CRC32C")
                     }
@@ -61,14 +61,14 @@ struct Boc {
                 self.rootIndices = rootIndices
                 
                 if hasIdx {
-                    index = try reader.loadBuffer(bytes: cells * offBytes)
+                    index = try reader.loadBytes(cells * offBytes)
                 } else {
                     index = nil
                 }
                 
-                cellData = try reader.loadBuffer(bytes: totalCellSize)
+                cellData = try reader.loadBytes(totalCellSize)
                 if hasCrc32c {
-                    let crc32 = try reader.loadBuffer(bytes: 4)
+                    let crc32 = try reader.loadBytes(4)
                     
                     if data.subdata(in: 0..<(data.count - 4)).crc32c() != crc32 {
                         throw TonError.custom("Invalid CRC32C")

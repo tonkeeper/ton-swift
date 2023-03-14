@@ -20,6 +20,6 @@ public struct DictionaryBufferValue: DictionaryValue {
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.bits.loadBuffer(bytes: size)
+        return try src.bits.loadBytes(size)
     }
 }
