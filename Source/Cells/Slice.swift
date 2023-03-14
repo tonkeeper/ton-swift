@@ -13,24 +13,17 @@ public class Slice {
         self.refs = refs
     }
     
-    /**
-     Get remaining bits
-    */
+    /// Remaining unread bits in this slice
     public var remainingBits: Int {
         return reader.remaining
     }
     
-    /**
-     Get remaining refs
-    */
+    /// Remaining unread refs in this slice
     public var remainingRefs: Int {
         return refs.count
     }
     
-    /**
-     Skip bits
-    - parameter bits
-    */
+    /// Skips the number of bits.
     public func skip(bits: Int) throws -> Slice {
         try reader.skip(bits)
         return self
@@ -62,6 +55,17 @@ public class Slice {
         } else {
             return nil
         }
+    }
+    
+    /// Lets you attempt to read a complex data type.
+    /// If parsing succeeded, the slice is advanced.
+    /// If parsing failed, the slice remains unchanged.
+    public func tryLoad<T>(_ closure: (Slice) throws -> T) throws -> T {
+        let tmpslice = self.clone();
+        let result = try closure(tmpslice);
+        self.reader = tmpslice.reader;
+        self.refs = tmpslice.refs;
+        return result;
     }
 
     /// Loads an optional boolean.
