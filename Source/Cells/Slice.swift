@@ -14,7 +14,7 @@ public class Slice {
     }
 
     fileprivate init(reader: BitReader, refs: [Cell]) {
-        self.reader = reader.clone()
+        self.reader = reader
         self.refs = refs
     }
     
@@ -400,7 +400,7 @@ public class Slice {
     - returns cloned slice
     */
     public func clone() -> Slice {
-        return Slice(reader: reader, refs: refs)
+        return Slice(reader: reader.clone(), refs: refs)
     }
     
     /**
