@@ -110,7 +110,7 @@ public struct Cell: Hashable {
             throw TonError.custom("Exotic cells cannot be parsed");
         }
         
-        return Slice(reader: BitReader(bits: bits), refs: refs)
+        return Slice(cell: self)
     }
     
     /**

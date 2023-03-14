@@ -8,7 +8,12 @@ public class Slice {
     private var reader: BitReader
     private var refs: [Cell]
     
-    init(reader: BitReader, refs: [Cell]) {
+    init(cell: Cell) {
+        reader = BitReader(bits: cell.bits)
+        refs = cell.refs
+    }
+
+    fileprivate init(reader: BitReader, refs: [Cell]) {
         self.reader = reader.clone()
         self.refs = refs
     }
