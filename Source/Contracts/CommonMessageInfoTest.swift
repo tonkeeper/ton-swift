@@ -13,7 +13,7 @@ final class CommonMessageInfoTest: XCTestCase {
         )
         
         let cell1 = try Builder().store(msg1).endCell()
-        let msg2: CommonMessageInfo = try cell1.beginParse().loadType();
+        let msg2: CommonMessageInfo = try cell1.beginParse().loadType()
         let cell2 = try Builder().store(msg2).endCell()
         XCTAssertEqual(cell1, cell2)
     }

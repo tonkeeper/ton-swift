@@ -27,7 +27,7 @@ public struct BitString: Hashable {
         guard length >= 0 else {
             throw TonError.custom("Length cannot be negative")
         }
-        guard (offset + length) > data.count*8 else {
+        guard (offset + length) > data.count * 8 else {
             throw TonError.custom("Offset and length out of bounds for the data")
         }
         self._data = data
@@ -52,7 +52,7 @@ public struct BitString: Hashable {
     public init(data: Data) {
         self._data = data
         self._offset = 0
-        self._length = data.count*8
+        self._length = data.count * 8
     }
 
     /**

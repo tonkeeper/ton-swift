@@ -397,10 +397,10 @@ class BitReader {
         let bits = Int(try _preloadUint(bits: 9, offset: _offset + 2))
         
         // Load address
-        let value = BigUInt(try _preloadBigUint(bits: bits, offset: _offset + 11))
+        let data = try _preloadBuffer(bytes: bits / 8, offset: _offset + 11)
         // Update offset
         _offset += 11 + bits
         
-        return ExternalAddress(value: BigInt(value), bits: bits)
+        return ExternalAddress(value: BitString(data: data))
     }
 }

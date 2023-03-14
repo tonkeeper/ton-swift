@@ -250,8 +250,8 @@ class BitBuilder {
     func writeAddress(address: ExternalAddress?) throws {
         if let address = address {
             try writeUint(value: BigInt(1), bits: 2)
-            try writeUint(value: BigInt(address.bits), bits: 9)
-            try writeUint(value: BigInt(address.value), bits: address.bits)
+            try writeUint(value: BigInt(address.value.length), bits: 9)
+            try writeBits(src: address.value)
         } else {
             try writeUint(value: BigInt(0), bits: 2)
         }
