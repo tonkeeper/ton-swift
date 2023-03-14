@@ -2,9 +2,7 @@ import Foundation
 import BigInt
 
 func serializeInternalKey(value: Any) throws -> String {
-    if let value = value as? UInt32 {
-        return "u:\(value)"
-    } else if let value = value as? UInt64 {
+    if let value = value as? UInt64 {
         return "u:\(value)"
     } else if let value = value as? Int {
         return "n:\(value)"
@@ -31,7 +29,7 @@ func deserializeInternalKey(value: String) throws -> any Hashable {
         }
 
     } else if k == "u:" {
-        if let uintValue = UInt32(v) {
+        if let uintValue = UInt64(v) {
             return uintValue
         }
         
