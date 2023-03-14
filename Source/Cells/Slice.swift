@@ -13,6 +13,7 @@ public class Slice {
         refs = cell.refs
     }
 
+    /// Unchecked initializer for cloning
     fileprivate init(reader: BitReader, refs: [Cell]) {
         self.reader = reader
         self.refs = refs
