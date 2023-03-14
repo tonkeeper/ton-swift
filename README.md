@@ -11,7 +11,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] Cells
 - [x] Contract
 - [x] StateInit
-- [ ] CommonMsgInfo
+- [x] CommonMsgInfo
 - [x] Send Flags
 - [ ] Signatures
 - [ ] Wallet V3R1, V3R2
