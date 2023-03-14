@@ -17,6 +17,6 @@ public struct DictionaryBigUIntValue: DictionaryValue {
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.loadUintBig(bits: bits)
+        return try src.bits.loadUintBig(bits: bits)
     }
 }

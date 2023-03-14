@@ -18,7 +18,7 @@ public struct DictionaryKeyBigUInt: DictionaryKey {
                 .storeInt(src, bits: bits)
                 .endCell()
                 .beginParse()
-                .loadUintBig(bits: bits)
+                .bits.loadUintBig(bits: bits)
         )
     }
 
@@ -27,6 +27,6 @@ public struct DictionaryKeyBigUInt: DictionaryKey {
             .storeUint(src, bits: bits)
             .endCell()
             .beginParse()
-            .loadIntBig(bits: bits)
+            .bits.loadIntBig(bits: bits)
     }
 }

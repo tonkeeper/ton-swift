@@ -13,7 +13,7 @@ public struct DictionaryKeyAddress: DictionaryKey {
             try Builder()
                 .storeAddress(address: src)
                 .endCell().beginParse()
-                .preloadUintBig(bits: bits)
+                .bits.preloadUintBig(bits: bits)
         )
     }
 

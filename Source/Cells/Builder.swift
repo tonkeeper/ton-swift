@@ -5,6 +5,8 @@ public class Builder {
     private var _bits: BitBuilder
     private var _refs: [Cell]
     
+    // TBD: public var bits: BitBuilder { get { return self._bits } }
+    
     public init() {
         _bits = BitBuilder()
         _refs = []
@@ -236,11 +238,9 @@ public class Builder {
      */
     public func storeSlice(src: Slice) throws {
         let c = src.clone()
-        dump(c)
         if c.remainingBits > 0 {
-            try storeBits(c.loadBits(bits: c.remainingBits))
+            try storeBits(c.bits.loadBits(c.remainingBits))
         }
-        
         while c.remainingRefs > 0 {
             try storeRef(cell: c.loadRef())
         }

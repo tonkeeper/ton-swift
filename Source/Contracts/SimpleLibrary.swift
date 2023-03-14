@@ -10,7 +10,7 @@ public struct SimpleLibrary: Hashable {
 
 public func loadSimpleLibrary(slice: Slice) throws -> SimpleLibrary {
     return SimpleLibrary(
-        public: try slice.loadBit(),
+        public: try slice.bits.loadBit(),
         root: try slice.loadRef()
     )
 }

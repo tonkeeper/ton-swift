@@ -1,7 +1,8 @@
 import Foundation
 import BigInt
 
-class BitBuilder {
+/// Interface for writing bits to a BitString.
+public class BitBuilder {
     private var _buffer: Data
     private var _length: Int
     

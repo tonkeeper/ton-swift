@@ -1,11 +1,17 @@
 import Foundation
 import BigInt
 
-class BitReader {
+/// Interface for reading bits from the Cell
+public class BitReader {
     private var _bits: BitString
     private var _offset: Int
     
-    public init(bits: BitString, offset: Int = 0) {
+    public init(bits: BitString) {
+        _bits = bits
+        _offset = 0
+    }
+    
+    private init(bits: BitString, offset: Int = 0) {
         _bits = bits
         _offset = offset
     }
@@ -13,6 +19,7 @@ class BitReader {
     /// Number of bits remaining
     public var remaining: Int { _bits.length - _offset }
 
+    /// Makes a copy of the BitReader at its current state.
     func clone() -> BitReader {
         return BitReader(bits: _bits, offset: _offset)
     }
@@ -24,7 +31,6 @@ class BitReader {
         if bits < 0 || _offset + bits > _bits.length {
             throw TonError.custom("Index \(_offset + bits) is out of bounds")
         }
-        
         _offset += bits
     }
 
@@ -32,8 +38,12 @@ class BitReader {
     public func loadBit() throws -> Bool {
         let r = try _bits.at(index: _offset)
         _offset += 1
-        
         return r
+    }
+    
+    /// Load a single bit as a boolean value.
+    public func loadBoolean() throws -> Bool {
+        return try loadBit()
     }
 
     /// Preload a single bit without advancing the cursor.
@@ -205,6 +215,42 @@ class BitReader {
         let size = Int(try _preloadUint(bits: bits, offset: _offset))
         return BigUInt(try _preloadUint(bits: size * 8, offset: _offset + bits))
     }
+    
+    /// Loads an optional boolean.
+    public func loadMaybeBoolean() throws -> Bool? {
+        if try loadBit() {
+            return try loadBoolean()
+        } else {
+            return nil
+        }
+    }
+
+    /**
+     Load maybe uint
+    - parameter bits number of bits to read
+    - returns uint value or null
+     */
+    public func loadMaybeUint(bits: Int) throws -> UInt64? {
+        if try loadBit() {
+            return try loadUint(bits: bits)
+        } else {
+            return nil
+        }
+    }
+    
+    /**
+     Load maybe uint
+    - parameter bits number of bits to read
+    - returns uint value or null
+     */
+    public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
+        if try loadBit() {
+            return try loadUintBig(bits: bits)
+        } else {
+            return nil
+        }
+    }
+
     
     /**
      Load coins value

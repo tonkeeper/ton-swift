@@ -18,7 +18,7 @@ public struct DictionaryKeyBuffer: DictionaryKey {
                 .storeBuffer(src)
                 .endCell()
                 .beginParse()
-                .loadUintBig(bits: bits * 8)
+                .bits.loadUintBig(bits: bits * 8)
         )
     }
 
@@ -27,6 +27,6 @@ public struct DictionaryKeyBuffer: DictionaryKey {
             .storeUint(src, bits: bits * 8)
             .endCell()
             .beginParse()
-            .loadBuffer(bytes: bits)
+            .bits.loadBuffer(bytes: bits)
     }
 }

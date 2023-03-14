@@ -55,17 +55,17 @@ public enum CommonMessageInfo: Readable, Writable {
     
     public static func readFrom(slice: Slice) throws -> CommonMessageInfo {
         // Internal message
-        if !(try slice.loadBit()) {
-            let ihrDisabled = try slice.loadBit()
-            let bounce = try slice.loadBit()
-            let bounced = try slice.loadBit()
+        if !(try slice.bits.loadBit()) {
+            let ihrDisabled = try slice.bits.loadBit()
+            let bounce = try slice.bits.loadBit()
+            let bounced = try slice.bits.loadBit()
             let src = try slice.loadAddress()
             let dest = try slice.loadAddress()
             let value = try loadCurrencyCollection(slice: slice)
             let ihrFee = try slice.loadCoins()
             let forwardFee = try slice.loadCoins()
-            let createdLt = try slice.loadUint(bits: 64)
-            let createdAt = UInt32(try slice.loadUint(bits: 32))
+            let createdLt = try slice.bits.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.bits.loadUint(bits: 32))
             
             return CommonMessageInfo.internalInfo(
                 info: .init(
@@ -84,7 +84,7 @@ public enum CommonMessageInfo: Readable, Writable {
         }
         
         // External In message
-        if !(try slice.loadBit()) {
+        if !(try slice.bits.loadBit()) {
             let src = try slice.loadMaybeExternalAddress()
             let dest = try slice.loadAddress()
             let importFee = try slice.loadCoins()
@@ -100,8 +100,8 @@ public enum CommonMessageInfo: Readable, Writable {
             // External Out mesage
             let src = try slice.loadAddress()
             let dest = try slice.loadMaybeExternalAddress()
-            let createdLt = try slice.loadUint(bits: 64)
-            let createdAt = UInt32(try slice.loadUint(bits: 32))
+            let createdLt = try slice.bits.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.bits.loadUint(bits: 32))
             
             return CommonMessageInfo.externalOutInfo(
                 info: .init(

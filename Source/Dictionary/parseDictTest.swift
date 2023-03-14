@@ -22,9 +22,9 @@ final class ParseDictTest: XCTestCase {
             .endCell()
         
         let loaded = try parseDict(sc: try root.beginParse(), keySize: 16, extractor: { $0 })
-        XCTAssertEqual(try loaded[13]?.loadUint(bits: 16), 169)
-        XCTAssertEqual(try loaded[17]?.loadUint(bits: 16), 289)
-        XCTAssertEqual(try loaded[239]?.loadUint(bits: 16), 57121)
+        XCTAssertEqual(try loaded[13]?.bits.loadUint(bits: 16), 169)
+        XCTAssertEqual(try loaded[17]?.bits.loadUint(bits: 16), 289)
+        XCTAssertEqual(try loaded[239]?.bits.loadUint(bits: 16), 57121)
         
         // should parse with single node
         let root2 = try Builder()

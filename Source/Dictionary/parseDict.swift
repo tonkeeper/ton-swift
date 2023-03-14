@@ -3,7 +3,7 @@ import BigInt
 
 func readUnaryLength(slice: Slice) throws -> UInt64 {
     var res: UInt64 = 0
-    while try slice.loadBit() {
+    while try slice.bits.loadBit() {
         res += 1
     }
     
@@ -12,7 +12,7 @@ func readUnaryLength(slice: Slice) throws -> UInt64 {
 
 func doParse<V>(prefix: String, slice: Slice, n: UInt64, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
     // Reading label
-    let lb0 = try slice.loadBit() ? 1 : 0
+    let lb0 = try slice.bits.loadBit() ? 1 : 0
     var prefixLength: UInt64 = 0
     var pp = prefix
     
@@ -24,20 +24,20 @@ func doParse<V>(prefix: String, slice: Slice, n: UInt64, res: inout [BigInt: V],
         
         // Read prefix
         for _ in 0..<prefixLength {
-            pp += try slice.loadBit() ? "1" : "0"
+            pp += try slice.bits.loadBit() ? "1" : "0"
         }
     } else {
-        let lb1 = try slice.loadBit() ? 1 : 0
+        let lb1 = try slice.bits.loadBit() ? 1 : 0
         if lb1 == 0 {
             // Long label detected
-            prefixLength = try slice.loadUint(bits: Int(ceil(log2(Double(n + 1)))))
+            prefixLength = try slice.bits.loadUint(bits: Int(ceil(log2(Double(n + 1)))))
             for _ in 0..<prefixLength {
-                pp += try slice.loadBit() ? "1" : "0"
+                pp += try slice.bits.loadBit() ? "1" : "0"
             }
         } else {
             // Same label detected
-            let bit = try slice.loadBit() ? "1" : "0"
-            prefixLength = try slice.loadUint(bits: Int(ceil(log2(Double(n + 1)))))
+            let bit = try slice.bits.loadBit() ? "1" : "0"
+            prefixLength = try slice.bits.loadUint(bits: Int(ceil(log2(Double(n + 1)))))
             for _ in 0..<prefixLength {
                 pp += bit
             }

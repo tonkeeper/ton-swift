@@ -2,7 +2,7 @@ import XCTest
 
 final class SliceTest: XCTestCase {
     
-    func testCSlice() throws {
+    func testSlice() throws {
         // should read uints from slice
         for _ in 0..<1000 {
             let a = UInt64.random(in: 0..<10000000)
@@ -12,11 +12,11 @@ final class SliceTest: XCTestCase {
             try builder.writeUint(value: b, bits: 48)
             
             let bits = try builder.build()
-            let reader = try Cell(bits: bits).beginParse()
-            XCTAssertEqual(try reader.preloadUint(bits: 48), a)
-            XCTAssertEqual(try reader.loadUint(bits: 48), a)
-            XCTAssertEqual(try reader.preloadUint(bits: 48), b)
-            XCTAssertEqual(try reader.loadUint(bits: 48), b)
+            let slice = try Cell(bits: bits).beginParse()
+            XCTAssertEqual(try slice.bits.preloadUint(bits: 48), a)
+            XCTAssertEqual(try slice.bits.loadUint(bits: 48), a)
+            XCTAssertEqual(try slice.bits.preloadUint(bits: 48), b)
+            XCTAssertEqual(try slice.bits.loadUint(bits: 48), b)
             
             // TODO: - create tests for int, varUint, varInt, coins, address
         }

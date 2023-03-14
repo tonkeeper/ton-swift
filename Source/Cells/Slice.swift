@@ -1,62 +1,49 @@
 import Foundation
 import BigInt
 
-/**
- Slice is a class that allows to read cell data
- */
+
+/// `Slice` is a class that allows to read cell data (bits and refs), consuming it along the way.
+/// Once you have done reading and want to make sure all the data is consumed, call `endParse()`.
 public class Slice {
-    private var reader: BitReader
+    
+    /// Interface for reading bits
+    public private(set) var bits: BitReader
     private var refs: [Cell]
     
     init(cell: Cell) {
-        reader = BitReader(bits: cell.bits)
+        bits = BitReader(bits: cell.bits)
         refs = cell.refs
     }
 
     /// Unchecked initializer for cloning
-    fileprivate init(reader: BitReader, refs: [Cell]) {
-        self.reader = reader
+    fileprivate init(bits: BitReader, refs: [Cell]) {
+        self.bits = bits
         self.refs = refs
     }
-    
-    /// Remaining unread bits in this slice
-    public var remainingBits: Int {
-        return reader.remaining
-    }
-    
-    /// Remaining unread refs in this slice
+        
+    /// Remaining unread refs in this slice.
     public var remainingRefs: Int {
         return refs.count
     }
     
-    /// Skips the number of bits.
-    public func skip(bits: Int) throws -> Slice {
-        try reader.skip(bits)
-        return self
+    /// Remaining unread bits in this slice.
+    public var remainingBits: Int {
+        return bits.remaining
     }
-    
-    /// Loads a single bit.
-    public func loadBit() throws -> Bool {
-        return try reader.loadBit()
-    }
-    
-    /// Preloads a single bit without advancing the cursor.
-    public func preloadBit() throws -> Bool {
-        return try reader.preloadBit()
-    }
-    
-    public func loadBoolean() throws -> Bool {
-        return try loadBit()
-    }
-    
+
     /// Loads type T that implements interface Readable
     public func loadType<T: Readable>() throws -> T {
         return try T.readFrom(slice: self)
     }
     
+    /// Preloads type T that implements interface Readable
+    public func preloadType<T: Readable>() throws -> T {
+        return try T.readFrom(slice: self.clone())
+    }
+    
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
-        if try loadBit() {
+        if try bits.loadBit() {
             return try closure(self)
         } else {
             return nil
@@ -69,156 +56,39 @@ public class Slice {
     public func tryLoad<T>(_ closure: (Slice) throws -> T) throws -> T {
         let tmpslice = self.clone();
         let result = try closure(tmpslice);
-        self.reader = tmpslice.reader;
+        self.bits = tmpslice.bits;
         self.refs = tmpslice.refs;
         return result;
     }
-
-    /// Loads an optional boolean.
-    public func loadMaybeBoolean() throws -> Bool? {
-        if try loadBit() {
-            return try loadBoolean()
-        } else {
-            return nil
-        }
-    }
-    
-    /// Load the number of bits as a new BitString.
-    public func loadBits(bits: Int) throws -> BitString {
-        return try reader.loadBits(bits)
-    }
-    
-    /**
-     Preload bits as a new BitString
-    - parameter bits: number of bits to read
-    - returns new BitString
-    */
-    public func preloadBits(bits: Int) throws -> BitString {
-        return try reader.preloadBits(bits)
-    }
-    
-    /**
-     Load int
-    - parameter bits: number of bits to read
-    - returns int value
-    */
-    public func loadInt(bits: Int) throws -> Int {
-        return try reader.loadInt(bits: bits)
-    }
-    
-    /**
-     Load int
-    - parameter bits: number of bits to read
-    - returns int value
-    */
-    public func loadIntBig(bits: Int) throws -> BigInt {
-        return try reader.loadIntBig(bits: bits)
-    }
-    
-    /**
-     Load uint
-    - parameter bits: number of bits to read
-    - returns uint value
-    */
-    public func loadUint(bits: Int) throws -> UInt64 {
-        return try reader.loadUint(bits: bits)
-    }
-    
-    /**
-     Load uint
-    - parameter bits: number of bits to read
-    - returns uint value
-    */
-    public func loadUintBig(bits: Int) throws -> BigUInt {
-        return try reader.loadUintBig(bits: bits)
-    }
-    
-    /**
-     Preload uint
-    - parameter bits: number of bits to read
-    - returns uint value
-    */
-    public func preloadUint(bits: Int) throws -> UInt64 {
-        return try reader.preloadUint(bits: bits)
-    }
-    
-    /**
-     Preload uint
-    - parameter bits number of bits to read
-    - returns uint value
-     */
-    public func preloadUintBig(bits: Int) throws -> BigUInt {
-        return try reader.preloadUintBig(bits: bits)
-    }
-    
-    /**
-     Load maybe uint
-    - parameter bits number of bits to read
-    - returns uint value or null
-     */
-    public func loadMaybeUint(bits: Int) throws -> UInt64? {
-        if try loadBit() {
-            return try loadUint(bits: bits)
-        } else {
-            return nil
-        }
-    }
-    
-    /**
-     Load maybe uint
-    - parameter bits number of bits to read
-    - returns uint value or null
-     */
-    public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
-        if try loadBit() {
-            return try loadUintBig(bits: bits)
-        } else {
-            return nil
-        }
-    }
-    
-    /**
-     Load reference
-     - returns: Cell
-     */
+        
+    /// Loads a cell reference.
     public func loadRef() throws -> Cell {
         if refs.isEmpty {
             throw TonError.custom("No more references")
         }
-        
         return refs.removeFirst()
     }
     
-    /**
-     Preload reference
-     - returns: Cell
-     */
+    /// Preloads a reference without advancing the cursor.
     public func preloadRef() throws -> Cell {
         if refs.isEmpty {
             throw TonError.custom("No more references")
         }
-        
         return refs.first!
     }
     
-    /**
-     Load optional reference
-     - returns: Cell or nil
-     */
+    /// Loads an optional cell reference.
     public func loadMaybeRef() throws -> Cell? {
-        if try loadBit() {
+        if try bits.loadBit() {
             return try loadRef()
         } else {
             return nil
         }
     }
     
-    /**
-     Preload optional reference
-     - returns: Cell or nil
-     */
+    /// Preloads an optional cell reference.
     public func preloadMaybeRef() throws -> Cell? {
-        if try preloadBit() {
+        if try bits.preloadBit() {
             return try preloadRef()
         } else {
             return nil
@@ -226,100 +96,11 @@ public class Slice {
     }
     
     /**
-     Load byte buffer
-     - parameter bytes: number of bytes to load
-     - returns: Data
-     */
-    public func loadBuffer(bytes: Int) throws -> Data {
-        return try reader.loadBuffer(bytes: bytes)
-    }
-    
-    /**
-     Preload byte buffer
-     - parameter bytes: number of bytes to load
-     - returns: Data
-     */
-    public func preloadBuffer(bytes: Int) throws -> Data {
-        return try reader.preloadBuffer(bytes: bytes)
-    }
-    
-    /**
-     Load string tail
-    */
-    public func loadStringTail() throws -> String {
-        return try readString(slice: self)
-    }
-    
-    /**
-     Load varuint
-    - parameter bits: number of bits to read in header
-    - returns varuint value
-    */
-    func loadVarUint(bits: Int) throws -> UInt64 {
-        return try reader.loadVarUint(bits: bits)
-    }
-    
-    /**
-     Load varuint
-    - parameter bits: number of bits to read in header
-    - returns varuint value
-    */
-    func loadVarUintBig(bits: Int) throws -> BigUInt {
-        return try reader.loadVarUintBig(bits: bits)
-    }
-    
-    /**
-     Preload varuint
-    - parameter bits: number of bits to read in header
-    - returns varuint value
-    */
-    func preloadVarUint(bits: Int) throws -> UInt64 {
-        return try reader.preloadVarUint(bits: bits)
-    }
-    
-    /**
-     Preload varuint
-    - parameter bits: number of bits to read in header
-    - returns varuint value
-    */
-    func preloadVarUintBig(bits: Int) throws -> BigUInt {
-        return try reader.preloadVarUintBig(bits: bits)
-    }
-    
-    /**
-     Load coins
-    - returns coins value
-    */
-    public func loadCoins() throws -> Coins {
-        return try reader.loadCoins()
-    }
-    
-    /**
-     Preload coins
-    - returns coins value
-    */
-    public func preloadCoins() throws -> Coins {
-        return try reader.preloadCoins()
-    }
-    
-    /**
-     Load maybe coins
-    - returns coins value or null
-    */
-    public func loadMaybeCoins() throws -> Coins? {
-        if try reader.loadBit() {
-            return try loadCoins()
-        }
-        
-        return nil
-    }
-    
-    /**
      Load internal Address
     - returns Address
     */
     public func loadAddress() throws -> Address {
-        return try reader.loadAddress()
+        return try bits.loadAddress()
     }
     
     /**
@@ -327,7 +108,7 @@ public class Slice {
     - returns Address or null
     */
     public func loadMaybeAddress() throws -> Address? {
-        return try reader.loadMaybeAddress()
+        return try bits.loadMaybeAddress()
     }
     
     /**
@@ -335,7 +116,7 @@ public class Slice {
      * @returns ExternalAddress
      */
     public func loadExternalAddress() throws -> ExternalAddress {
-        return try reader.loadExternalAddress()
+        return try bits.loadExternalAddress()
     }
     
     /**
@@ -343,7 +124,7 @@ public class Slice {
      * @returns ExternalAddress or null
      */
     public func loadMaybeExternalAddress() throws -> ExternalAddress? {
-        return try reader.loadMaybeExternalAddress()
+        return try bits.loadMaybeExternalAddress()
     }
     
     /**
@@ -367,47 +148,31 @@ public class Slice {
     }
     
     
-    /**
-     Checks if slice is empty
-    */
+    /// Checks if the cell is fully processed without unread bits or refs.
     public func endParse() throws {
         if remainingBits > 0 || remainingRefs > 0 {
             throw TonError.custom("Slice is not empty")
         }
     }
     
-    /**
-     Convert slice to cell
-    */
+    /// Converts the remaining data in the slice to a Cell.
     public func asCell() throws -> Cell {
-        let builder = Builder()
-        try builder.storeSlice(src: self)
-        
-        return try builder.endCell()
+        return try asBuilder().endCell()
     }
     
-    /**
-     Convert slice to builder
-     */
+    /// Converts slice to a Builder filled with remaining data in this slice.
     public func asBuilder() throws -> Builder {
         let builder = Builder()
         try builder.storeSlice(src: self)
-        
         return builder
     }
     
-    /**
-     Clone slice
-    - returns cloned slice
-    */
+    /// Clones slice at its current state.
     public func clone() -> Slice {
-        return Slice(reader: reader.clone(), refs: refs)
+        return Slice(bits: bits.clone(), refs: refs)
     }
     
-    /**
-     Print slice as string by converting it to cell
-    - returns string
-    */
+    /// Returns string representation of the slice as a cell.
     public func toString() throws -> String {
         return try asCell().toString()
     }

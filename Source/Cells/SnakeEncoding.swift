@@ -1,7 +1,14 @@
 import Foundation
 
+extension Slice {
+    /// Load snake-encoded String
+    public func loadStringTail() throws -> String {
+        return try readString(slice: self)
+    }
+}
+
 /// TBD: this looks like a snake encoding - should rename accordingly
-func readBuffer(slice: Slice) throws -> Data {
+func readSnakeData(slice: Slice) throws -> Data {
     // Check consistency
     if slice.remainingBits % 8 != 0 {
         throw TonError.custom("Invalid string length: \(slice.remainingBits)")
@@ -18,26 +25,26 @@ func readBuffer(slice: Slice) throws -> Data {
     if slice.remainingBits == 0 {
         res = Data()
     } else {
-        res = try slice.loadBuffer(bytes: slice.remainingBits / 8)
+        res = try slice.bits.loadBuffer(bytes: slice.remainingBits / 8)
     }
 
     // Read tail
     if slice.remainingRefs == 1 {
-        res.append(try readBuffer(slice: slice.loadRef().beginParse()))
+        res.append(try readSnakeData(slice: slice.loadRef().beginParse()))
     }
 
     return res
 }
 
 func readString(slice: Slice) throws -> String {
-    guard let str = String(data: try readBuffer(slice: slice), encoding: .utf8) else {
+    guard let str = String(data: try readSnakeData(slice: slice), encoding: .utf8) else {
         throw TonError.custom("Cannot read slice to string")
     }
     
     return str
 }
 
-func writeBuffer(src: Data, builder: Builder) throws {
+func writeSnakeBuffer(src: Data, builder: Builder) throws {
     if src.count > 0 {
         let bytes = Int(floor(Double(builder.availableBits / 8)))
         if src.count > bytes {
@@ -45,7 +52,7 @@ func writeBuffer(src: Data, builder: Builder) throws {
             let t = src.subdata(in: bytes..<src.endIndex)
             try builder.storeBuffer(a)
             let bb = Builder()
-            try writeBuffer(src: t, builder: bb)
+            try writeSnakeBuffer(src: t, builder: bb)
             try builder.storeRef(cell: bb.endCell())
         } else {
             try builder.storeBuffer(src)
@@ -55,11 +62,11 @@ func writeBuffer(src: Data, builder: Builder) throws {
 
 func stringToCell(src: String) throws -> Cell {
     let builder = Builder()
-    try writeBuffer(src: Data(src.utf8), builder: builder)
+    try writeSnakeBuffer(src: Data(src.utf8), builder: builder)
     
     return try builder.endCell()
 }
 
 func writeString(src: String, builder: Builder) throws {
-    try writeBuffer(src: Data(src.utf8), builder: builder)
+    try writeSnakeBuffer(src: Data(src.utf8), builder: builder)
 }

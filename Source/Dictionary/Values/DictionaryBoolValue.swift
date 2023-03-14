@@ -10,6 +10,6 @@ public struct DictionaryBoolValue: DictionaryValue {
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.loadBit()
+        return try src.bits.loadBit()
     }
 }
