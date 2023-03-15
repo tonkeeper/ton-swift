@@ -63,25 +63,17 @@ func parseFriendlyAddress(src: Data) throws -> FriendlyAddress {
 }
 
 public struct Address: Hashable {
-    private let _workchain: Int8
+    public let workchain: Int8
     public let hash: Data
     
     public init(workchain: Int8, hash: Data) {
-        self._workchain = workchain
+        self.workchain = workchain
         self.hash = hash
     }
     
     /// Generates a test address
     public static func mock(workchain: Int8, seed: String) -> Self {
         return Address(workchain: workchain, hash: Data(seed.utf8).sha256())
-    }
-    
-    public var workchain: UInt8 {
-        if _workchain == -1 {
-            return UInt8.max
-        } else {
-            return UInt8(_workchain)
-        }
     }
     
     public static func isAddress(_ src: Any) -> Bool {
@@ -133,7 +125,15 @@ public struct Address: Hashable {
     public func toRaw() -> Data {
         var addressWithChecksum = Data(count: 36)
         addressWithChecksum.replaceSubrange(0..<hash.count, with: hash)
-        addressWithChecksum.replaceSubrange(32..<36, with: [UInt8(workchain), UInt8(workchain), UInt8(workchain), UInt8(workchain)])
+        
+        var workchain: UInt8
+        if self.workchain == -1 {
+            workchain = UInt8.max
+        } else {
+            workchain = UInt8(self.workchain)
+        }
+        
+        addressWithChecksum.replaceSubrange(32..<36, with: [workchain, workchain, workchain, workchain])
         
         return addressWithChecksum
     }
@@ -142,6 +142,13 @@ public struct Address: Hashable {
         var tag = bounceable ? bounceableTag : nonBounceableTag
         if testOnly {
             tag |= testFlag
+        }
+        
+        var workchain: UInt8
+        if self.workchain == -1 {
+            workchain = UInt8.max
+        } else {
+            workchain = UInt8(self.workchain)
         }
         
         var addr = Data(count: 34)
