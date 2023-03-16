@@ -11,6 +11,7 @@ func serializeInternalKey(value: Any) throws -> String {
     } else if let value = value as? BigUInt {
         return "U:\(value)"
     } else if let value = value as? Address {
+        // TODO: should we serialize toRaw instead?
         return "a:\(value.toString())"
     } else if let value = value as? Data {
         return "f:\(value.hexString())"

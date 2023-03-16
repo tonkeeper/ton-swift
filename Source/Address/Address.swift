@@ -1,9 +1,6 @@
 import Foundation
 
-/// By default, addresses are bounceable for safety of TON transfers.
-public let BounceableDefault = true;
-
-public struct Address: Hashable {
+public struct Address: Hashable, Codable {
     public let workchain: Int8
     public let hash: Data
     
@@ -17,25 +14,10 @@ public struct Address: Hashable {
     public static func mock(workchain: Int8, seed: String) -> Self {
         return Address(workchain: workchain, hash: Data(seed.utf8).sha256())
     }
-    
-    public static func isAddress(_ src: Any) -> Bool {
-        return src is Address
-    }
-    
-    public static func isFriendly(source: String) -> Bool {
-        return source.firstIndex(of: ":") == nil
-    }
-    
-    public static func normalize(source: String) throws -> String {
-        return (try Address.parse(source)).toString()
-    }
-    
-    public static func normalize(source: Address) throws -> String {
-        return source.toString()
-    }
-    
+
+    /// Parses address from any format
     public static func parse(_ source: String) throws -> Address {
-        if isFriendly(source: source) {
+        if source.firstIndex(of: ":") == nil {
             return try FriendlyAddress(string: source).address
         } else {
             return try parse(raw: source)
@@ -57,58 +39,19 @@ public struct Address: Hashable {
         return Address(workchain: wc, hash: hash)
     }
 
-    
-    public func toRawString() -> String {
+    /// Returns raw format of the address: `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
+    public func toRaw() -> String {
         return "\(workchain):\(hash.hexString())"
     }
     
-    public func toRaw() -> Data {
-        var addressWithChecksum = Data(count: 36)
-        addressWithChecksum.replaceSubrange(0..<hash.count, with: hash)
-        
-        var workchain: UInt8
-        if self.workchain == -1 {
-            workchain = UInt8.max
-        } else {
-            workchain = UInt8(self.workchain)
-        }
-        
-        addressWithChecksum.replaceSubrange(32..<36, with: [workchain, workchain, workchain, workchain])
-        
-        return addressWithChecksum
+    /// Returns raw format of the address: `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
+    public func toFriendly(testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> FriendlyAddress {
+        return FriendlyAddress(address: self, testOnly: testOnly, bounceable: bounceable)
     }
     
-    public func toStringBuffer(testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> Data {
-        var tag = bounceable ? bounceableTag : nonBounceableTag
-        if testOnly {
-            tag |= testFlag
-        }
-        
-        var workchain: UInt8
-        if self.workchain == -1 {
-            workchain = UInt8.max
-        } else {
-            workchain = UInt8(self.workchain)
-        }
-        
-        var addr = Data(count: 34)
-        addr[0] = tag
-        addr[1] = workchain
-        addr[2...] = hash
-        var addressWithChecksum = Data(count: 36)
-        addressWithChecksum[0...] = addr
-        addressWithChecksum[34...] = addr.crc16()
-        
-        return addressWithChecksum
-    }
-    
+    /// Shortcut for constructing FriendlyAddress with all the options.
     public func toString(urlSafe: Bool = true, testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> String {
-        let buffer = toStringBuffer(testOnly: testOnly, bounceable: bounceable)
-        if urlSafe {
-            return buffer.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
-        } else {
-            return buffer.base64EncodedString()
-        }
+        return self.toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
     }
 }
 

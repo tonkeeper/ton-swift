@@ -9,7 +9,7 @@ public struct BitString: Hashable {
     private let _data: Data
     
     /**
-     - returns the length of the bitstring
+     - returns the length of the bitstring in bits
      */
     public var length: Int { _length }
     

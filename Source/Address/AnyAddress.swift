@@ -42,7 +42,7 @@ enum AnyAddress {
     }
 }
 
-extension AnyAddress: Writable {
+extension AnyAddress: Writable, Readable {
     func writeTo(builder: Builder) throws {
         switch self {
         case .none:
@@ -52,8 +52,23 @@ extension AnyAddress: Writable {
             try addr.writeTo(builder: builder)
             break
         case .externalAddr(let addr):
-            // TBD
+            try addr.writeTo(builder: builder)
             break
+        }
+    }
+    
+    static func readFrom(slice: Slice) throws -> AnyAddress {
+        let type = try slice.bits.preloadUint(bits: 2)
+        switch type {
+        case 0:
+            try slice.bits.skip(2);
+            return .none;
+        case 1:
+            return .externalAddr(try slice.loadType());
+        case 2,3:
+            return .internalAddr(try slice.loadType());
+        default:
+            throw TonError.custom("Unreachable error");
         }
     }
 }

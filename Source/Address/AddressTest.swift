@@ -17,9 +17,9 @@ final class AddressTest: XCTestCase {
         XCTAssertEqual(address1.address.hash, Data(hex: "2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3"))
         XCTAssertEqual(address2.address.hash, Data(hex: "2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3"))
         XCTAssertEqual(address3.hash, Data(hex: "2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3"))
-        XCTAssertEqual(address1.address.toRawString(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
-        XCTAssertEqual(address2.address.toRawString(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
-        XCTAssertEqual(address3.toRawString(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
+        XCTAssertEqual(address1.address.toRaw(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
+        XCTAssertEqual(address2.address.toRaw(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
+        XCTAssertEqual(address3.toRaw(), "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")
         
         // should serialize to friendly form
         let address = try Address.parse(raw: "0:2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3")

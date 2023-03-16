@@ -1,20 +1,21 @@
 import Foundation
 
+/// By default, addresses are bounceable for safety of TON transfers.
+public let BounceableDefault = true;
+
 let bounceableTag: UInt8 = 0x11
 let nonBounceableTag: UInt8 = 0x51
 let testFlag: UInt8 = 0x80
 
-
-struct FriendlyAddress: Codable {
-    let isTestOnly: Bool
-    let isBounceable: Bool
-    let workchain: Int8
-    let hashPart: Data
+/// Address encoded in a friendly format
+public struct FriendlyAddress: Codable {
+    public let isTestOnly: Bool
+    public let isBounceable: Bool
+    public let address: Address
     
-    var address: Address {
-        return Address(workchain: self.workchain, hash: self.hashPart)
-    }
-    
+    var workchain: Int8 { return self.address.workchain }
+    var hash: Data { return self.address.hash }
+        
     init(string: String) throws {
         // Convert from url-friendly to true base64
         let string = string.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
@@ -52,11 +53,53 @@ struct FriendlyAddress: Codable {
 
         self.isBounceable = (tag == bounceableTag)
 
+        let wc: Int8
         if addr[1] == 0xff {
-            self.workchain = -1
+            wc = -1
         } else {
-            self.workchain = Int8(addr[1])
+            wc = Int8(addr[1])
         }
-        self.hashPart = addr.subdata(in: 2..<34)
+        let hash = addr.subdata(in: 2..<34)
+        self.address = Address(workchain: wc, hash: hash)
     }
+    
+    init(address: Address, testOnly: Bool = false, bounceable: Bool = BounceableDefault) {
+        self.isTestOnly = testOnly
+        self.isBounceable = bounceable
+        self.address = address
+    }
+        
+    public func toString(urlSafe: Bool = true) -> String {
+        let buffer = toStringData()
+        if urlSafe {
+            return buffer.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
+        } else {
+            return buffer.base64EncodedString()
+        }
+    }
+    
+    private func toStringData() -> Data {
+        var tag = isBounceable ? bounceableTag : nonBounceableTag
+        if isTestOnly {
+            tag |= testFlag
+        }
+        
+        var wcByte: UInt8
+        if self.address.workchain == -1 {
+            wcByte = UInt8.max
+        } else {
+            wcByte = UInt8(self.workchain)
+        }
+        
+        var addr = Data(count: 34)
+        addr[0] = tag
+        addr[1] = wcByte
+        addr[2...] = address.hash
+        var addressWithChecksum = Data(count: 36)
+        addressWithChecksum[0...] = addr
+        addressWithChecksum[34...] = addr.crc16()
+        
+        return addressWithChecksum
+    }
+
 }
