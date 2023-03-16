@@ -95,36 +95,26 @@ public class Slice {
         }
     }
     
-    /**
-     Load internal Address
-    - returns Address
-    */
+    // TODO: remove
     public func loadAddress() throws -> Address {
-        return try bits.loadAddress()
+        return try self.loadType()
     }
     
-    /**
-     Load optional internal Address
-    - returns Address or null
-    */
+    // TODO: remove
     public func loadMaybeAddress() throws -> Address? {
-        return try bits.loadMaybeAddress()
+        let anyaddr: AnyAddress = try self.loadType()
+        return try anyaddr.asInternal()
     }
     
-    /**
-     * Load external address
-     * @returns ExternalAddress
-     */
+    // TODO: remove
     public func loadExternalAddress() throws -> ExternalAddress {
-        return try bits.loadExternalAddress()
+        return try self.loadType()
     }
     
-    /**
-     * Load optional external address
-     * @returns ExternalAddress or null
-     */
+    // TODO: remove
     public func loadMaybeExternalAddress() throws -> ExternalAddress? {
-        return try bits.loadMaybeExternalAddress()
+        let anyaddr: AnyAddress = try self.loadType()
+        return try anyaddr.asExternal()
     }
     
     /**

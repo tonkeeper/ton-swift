@@ -55,7 +55,6 @@ public class BitReader {
     public func loadBits(_ bits: Int) throws -> BitString {
         let r = try _bits.substring(offset: _offset, length: bits)
         _offset += bits
-        
         return r
     }
 
@@ -244,81 +243,17 @@ public class BitReader {
     }
 
     
-    /**
-     Load coins value
-    - returns read value as bigint
-    */
+    /// Load coins value
     func loadCoins() throws -> Coins {
         return Coins(amount: try loadVarUintBig(bits: 4))
     }
     
-    /**
-     Preload coins value
-    - returns read value as bigint
-    */
+    /// Preload coins value
     func preloadCoins() throws -> Coins {
         return Coins(amount: try preloadVarUintBig(bits: 4))
     }
     
-    /**
-     Load Address
-    - returns Address
-    */
-    func loadAddress() throws -> Address {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type == 2 {
-            return try _loadInternalAddress()
-        } else {
-            throw TonError.custom("Invalid address: \(type)")
-        }
-    }
     
-    /**
-     Load internal address
-    - returns Address or nil
-    */
-    func loadMaybeAddress() throws -> Address? {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type == 0 {
-            _offset += 2
-            return nil
-            
-        } else if type == 2 {
-            return try _loadInternalAddress()
-        } else {
-            throw TonError.custom("Invalid address")
-        }
-    }
-    
-    /**
-     Load external address
-    - returns ExternalAddress
-    */
-    func loadExternalAddress() throws -> ExternalAddress {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type == 1 {
-            return try _loadExternalAddress()
-        } else {
-            throw TonError.custom("Invalid address")
-        }
-    }
-    
-    /**
-     Load external address
-    - returns ExternalAddress or nil
-    */
-    func loadMaybeExternalAddress() throws -> ExternalAddress? {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type == 0 {
-            _offset += 2;
-            return nil
-        } else if type == 1 {
-            return try _loadExternalAddress()
-        } else {
-            throw TonError.custom("Invalid address")
-        }
-    }
-
     // MARK: - Private methods
     
     /**
@@ -402,43 +337,5 @@ public class BitReader {
         }
         
         return buf
-    }
-    
-    private func _loadInternalAddress() throws -> Address {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type != 2 {
-            throw TonError.custom("Invalid address")
-        }
-
-        // No Anycast supported
-        if try _preloadUint(bits: 1, offset: _offset + 2) != 0 {
-            throw TonError.custom("Invalid address")
-        }
-
-        // Read address
-        let wc = Int8(try _preloadInt(bits: 8, offset: _offset + 3))
-        let hash = try _preloadBuffer(bytes: 32, offset: _offset + 11)
-
-        // Update offset
-        self._offset += 267
-
-        return Address(workchain: wc, hash: hash)
-    }
-    
-    private func _loadExternalAddress() throws -> ExternalAddress {
-        let type = try _preloadUint(bits: 2, offset: _offset)
-        if type != 1 {
-            throw TonError.custom("Invalid address")
-        }
-        
-        // Load length
-        let bits = Int(try _preloadUint(bits: 9, offset: _offset + 2))
-        
-        // Load address
-        let data = try _preloadBuffer(bytes: bits / 8, offset: _offset + 11)
-        // Update offset
-        _offset += 11 + bits
-        
-        return ExternalAddress(value: BitString(data: data))
     }
 }

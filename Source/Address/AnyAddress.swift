@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 /// Represents `MsgAddress` structure per TL-B definition:
 /// Note that in TON optional address is represented by MsgAddressExt
 /// ```
@@ -23,7 +21,7 @@ enum AnyAddress {
     case internalAddr(Address)
     case externalAddr(ExternalAddress)
     
-    /// Unwraps to an optional internal address. Throws if it is an external address.
+    /// Converts to an optional internal address. Throws error if it is an external address.
     public func asInternal() throws -> Address? {
         switch self {
         case .none: return nil;
@@ -32,7 +30,7 @@ enum AnyAddress {
         }
     }
     
-    /// Unwraps to an external address. Throws if it is an internal address.
+    /// Converts to an external address. Throws error if it is an internal address.
     public func asExternal() throws -> ExternalAddress? {
         switch self {
         case .none: return nil;

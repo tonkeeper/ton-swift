@@ -89,7 +89,7 @@ extension Address: Writable, Readable {
         return try slice.tryLoad { s in
             let type = try s.bits.loadUint(bits: 2)
             if type != 2 {
-                throw TonError.custom("Invalid address: expecting internal address `addr_std$10`")
+                throw TonError.custom("Unsupported address type: expecting internal address `addr_std$10`")
             }
             
             // No Anycast supported
