@@ -182,7 +182,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     
     func store(builder: Builder, key: (any DictionaryKey)? = nil, value: (any DictionaryValue)? = nil) throws {
         if size == 0 {
-            try builder.storeBit(0 != 0)
+            try builder.bits.write(bit: false)
             return
         }
         
@@ -212,7 +212,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
         
         // Store
-        try builder.storeBit(1 != 0)
+        try builder.bits.write(bit: true)
         let dd = Builder()
         try serializeDict(src: prepared, keyLength: resolvedKey.bits, serializer: { value, builder in
             try resolvedValue.serialize(src: value, builder: builder)

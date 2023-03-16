@@ -31,25 +31,7 @@ public class Builder {
     public var availableRefs: Int {
         return 4 - refsCount
     }
-    
-    /// Write a single bit
-    @discardableResult
-    public func storeBit(_ value: Bool) throws -> Self {
-        try bits.writeBit(value: value)
-        return self
-    }
-    
-    /**
-     Write bits from BitString
-     - parameter src: source bits
-     - returns this builder
-     */
-    @discardableResult
-    public func storeBits(_ src: BitString) throws -> Self {
-        try bits.writeBits(src: src)
-        return self
-    }
-    
+        
     /**
      Store Buffer
      - parameter src: source buffer
@@ -141,10 +123,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeCoins(coins: Coins?) throws -> Self {
         if let coins {
-            try storeBit(true)
+            try bits.write(bit: true)
             try storeCoins(coins: coins)
         } else {
-            try storeBit(false)
+            try bits.write(bit: false)
         }
         
         return self
@@ -184,10 +166,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeRef(cell: Cell?) throws -> Self {
         if let cell = cell {
-            try storeBit(true)
+            try bits.write(bit: true)
             try storeRef(cell: cell)
         } else {
-            try storeBit(false)
+            try bits.write(bit: false)
         }
         
         return self
@@ -195,10 +177,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeRef(cell: Builder?) throws -> Self {
         if let cell = cell {
-            try storeBit(true)
+            try bits.write(bit: true)
             try storeRef(cell: cell)
         } else {
-            try storeBit(false)
+            try bits.write(bit: false)
         }
         
         return self
@@ -211,7 +193,7 @@ public class Builder {
     public func storeSlice(src: Slice) throws {
         let c = src.clone()
         if c.remainingBits > 0 {
-            try storeBits(c.bits.loadBits(c.remainingBits))
+            try bits.write(bits: c.bits.loadBits(c.remainingBits))
         }
         while c.remainingRefs > 0 {
             try storeRef(cell: c.loadRef())
@@ -224,10 +206,10 @@ public class Builder {
      */
     public func storeMaybeSlice(src: Slice?) throws {
         if let src = src {
-            try storeBit(true)
+            try bits.write(bit: true)
             try storeSlice(src: src)
         } else {
-            try storeBit(false)
+            try bits.write(bit: false)
         }
     }
     
@@ -250,10 +232,10 @@ public class Builder {
     @discardableResult
     public func storeMaybe(_ object: Writable?) throws -> Self {
         if let object = object {
-            try storeBit(true)
+            try bits.write(bit: true)
             try store(object)
         } else {
-            try storeBit(false)
+            try bits.write(bit: false)
         }
         
         return self
@@ -269,7 +251,7 @@ public class Builder {
         if let dict = dict {
             try dict.store(builder: self, key: key, value: value)
         } else {
-            try storeBit(0 != 0)
+            try bits.write(bit: 0 != 0)
         }
         
         return self

@@ -203,9 +203,9 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     // Serialize
     var builder = BitBuilder(capacity: UInt16(totalSize))
     try builder.writeUint(value: UInt32(0xb5ee9c72), bits: 32) // Magic
-    try builder.writeBit(value: hasIdx) // Has index
-    try builder.writeBit(value: hasCrc32c) // Has crc32c
-    try builder.writeBit(value: hasCacheBits) // Has cache bits
+    try builder.write(bit: hasIdx) // Has index
+    try builder.write(bit: hasCrc32c) // Has crc32c
+    try builder.write(bit: hasCacheBits) // Has cache bits
     try builder.writeUint(value: flags, bits: 2) // Flags
     try builder.writeUint(value: UInt32(sizeBytes), bits: 3) // Size bytes
     try builder.writeUint(value: UInt32(offsetBytes), bits: 8) // Offset bytes

@@ -16,7 +16,7 @@ public func loadSimpleLibrary(slice: Slice) throws -> SimpleLibrary {
 }
 
 public func storeSimpleLibrary(src: SimpleLibrary, builder: Builder) throws {
-    try builder.storeBit(src.public)
+    try builder.bits.write(bit: src.public)
     try builder.storeRef(cell: src.root)
 }
 

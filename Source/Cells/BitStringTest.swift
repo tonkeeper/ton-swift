@@ -97,7 +97,7 @@ final class BitStringTest: XCTestCase {
         for c in cases {
             let builder = BitBuilder()
             for f in c[0] {
-                try builder.writeBit(value: f == "1")
+                try builder.write(bit: f == "1")
             }
             let r = try builder.build()
             

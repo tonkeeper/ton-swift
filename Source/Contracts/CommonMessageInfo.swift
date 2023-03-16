@@ -117,10 +117,10 @@ public enum CommonMessageInfo: Readable, Writable {
     public func writeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
-            try builder.storeBit(false)
-            try builder.storeBit(info.ihrDisabled)
-            try builder.storeBit(info.bounce)
-            try builder.storeBit(info.bounced)
+            try builder.bits.write(bit: false)
+            try builder.bits.write(bit: info.ihrDisabled)
+            try builder.bits.write(bit: info.bounce)
+            try builder.bits.write(bit: info.bounced)
             try builder.store(AnyAddress.from(info.src))
             try builder.store(AnyAddress.from(info.dest))
             try builder.store(storeCurrencyCollection(collection: info.value, builder: builder))
@@ -130,16 +130,16 @@ public enum CommonMessageInfo: Readable, Writable {
             try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
-            try builder.storeBit(true)
-            try builder.storeBit(true)
+            try builder.bits.write(bit: true)
+            try builder.bits.write(bit: true)
             try builder.store(AnyAddress.from(info.src))
             try builder.store(AnyAddress.from(info.dest))
             try builder.storeUint(info.createdLt, bits: 64)
             try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalInInfo(let info):
-            try builder.storeBit(true)
-            try builder.storeBit(false)
+            try builder.bits.write(bit: true)
+            try builder.bits.write(bit: false)
             try builder.store(AnyAddress.from(info.src))
             try builder.store(AnyAddress.from(info.dest))
             try builder.storeCoins(coins: info.importFee)

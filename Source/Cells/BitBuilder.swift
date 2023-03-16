@@ -39,10 +39,10 @@ public class BitBuilder {
     
     
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
-    public func writeBit(value: Int) throws {
+    public func write(bit: Int) throws {
         try checkCapacity(1)
         
-        if value > 0 {
+        if bit > 0 {
             _buffer[_length / 8] |= 1 << (7 - (_length % 8))
         }
         
@@ -50,14 +50,14 @@ public class BitBuilder {
     }
     
     /// Writes bit as a boolean (true => 1, false => 0)
-    public func writeBit(value: Bool) throws {
-        try writeBit(value: value ? 1 : 0)
+    public func write(bit: Bool) throws {
+        try write(bit: bit ? 1 : 0)
     }
     
     /// Writes bits from a bitstring
-    public func writeBits(src: BitString) throws {
-        for i in 0..<src.length {
-            try writeBit(value: src.at(index: i))
+    public func write(bits: BitString) throws {
+        for i in 0..<bits.length {
+            try write(bit: bits.at(index: i))
         }
     }
     
@@ -166,9 +166,9 @@ public class BitBuilder {
         for i in 0..<bits {
             let off = bits - i - 1
             if (off < b.count) {
-                try writeBit(value: b[off])
+                try write(bit: b[off])
             } else {
-                try writeBit(value: false)
+                try write(bit: false)
             }
         }
     }
@@ -205,7 +205,7 @@ public class BitBuilder {
             if v != -1 && v != 0 {
                 throw TonError.custom("Value is not zero or -1 for \(bits) bits. Got \(v)")
             } else {
-                try writeBit(value: v == -1)
+                try write(bit: v == -1)
                 return
             }
         }
@@ -216,10 +216,10 @@ public class BitBuilder {
         }
         
         if v < 0 {
-            try writeBit(value: true)
+            try write(bit: true)
             v = (1 << (bits - 1)) + v
         } else {
-            try writeBit(value: false)
+            try write(bit: false)
         }
         
         try writeUint(value: v, bits: bits - 1)

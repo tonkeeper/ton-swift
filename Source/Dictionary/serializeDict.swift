@@ -103,17 +103,17 @@ func buildTree<T>(_ src: [BigInt: T], _ keyLength: Int) throws -> Edge<T> {
 @discardableResult
 func writeLabelShort(_ src: String, to builder: Builder) throws -> Builder {
     // Header
-    try builder.storeBit(0 != 0)
+    try builder.bits.write(bit: false)
 
     // Unary length
     for _ in 0..<src.count {
-        try builder.storeBit(1 != 0)
+        try builder.bits.write(bit: true)
     }
-    try builder.storeBit(0 != 0)
+    try builder.bits.write(bit: false)
 
     // Value
     for c in src {
-        try builder.storeBit(c == "1")
+        try builder.bits.write(bit: c == "1")
     }
     
     return builder
@@ -126,8 +126,8 @@ func labelShortLength(_ src: String) -> Int {
 @discardableResult
 func writeLabelLong(src: String, keyLength: Int, to: Builder) throws -> Builder {
     // Header
-    try to.storeBit(1 != 0)
-    try to.storeBit(0 != 0)
+    try to.bits.write(bit: true)
+    try to.bits.write(bit: false)
     
     // Length
     let length = Int(ceil(log2(Double(keyLength + 1))))
@@ -135,7 +135,7 @@ func writeLabelLong(src: String, keyLength: Int, to: Builder) throws -> Builder 
     
     // Value
     for char in src {
-        try to.storeBit(char == "1")
+        try to.bits.write(bit: char == "1")
     }
     return to
 }
@@ -146,10 +146,10 @@ func labelLongLength(src: String, keyLength: Int) -> Int {
 
 func writeLabelSame(value: Int, length: Int, keyLength: Int, to: Builder) throws {
     // Header
-    try to.storeBit(1 != 0)
-    try to.storeBit(1 != 0)
+    try to.bits.write(bit: true)
+    try to.bits.write(bit: true)
     // Value
-    try to.storeBit(value != 0)
+    try to.bits.write(bit: value != 0)
     
     // Length
     let lenLen = Int(ceil(log2(Double(keyLength + 1))))

@@ -6,7 +6,7 @@ public struct DictionaryBoolValue: DictionaryValue {
             throw TonError.custom("Wrong src type. Expected bool")
         }
         
-        try builder.storeBit(src)
+        try builder.bits.write(bit: src)
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {

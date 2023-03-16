@@ -25,7 +25,7 @@ func storeCurrencyCollection(collection: CurrencyCollection, builder: Builder) t
     if let other = collection.other {
         try builder.storeDict(dict: other)
     } else {
-        try builder.storeBit(false)
+        try builder.bits.write(bit: false)
     }
     
     return builder

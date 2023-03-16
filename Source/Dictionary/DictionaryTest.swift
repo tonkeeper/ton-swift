@@ -4,7 +4,7 @@ final class DictionaryTest: XCTestCase {
     
     private func storeBits(builder: Builder, src: String) throws -> Builder {
         for s in src {
-            try builder.storeBit(s != "0")
+            try builder.bits.write(bit: s != "0")
         }
         
         return builder

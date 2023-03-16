@@ -150,14 +150,14 @@ public struct BitString: Hashable {
     
     public func bitsToPaddedBuffer() throws -> Data {
         let builder = BitBuilder(capacity: UInt16((self.length + 7) / 8 * 8))
-        try builder.writeBits(src: self)
+        try builder.write(bits: self)
 
         let padding = (self.length + 7) / 8 * 8 - self.length
         for i in 0..<padding {
             if i == 0 {
-                try builder.writeBit(value: true)
+                try builder.write(bit: true)
             } else {
-                try builder.writeBit(value: false)
+                try builder.write(bit: false)
             }
         }
         
