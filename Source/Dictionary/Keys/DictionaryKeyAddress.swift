@@ -11,7 +11,7 @@ public struct DictionaryKeyAddress: DictionaryKey {
         
         return BigInt(
             try Builder()
-                .storeAddress(address: src)
+                .store(src)
                 .endCell().beginParse()
                 .bits.preloadUintBig(bits: bits)
         )

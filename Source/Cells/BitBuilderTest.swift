@@ -255,9 +255,9 @@ final class BitBuilderTest: XCTestCase {
         ]
         
         for c in cases {
-            let builder = BitBuilder()
-            try builder.writeAddress(address: Address.parse(c[0]))
-            let bits = try builder.build()
+            let builder = Builder()
+            try builder.store(Address.parse(c[0]))
+            let bits = try builder.endCell().bits
             XCTAssertEqual(try bits.toString(), c[1])
         }
     }

@@ -135,22 +135,6 @@ public class Builder {
     }
     
     /**
-     Store address
-     - parameter address: address to store
-     - returns this builder
-     */
-    @discardableResult
-    public func storeAddress(address: Address?) throws -> Self {
-        try _bits.writeAddress(address: address)
-        return self
-    }
-    @discardableResult
-    public func storeAddress(address: ExternalAddress?) throws -> Self {
-        try _bits.writeAddress(address: address)
-        return self
-    }
-    
-    /**
      * Store coins value
      * @param amount amount of coins
      * @returns this builder

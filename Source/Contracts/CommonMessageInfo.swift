@@ -121,8 +121,8 @@ public enum CommonMessageInfo: Readable, Writable {
             try builder.storeBit(info.ihrDisabled)
             try builder.storeBit(info.bounce)
             try builder.storeBit(info.bounced)
-            try builder.storeAddress(address: info.src)
-            try builder.storeAddress(address: info.dest)
+            try builder.store(AnyAddress.from(info.src))
+            try builder.store(AnyAddress.from(info.dest))
             try builder.store(storeCurrencyCollection(collection: info.value, builder: builder))
             try builder.storeCoins(coins: info.ihrFee)
             try builder.storeCoins(coins: info.forwardFee)
@@ -132,16 +132,16 @@ public enum CommonMessageInfo: Readable, Writable {
         case .externalOutInfo(let info):
             try builder.storeBit(true)
             try builder.storeBit(true)
-            try builder.storeAddress(address: info.src)
-            try builder.storeAddress(address: info.dest)
+            try builder.store(AnyAddress.from(info.src))
+            try builder.store(AnyAddress.from(info.dest))
             try builder.storeUint(info.createdLt, bits: 64)
             try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalInInfo(let info):
             try builder.storeBit(true)
             try builder.storeBit(false)
-            try builder.storeAddress(address: info.src)
-            try builder.storeAddress(address: info.dest)
+            try builder.store(AnyAddress.from(info.src))
+            try builder.store(AnyAddress.from(info.dest))
             try builder.storeCoins(coins: info.importFee)
         }
     }

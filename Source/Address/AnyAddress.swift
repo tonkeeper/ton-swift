@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents `MsgAddress` structure per TL-B definition:
-/// Note that in TON optional address is represented by MsgAddressExt
+/// Note that in TON optional address is represented by MsgAddressExt and not as you'd expect `(Maybe Address)`.
 /// ```
 /// addr_none$00 = MsgAddressExt;
 /// addr_extern$01 len:(## 9) external_address:(bits len)
@@ -20,6 +20,30 @@ enum AnyAddress {
     case none
     case internalAddr(Address)
     case externalAddr(ExternalAddress)
+    
+    public static func from(_ addr: Address) -> Self {
+        return .internalAddr(addr)
+    }
+    
+    public static func from(_ maybeAddr: Address?) -> Self {
+        if let addr = maybeAddr {
+            return .internalAddr(addr)
+        } else {
+            return .none
+        }
+    }
+    
+    public static func from(_ addr: ExternalAddress) -> Self {
+        return .externalAddr(addr)
+    }
+    
+    public static func from(_ maybeAddr: ExternalAddress?) -> Self {
+        if let addr = maybeAddr {
+            return .externalAddr(addr)
+        } else {
+            return .none
+        }
+    }
     
     /// Converts to an optional internal address. Throws error if it is an external address.
     public func asInternal() throws -> Address? {

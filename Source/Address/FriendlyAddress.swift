@@ -70,15 +70,6 @@ public struct FriendlyAddress: Codable {
     }
         
     public func toString(urlSafe: Bool = true) -> String {
-        let buffer = toStringData()
-        if urlSafe {
-            return buffer.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
-        } else {
-            return buffer.base64EncodedString()
-        }
-    }
-    
-    private func toStringData() -> Data {
         var tag = isBounceable ? bounceableTag : nonBounceableTag
         if isTestOnly {
             tag |= testFlag
@@ -95,11 +86,14 @@ public struct FriendlyAddress: Codable {
         addr[0] = tag
         addr[1] = wcByte
         addr[2...] = address.hash
-        var addressWithChecksum = Data(count: 36)
-        addressWithChecksum[0...] = addr
-        addressWithChecksum[34...] = addr.crc16()
-        
-        return addressWithChecksum
+        var addrcrc = Data(count: 36)
+        addrcrc[0...] = addr
+        addrcrc[34...] = addr.crc16()
+                
+        if urlSafe {
+            return addrcrc.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
+        } else {
+            return addrcrc.base64EncodedString()
+        }
     }
-
 }

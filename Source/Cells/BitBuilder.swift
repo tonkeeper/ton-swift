@@ -233,31 +233,7 @@ public class BitBuilder {
     func writeCoins(coins: Coins) throws {
         try writeVarUint(value: coins.amount, bits: 4)
     }
-    
-    /**
-     Write address
-    - parameter address: write address or address external
-    */
-    func writeAddress(address: Address?) throws {
-        if let address = address {
-            try writeUint(value: BigInt(2), bits: 2)
-            try writeUint(value: BigInt(0), bits: 1)
-            try writeInt(address.workchain, bits: 8)
-            try writeBuffer(src: address.hash)
-        } else {
-            try writeUint(value: BigInt(0), bits: 2)
-        }
-    }
-    func writeAddress(address: ExternalAddress?) throws {
-        if let address = address {
-            try writeUint(value: BigInt(1), bits: 2)
-            try writeUint(value: BigInt(address.value.length), bits: 9)
-            try writeBits(src: address.value)
-        } else {
-            try writeUint(value: BigInt(0), bits: 2)
-        }
-    }
-    
+        
     /**
      Wrtie var uint value, used for serializing coins
     - parameter value: value to write as bigint or number
