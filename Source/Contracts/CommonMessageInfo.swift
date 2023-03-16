@@ -59,8 +59,8 @@ public enum CommonMessageInfo: Readable, Writable {
             let ihrDisabled = try slice.bits.loadBit()
             let bounce = try slice.bits.loadBit()
             let bounced = try slice.bits.loadBit()
-            let src = try slice.loadAddress()
-            let dest = try slice.loadAddress()
+            let src: Address = try slice.loadType()
+            let dest: Address = try slice.loadType()
             let value = try loadCurrencyCollection(slice: slice)
             let ihrFee = try slice.loadCoins()
             let forwardFee = try slice.loadCoins()
@@ -85,28 +85,28 @@ public enum CommonMessageInfo: Readable, Writable {
         
         // External In message
         if !(try slice.bits.loadBit()) {
-            let src = try slice.loadMaybeExternalAddress()
-            let dest = try slice.loadAddress()
+            let src: AnyAddress = try slice.loadType()
+            let dest: Address = try slice.loadType()
             let importFee = try slice.loadCoins()
             
             return CommonMessageInfo.externalInInfo(
                 info: .init(
-                    src: src,
+                    src: try src.asExternal(),
                     dest: dest,
                     importFee: importFee
                 )
             )
         } else {
             // External Out mesage
-            let src = try slice.loadAddress()
-            let dest = try slice.loadMaybeExternalAddress()
+            let src: Address = try slice.loadType()
+            let dest: AnyAddress = try slice.loadType()
             let createdLt = try slice.bits.loadUint(bits: 64)
             let createdAt = UInt32(try slice.bits.loadUint(bits: 32))
             
             return CommonMessageInfo.externalOutInfo(
                 info: .init(
                     src: src,
-                    dest: dest,
+                    dest: try dest.asExternal(),
                     createdLt: createdLt,
                     createdAt: createdAt
                 )

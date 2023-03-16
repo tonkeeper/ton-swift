@@ -94,29 +94,7 @@ public class Slice {
             return nil
         }
     }
-    
-    // TODO: remove
-    public func loadAddress() throws -> Address {
-        return try self.loadType()
-    }
-    
-    // TODO: remove
-    public func loadMaybeAddress() throws -> Address? {
-        let anyaddr: AnyAddress = try self.loadType()
-        return try anyaddr.asInternal()
-    }
-    
-    // TODO: remove
-    public func loadExternalAddress() throws -> ExternalAddress {
-        return try self.loadType()
-    }
-    
-    // TODO: remove
-    public func loadMaybeExternalAddress() throws -> ExternalAddress? {
-        let anyaddr: AnyAddress = try self.loadType()
-        return try anyaddr.asExternal()
-    }
-    
+        
     /**
      Loads dictionary
     - parameter key: key description

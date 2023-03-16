@@ -18,10 +18,11 @@ public struct DictionaryKeyAddress: DictionaryKey {
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
+        let a:Address = try Builder()
             .storeUint(src, bits: bits)
             .endCell()
             .beginParse()
-            .loadAddress()
+            .loadType()
+        return a
     }
 }

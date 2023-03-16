@@ -76,7 +76,7 @@ class TupleReader {
     }
     
     public func readAddress() throws -> Address {
-        return try readCell().beginParse().loadAddress()
+        return try readCell().beginParse().loadType()
     }
     
     public func readAddressOpt() throws -> Address? {
@@ -84,7 +84,8 @@ class TupleReader {
             return nil
         }
         
-        return try cell.beginParse().loadMaybeAddress()
+        let a: AnyAddress = try cell.beginParse().loadType()
+        return try a.asInternal()
     }
     
     public func readCell() throws -> Cell {

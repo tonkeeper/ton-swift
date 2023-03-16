@@ -10,6 +10,7 @@ public struct DictionaryAddressValue: DictionaryValue {
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.loadAddress()
+        let a: Address = try src.loadType()
+        return a
     }
 }
