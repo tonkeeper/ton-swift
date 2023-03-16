@@ -13,6 +13,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] StateInit
 - [x] CommonMsgInfo
 - [x] Send Flags
+- [x] Snake data
 - [ ] Signatures
 - [ ] Wallet V3R1, V3R2
 - [ ] Wallet V4

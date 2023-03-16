@@ -10,7 +10,7 @@ final class СontractAddressTest: XCTestCase {
             data: try Builder().storeUint(UInt64(2), bits: 8).endCell()
         )
         let addr = try OpaqueContract(workchain: 0, stateInit: stateInit).address()
-        XCTAssertEqual(addr, try Address.parse(source: "EQCSY_vTjwGrlvTvkfwhinJ60T2oiwgGn3U7Tpw24kupIhHz"))
+        XCTAssertEqual(addr, try Address.parse("EQCSY_vTjwGrlvTvkfwhinJ60T2oiwgGn3U7Tpw24kupIhHz"))
     }
     
 }
