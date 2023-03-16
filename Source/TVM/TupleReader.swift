@@ -170,7 +170,7 @@ class TupleReader {
     
     public func readString() throws -> String {
         let s = try readCell().beginParse()
-        return try s.loadStringTail()
+        return try s.loadSnakeString()
     }
     
     public func readStringOpt() throws -> String? {
@@ -180,6 +180,6 @@ class TupleReader {
         }
         
         let s = try readCell().beginParse()
-        return try s.loadStringTail()
+        return try s.loadSnakeString()
     }
 }

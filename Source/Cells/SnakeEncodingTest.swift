@@ -11,8 +11,8 @@ final class StringFromSliceTest: XCTestCase {
         ]
         
         for c in cases {
-            let cell = try stringToCell(src: c)
-            XCTAssertEqual(try readString(slice: try cell.beginParse()), c)
+            let cell = try c.toTonCell()
+            XCTAssertEqual(try (try cell.beginParse()).loadSnakeString(), c)
         }
     }
     
