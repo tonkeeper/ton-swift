@@ -159,7 +159,7 @@ func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: BitBuild
     
     try to.writeUint(value: UInt64(d1), bits: 8)
     try to.writeUint(value: UInt64(d2), bits: 8)
-    try to.writeBuffer(src: cell.bits.bitsToPaddedBuffer())
+    try to.writeData(cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
         try to.writeUint(value: r, bits: sizeBytes * 8)
@@ -188,7 +188,6 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     
     let offsetBytes = max(Int(ceil(Double(try totalCellSize.bitsCount(mode: .uint)) / 8.0)), 1)
     let hasIdxFactor = hasIdx ? (cellsNum * offsetBytes) : 0
-    let hasCrc32cFactor = hasCrc32c ? 4 : 0
     let totalSize = (
         4 + // magic
         1 + // flags and s_bytes
@@ -198,11 +197,11 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
         1 * sizeBytes + // root_idx
         hasIdxFactor +
         totalCellSize +
-        hasCrc32cFactor
+        (hasCrc32c ? 4 : 0)
     ) * 8
 
     // Serialize
-    var builder = BitBuilder(size: totalSize)
+    var builder = BitBuilder(capacity: UInt16(totalSize))
     try builder.writeUint(value: UInt32(0xb5ee9c72), bits: 32) // Magic
     try builder.writeBit(value: hasIdx) // Has index
     try builder.writeBit(value: hasCrc32c) // Has crc32c
@@ -232,11 +231,11 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     }
 
     if hasCrc32c {
-        let crc32 = (try builder.buffer()).crc32c()
-        try builder.writeBuffer(src: crc32)
+        let crc32 = (try builder.toData()).crc32c()
+        try builder.writeData(crc32)
     }
 
-    let res = try builder.buffer()
+    let res = try builder.toData()
     if res.count != totalSize / 8 {
         throw TonError.custom("Internal error")
     }

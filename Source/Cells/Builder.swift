@@ -12,39 +12,27 @@ public class Builder {
         _refs = []
     }
     
-    /**
-     Bits written so far
-     */
+    /// Number of written bits
     public var bits: Int {
         return _bits.length
     }
     
-    /**
-     References written so far
-     */
+    /// Number of references added to this cell
     public var refs: Int {
         return _refs.count
     }
     
-    /**
-     Available bits
-     */
+    /// Remaining bits available
     public var availableBits: Int {
         return 1023 - bits
     }
     
-    /**
-     Available references
-     */
+    /// Remaining refs available
     public var availableRefs: Int {
         return 4 - refs
     }
     
-    /**
-     Write a single bit
-     - parameter value: bit to write, true or positive number for 1, false or zero or negative for 0
-     - returns this builder
-     */
+    /// Write a single bit
     @discardableResult
     public func storeBit(_ value: Bool) throws -> Self {
         try _bits.writeBit(value: value)
@@ -69,7 +57,7 @@ public class Builder {
      */
     @discardableResult
     public func storeBuffer(_ src: Data) throws -> Self {
-        try _bits.writeBuffer(src: src)
+        try _bits.writeData(src)
         return self
     }
     

@@ -3,31 +3,44 @@ import BigInt
 
 /// Interface for writing bits to a BitString.
 public class BitBuilder {
+    
+    /// Maximum length of the bitstring in bits
+    let capacity: Int
+    
     private var _buffer: Data
     private var _length: Int
     
-    /**
-     - returns the length of the bitstring
-     */
+    /// Number of bits written
     public var length: Int {
         return _length
     }
     
-    public init(size: Int = 1023) {
-        _buffer = Data(count: (size + 7) / 8)
-        _length = 0
+    /// Remaining bits available
+    public var availableBits: Int {
+        return capacity - _length
     }
+    
+    /// Returns whether the written bits are byte-aligned
+    public var aligned: Bool {
+        return _length % 8 == 0
+    }
+    
+    /// Initialize the BitBuilder with a given capacity.
+    /// The backing buffer will be allocated right away, so the capacity is limited to 64Kbit at the API level.
+    public init(capacity: UInt16 = 1023) {
+        let cap = Int(capacity)
+        _buffer = Data(count: (cap + 7) / 8)
+        _length = 0
+        self.capacity = cap
+    }
+    
     
     // MARK: - Public methods
     
-    /**
-     Write a single bit
-     - parameter value: bit to write, positive number for 1, zero or negative for 0
-     */
+    
+    /// Write a single bit: the bit is set for positive values, not set for zero or negative
     public func writeBit(value: Int) throws {
-        if _length > _buffer.count * 8 {
-            throw TonError.custom("BitBuilder overflow")
-        }
+        try checkCapacity(1)
         
         if value > 0 {
             _buffer[_length / 8] |= 1 << (7 - (_length % 8))
@@ -36,59 +49,40 @@ public class BitBuilder {
         _length += 1
     }
     
-    /**
-     Write a single bit
-     - parameter value: bit to write, true for 1, false for 0
-     */
+    /// Writes bit as a boolean (true => 1, false => 0)
     public func writeBit(value: Bool) throws {
         try writeBit(value: value ? 1 : 0)
     }
     
-    /**
-     Copy bits from BitString
-     - parameter src: source bits
-     */
+    /// Writes bits from a bitstring
     public func writeBits(src: BitString) throws {
         for i in 0..<src.length {
             try writeBit(value: src.at(index: i))
         }
     }
     
-    /**
-     Build BitString
-     - returns result bit string
-     */
+    /// Converts builder into BitString
     public func build() throws -> BitString {
         return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
-    /**
-     Build into Buffer
-    - returns result buffer
-    */
-    public func buffer() throws -> Data {
-        if _length % 8 != 0 {
-            throw TonError.custom("BitBuilder buffer is not byte aligned")
+    /// Converts to data if the bitstring contains a whole number of bytes.
+    public func toData() throws -> Data {
+        if !aligned {
+            throw TonError.custom("BitBuilder buffer is not byte-aligned")
         }
-        
         return _buffer.subdata(in: 0..._length / 8)
     }
     
-    /**
-     Write bits from buffer
-    - parameter src: source buffer
-    */
-    func writeBuffer(src: Data) throws {
+    /// Writes bytes from the src data.
+    func writeData(_ src: Data) throws {
+        try checkCapacity(src.count*8)
+        
         // Special case for aligned offsets
-        if _length % 8 == 0 {
-            if _length + src.count * 8 > _buffer.count * 8 {
-                throw TonError.custom("BitBuilder overflow")
-            }
-            
+        if aligned {
             for i in 0..<src.count {
                 _buffer[_length / 8 + i] = src[i]
             }
-
             _length += src.count * 8
         } else {
             for i in 0..<src.count {
@@ -112,30 +106,35 @@ public class BitBuilder {
         try writeUint(value: BigInt(value), bits: bits)
     }
     public func writeUint(value: BigInt, bits: Int) throws {
-        // Special case for 8 bits
-        if bits == 8 && _length % 8 == 0 {
-            let v = Int(value)
-            if v < 0 || v > 255 {
-                throw TonError.custom("Value is out of range for \(bits) bits. Got \(value)")
-            }
-            
-            _buffer[_length / 8] = UInt8(value)
-            _length += 8
-            
-            return
-        }
+        try checkCapacity(bits)
         
-        // Special case for 16 bits
-        if bits == 16 && _length % 8 == 0 {
-            let v = Int(value)
-            if v < 0 || v > 65536 {
-                throw TonError.custom("Value is out of range for \(bits) bits. Got \(value)")
+        // Special cases when our buffer is aligned
+        if aligned {
+            // Special case for 8 bits
+            if bits == 8 {
+                let v = Int(value)
+                if v < 0 || v > 255 {
+                    throw TonError.custom("Value is out of range for \(bits) bits. Got \(value)")
+                }
+                
+                _buffer[_length / 8] = UInt8(value)
+                _length += 8
+                
+                return
             }
-            _buffer[_length / 8] = UInt8(v >> 8)
-            _buffer[_length / 8 + 1] = UInt8(v & 0xff)
-            _length += 16
             
-            return
+            // Special case for 16 bits
+            if bits == 16 {
+                let v = Int(value)
+                if v < 0 || v > 65536 {
+                    throw TonError.custom("Value is out of range for \(bits) bits. Got \(value)")
+                }
+                _buffer[_length / 8] = UInt8(v >> 8)
+                _buffer[_length / 8 + 1] = UInt8(v & 0xff)
+                _length += 16
+                
+                return
+            }
         }
         
         // Corner case for zero bits
@@ -267,6 +266,12 @@ public class BitBuilder {
 
         // Write number
         try writeUint(value: v, bits: sizeBits)
+    }
+    
+    private func checkCapacity(_ bits: Int) throws {
+        if availableBits < bits || bits < 0 {
+            throw TonError.custom("BitBuilder overflow: need to write \(bits), but available \(availableBits)")
+        }
     }
 
 }

@@ -149,7 +149,7 @@ public struct BitString: Hashable {
     
     
     public func bitsToPaddedBuffer() throws -> Data {
-        let builder = BitBuilder(size: (self.length + 7) / 8 * 8)
+        let builder = BitBuilder(capacity: UInt16((self.length + 7) / 8 * 8))
         try builder.writeBits(src: self)
 
         let padding = (self.length + 7) / 8 * 8 - self.length
@@ -161,7 +161,7 @@ public struct BitString: Hashable {
             }
         }
         
-        return try builder.buffer()
+        return try builder.toData()
     }
 
 }
