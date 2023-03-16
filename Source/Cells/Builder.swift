@@ -2,40 +2,40 @@ import Foundation
 import BigInt
 
 public class Builder {
-    private var _bits: BitBuilder
-    private var _refs: [Cell]
+    public private(set) var bits: BitBuilder
+    public private(set) var refs: [Cell]
     
     // TBD: public var bits: BitBuilder { get { return self._bits } }
     
     public init() {
-        _bits = BitBuilder()
-        _refs = []
+        bits = BitBuilder()
+        refs = []
     }
     
     /// Number of written bits
-    public var bits: Int {
-        return _bits.length
+    public var bitsCount: Int {
+        return bits.length
     }
     
     /// Number of references added to this cell
-    public var refs: Int {
-        return _refs.count
+    public var refsCount: Int {
+        return refs.count
     }
     
     /// Remaining bits available
     public var availableBits: Int {
-        return 1023 - bits
+        return 1023 - bitsCount
     }
     
     /// Remaining refs available
     public var availableRefs: Int {
-        return 4 - refs
+        return 4 - refsCount
     }
     
     /// Write a single bit
     @discardableResult
     public func storeBit(_ value: Bool) throws -> Self {
-        try _bits.writeBit(value: value)
+        try bits.writeBit(value: value)
         return self
     }
     
@@ -46,7 +46,7 @@ public class Builder {
      */
     @discardableResult
     public func storeBits(_ src: BitString) throws -> Self {
-        try _bits.writeBits(src: src)
+        try bits.writeBits(src: src)
         return self
     }
     
@@ -57,7 +57,7 @@ public class Builder {
      */
     @discardableResult
     public func storeBuffer(_ src: Data) throws -> Self {
-        try _bits.writeData(src)
+        try bits.writeData(src)
         return self
     }
     
@@ -69,17 +69,17 @@ public class Builder {
     */
     @discardableResult
     public func storeInt(_ value: Int, bits: Int) throws -> Self {
-        try _bits.writeInt(value, bits: bits)
+        try self.bits.writeInt(value, bits: bits)
         return self
     }
     @discardableResult
     public func storeInt(_ value: BigUInt, bits: Int) throws -> Self {
-        try _bits.writeInt(value, bits: bits)
+        try self.bits.writeInt(value, bits: bits)
         return self
     }
     @discardableResult
     public func storeInt(_ value: BigInt, bits: Int) throws -> Self {
-        try _bits.writeInt(value, bits: bits)
+        try self.bits.writeInt(value, bits: bits)
         return self
     }
     
@@ -91,17 +91,17 @@ public class Builder {
      */
     @discardableResult
     public func storeUint(_ value: UInt64, bits: Int) throws -> Self {
-        try _bits.writeUint(value: value, bits: bits)
+        try self.bits.writeUint(value: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigUInt, bits: Int) throws -> Self {
-        try _bits.writeUint(value: value, bits: bits)
+        try self.bits.writeUint(value: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigInt, bits: Int) throws -> Self {
-        try _bits.writeUint(value: value, bits: bits)
+        try self.bits.writeUint(value: value, bits: bits)
         return self
     }
     
@@ -113,12 +113,12 @@ public class Builder {
     */
     @discardableResult
     public func storeVarUint(value: UInt64, bits: Int) throws -> Self {
-        try _bits.writeVarUint(value: value, bits: bits)
+        try self.bits.writeVarUint(value: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeVarUint(value: BigUInt, bits: Int) throws -> Self {
-        try _bits.writeVarUint(value: value, bits: bits)
+        try self.bits.writeVarUint(value: value, bits: bits)
         return self
     }
     
@@ -129,7 +129,7 @@ public class Builder {
      */
     @discardableResult
     public func storeCoins(coins: Coins) throws -> Self {
-        try _bits.writeCoins(coins: coins)
+        try self.bits.writeCoins(coins: coins)
         return self
     }
     
@@ -157,21 +157,21 @@ public class Builder {
      */
     @discardableResult
     public func storeRef(cell: Cell) throws -> Self {
-        if _refs.count >= 4 {
+        if refs.count >= 4 {
             throw TonError.custom("Too many references")
         }
         
-        _refs.append(cell)
+        refs.append(cell)
         
         return self
     }
     @discardableResult
     public func storeRef(cell: Builder) throws -> Self {
-        if _refs.count >= 4 {
+        if refs.count >= 4 {
             throw TonError.custom("Too many references")
         }
         
-        _refs.append(try cell.endCell())
+        refs.append(try cell.endCell())
         
         return self
     }
@@ -291,7 +291,7 @@ public class Builder {
     - returns cell
     */
     public func endCell() throws -> Cell {
-        return try Cell(bits: _bits.build(), refs: _refs)
+        return try Cell(bits: bits.build(), refs: refs)
     }
     
     /**
