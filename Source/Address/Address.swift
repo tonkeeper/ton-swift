@@ -79,10 +79,10 @@ extension Address: Equatable {
 /// ```
 extension Address: Writable, Readable {
     public func writeTo(builder b: Builder) throws {
-        try b.storeUint(UInt64(2), bits: 2) // $10
-        try b.storeUint(UInt64(0), bits: 1)
-        try b.storeInt(Int(self.workchain), bits: 8)
-        try b.storeBuffer(self.hash)
+        try b.bits.writeUint(value: UInt64(2), bits: 2) // $10
+        try b.bits.writeUint(value: UInt64(0), bits: 1)
+        try b.bits.writeInt(Int(self.workchain), bits: 8)
+        try b.bits.writeData(self.hash)
     }
     
     public static func readFrom(slice: Slice) throws -> Address {

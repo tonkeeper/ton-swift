@@ -49,11 +49,11 @@ extension Builder {
             if src.count > bytes {
                 let a = src.subdata(in: 0..<bytes)
                 let t = src.subdata(in: bytes..<src.endIndex)
-                try self.storeBuffer(a)
+                try self.bits.writeData(a)
                 let cell = try (try Builder().writeSnakeData(t)).endCell();
                 try self.storeRef(cell: cell)
             } else {
-                try self.storeBuffer(src)
+                try self.bits.writeData(src)
             }
         }
         return self

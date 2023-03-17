@@ -27,9 +27,7 @@ final class ParseDictTest: XCTestCase {
         XCTAssertEqual(try loaded[239]?.bits.loadUint(bits: 16), 57121)
         
         // should parse with single node
-        let root2 = try Builder()
-            .storeBuffer(Data(hex: "a01f6e01b8f0a32c242ce41087ffee755406d9bcf9059a75e6b28d4af2a8250b73a8ee6b2800")!)
-            .endCell()
+        let root2 = try Cell(data: Data(hex: "a01f6e01b8f0a32c242ce41087ffee755406d9bcf9059a75e6b28d4af2a8250b73a8ee6b2800")!)
         
         let loaded2 = try parseDict(sc: try root2.beginParse(), keySize: 256, extractor: { $0 })
         XCTAssertEqual(loaded2.keys.first, BigInt("113728506967403912844988930199811170511118141411198189003219273357906839886749"))

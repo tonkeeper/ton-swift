@@ -31,18 +31,7 @@ public class Builder {
     public var availableRefs: Int {
         return 4 - refsCount
     }
-        
-    /**
-     Store Buffer
-     - parameter src: source buffer
-     - returns this builder
-     */
-    @discardableResult
-    public func storeBuffer(_ src: Data) throws -> Self {
-        try bits.writeData(src)
-        return self
-    }
-    
+
     /**
      Store int value
     - parameter value: value as bigint or number

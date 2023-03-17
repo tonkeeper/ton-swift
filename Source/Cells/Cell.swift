@@ -57,6 +57,12 @@ public struct Cell: Hashable {
         self.mask = LevelMask()
     }
     
+    /// Initializes a new cell with plain bytestring. This does not parse Bag-of-Cells (BoC), but uses provided data as a bitstring (byte-aligned).
+    /// Throws if data contains more than 1023 bits.
+    public init(data: Data) throws {
+        try self.init(bits: BitString(data: data))
+    }
+    
     /**
      Deserialize cells from BOC
     - parameter src: source buffer

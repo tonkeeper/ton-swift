@@ -14,9 +14,7 @@ public struct DictionaryKeyBuffer: DictionaryKey {
         }
 
         return BigInt(
-            try Builder()
-                .storeBuffer(src)
-                .endCell()
+            try Cell(data: src)
                 .beginParse()
                 .bits.loadUintBig(bits: bits * 8)
         )
