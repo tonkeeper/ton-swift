@@ -82,7 +82,7 @@ extension Address: Writable, Readable {
         try b.bits.writeUint(value: UInt64(2), bits: 2) // $10
         try b.bits.writeUint(value: UInt64(0), bits: 1)
         try b.bits.writeInt(Int(self.workchain), bits: 8)
-        try b.bits.writeData(self.hash)
+        try b.bits.write(data: self.hash)
     }
     
     public static func readFrom(slice: Slice) throws -> Address {

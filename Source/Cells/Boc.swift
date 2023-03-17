@@ -159,7 +159,7 @@ func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: BitBuild
     
     try to.writeUint(value: UInt64(d1), bits: 8)
     try to.writeUint(value: UInt64(d2), bits: 8)
-    try to.writeData(cell.bits.bitsToPaddedBuffer())
+    try to.write(data: cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
         try to.writeUint(value: r, bits: sizeBytes * 8)
@@ -232,7 +232,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
 
     if hasCrc32c {
         let crc32 = (try builder.toData()).crc32c()
-        try builder.writeData(crc32)
+        try builder.write(data: crc32)
     }
 
     let res = try builder.toData()

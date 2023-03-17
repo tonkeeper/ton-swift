@@ -16,7 +16,7 @@ public struct DictionaryBufferValue: DictionaryValue {
             throw TonError.custom("Invalid buffer size")
         }
         
-        try builder.bits.writeData(src)
+        try builder.bits.write(data: src)
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {

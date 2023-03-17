@@ -35,9 +35,6 @@ public class BitBuilder {
     }
     
     
-    // MARK: - Public methods
-    
-    
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     public func write(bit: Int) throws {
         try checkCapacity(1)
@@ -61,32 +58,19 @@ public class BitBuilder {
         }
     }
     
-    /// Converts builder into BitString
-    public func build() throws -> BitString {
-        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
-    }
-    
-    /// Converts to data if the bitstring contains a whole number of bytes.
-    public func toData() throws -> Data {
-        if !aligned {
-            throw TonError.custom("BitBuilder buffer is not byte-aligned")
-        }
-        return _buffer.subdata(in: 0..._length / 8)
-    }
-    
     /// Writes bytes from the src data.
-    func writeData(_ src: Data) throws {
-        try checkCapacity(src.count*8)
+    func write(data: Data) throws {
+        try checkCapacity(data.count*8)
         
         // Special case for aligned offsets
         if aligned {
-            for i in 0..<src.count {
-                _buffer[_length / 8 + i] = src[i]
+            for i in 0..<data.count {
+                _buffer[_length / 8 + i] = data[i]
             }
-            _length += src.count * 8
+            _length += data.count * 8
         } else {
-            for i in 0..<src.count {
-                try writeUint(value: BigInt(src[i]), bits: 8)
+            for i in 0..<data.count {
+                try writeUint(value: BigInt(data[i]), bits: 8)
             }
         }
     }
@@ -268,6 +252,19 @@ public class BitBuilder {
         try writeUint(value: v, bits: sizeBits)
     }
     
+    /// Converts builder into BitString
+    public func build() throws -> BitString {
+        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+    }
+    
+    /// Converts to data if the bitstring contains a whole number of bytes.
+    public func toData() throws -> Data {
+        if !aligned {
+            throw TonError.custom("BitBuilder buffer is not byte-aligned")
+        }
+        return _buffer.subdata(in: 0..._length / 8)
+    }
+
     private func checkCapacity(_ bits: Int) throws {
         if availableBits < bits || bits < 0 {
             throw TonError.custom("BitBuilder overflow: need to write \(bits), but available \(availableBits)")
