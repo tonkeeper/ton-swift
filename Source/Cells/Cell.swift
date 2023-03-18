@@ -10,7 +10,7 @@ public enum CellType: Int {
 /// TON cell
 public struct Cell: Hashable {
     
-    private let basic: BasicCell;
+    private let basic: BasicCell
     
     public var type: CellType { basic.type }
     public var bits: BitString { basic.bits }
@@ -152,6 +152,22 @@ public struct Cell: Hashable {
         }
         
         return s
+    }
+    
+    /**
+     Covnert cell to slice
+    - returns slice
+    */
+    public func asSlice() throws -> Slice {
+        return try beginParse()
+    }
+
+    /**
+     Convert cell to a builder that has this cell stored
+    - returns builder
+    */
+    public func asBuilder() throws -> Builder {
+        return try Builder().storeSlice(src: asSlice())
     }
 }
 

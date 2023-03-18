@@ -179,7 +179,8 @@ public class Builder {
      Store slice it in this builder
      - parameter src: source slice
      */
-    public func storeSlice(src: Slice) throws {
+    @discardableResult
+    public func storeSlice(src: Slice) throws -> Self {
         let c = src.clone()
         if c.remainingBits > 0 {
             try bits.write(bits: c.bits.loadBits(c.remainingBits))
@@ -187,6 +188,8 @@ public class Builder {
         while c.remainingRefs > 0 {
             try storeRef(cell: c.loadRef())
         }
+        
+        return self
     }
     
     /**
@@ -277,6 +280,6 @@ public class Builder {
 // MARK: - Writable
 extension Builder: Writable {
     public func writeTo(builder: Builder) throws {
-//        try storeSlice(src: try builder.endCell().beginParse())
+        try storeSlice(src: try builder.endCell().beginParse())
     }
 }
