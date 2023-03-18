@@ -97,15 +97,21 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - returns Dictionary
     */
     public static func load(key: DictionaryKey, value: any DictionaryValue, sc: Slice) throws -> Dictionary {
-        return try loadDirect(key: key, value: value, sc: sc)
+        let cell = try sc.loadMaybeRef()
+        if let cell, !cell.isExotic {
+            return try loadDirect(key: key, value: value, sc: cell.beginParse())
+        } else {
+            return .empty(key: key, value: value)
+        }
     }
+    
     public static func load(key: DictionaryKey, value: any DictionaryValue, sc: Cell) throws -> Dictionary {
         if sc.isExotic {
             return .empty(key: key, value: value)
         }
-        let slice = try sc.beginParse()
         
-        return try loadDirect(key: key, value: value, sc: slice)
+        let slice = try sc.beginParse()
+        return try load(key: key, value: value, sc: slice)
     }
 
     /**
@@ -123,7 +129,6 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
 
         let slice = sc
-        
         let values = try parseDict(sc: slice, keySize: UInt64(key.bits), extractor: value.parse)
         var prepare = [String: V]()
         for (k, v) in values {

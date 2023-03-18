@@ -21,7 +21,7 @@ final class DictionaryTest: XCTestCase {
             .storeRef(cell: try storeBits(builder: Builder(), src: "1011111011111101111100100001"))
             .endCell()
         
-        let dict: Dictionary<UInt64, UInt64> = try Dictionary.load(
+        let dict: Dictionary<UInt64, UInt64> = try Dictionary.loadDirect(
             key: DictionaryKeys.Uint(bits: 16),
             value: DictionaryValues.Uint(bits: 16),
             sc: try root.beginParse()
