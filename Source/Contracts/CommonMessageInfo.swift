@@ -61,7 +61,7 @@ public enum CommonMessageInfo: Readable, Writable {
             let bounced = try slice.bits.loadBit()
             let src: Address = try slice.loadType()
             let dest: Address = try slice.loadType()
-            let value = try CurrencyCollection.readFrom(slice: slice)
+            let value: CurrencyCollection = try slice.loadType()
             let ihrFee = try slice.loadCoins()
             let forwardFee = try slice.loadCoins()
             let createdLt = try slice.bits.loadUint(bits: 64)
