@@ -1,6 +1,12 @@
 import Foundation
 import BigInt
 
+/// Implements CurrencyCollection per TLB schema:
+///
+/// ```
+/// extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;
+/// currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
+/// ```
 struct CurrencyCollection: Readable, Writable {
     let other: Dictionary<Int, BigUInt>?
     let coins: Coins
