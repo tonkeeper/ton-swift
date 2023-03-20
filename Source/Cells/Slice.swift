@@ -124,6 +124,13 @@ public class Slice {
     }
     
     /// Converts the remaining data in the slice to a Cell.
+    /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
+    public func loadRemainder() throws -> Cell {
+        return try asBuilder().endCell()
+    }
+    
+    /// Converts the remaining data in the slice to a Cell.
+    /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
     public func asCell() throws -> Cell {
         return try asBuilder().endCell()
     }
@@ -142,6 +149,6 @@ public class Slice {
     
     /// Returns string representation of the slice as a cell.
     public func toString() throws -> String {
-        return try asCell().toString()
+        return try loadRemainder().toString()
     }
 }

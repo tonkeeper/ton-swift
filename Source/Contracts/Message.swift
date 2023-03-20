@@ -28,7 +28,7 @@ public struct Message: Readable, Writable {
         if try slice.bits.loadBit() {
             body = try slice.loadRef()
         } else {
-            body = try slice.asCell()
+            body = try slice.loadRemainder()
         }
         
         return Message(info: info, stateInit: stateInit, body: body)
