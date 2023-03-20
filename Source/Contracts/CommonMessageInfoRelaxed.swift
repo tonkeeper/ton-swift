@@ -10,7 +10,8 @@ import Foundation
                 value:CurrencyCollection
                 ihr_fee:Grams
                 fwd_fee:Grams
- created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+                created_lt:uint64
+                created_at:uint32 = CommonMsgInfoRelaxed;
  
  ext_out_msg_info$11 src:MsgAddress
                     dest:MsgAddressExt

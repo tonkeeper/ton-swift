@@ -7,6 +7,14 @@ public enum CellType: Int {
     case merkleUpdate = 4
 }
 
+/// Metrics of a cell or a builder
+public struct CellMetrics {
+    /// Number of bits in the cell
+    var bitsCount: Int
+    /// Number of refs in the cell
+    var refsCount: Int
+}
+
 /// TON cell
 public struct Cell: Hashable {
     
@@ -18,6 +26,10 @@ public struct Cell: Hashable {
 
     public var level: UInt32 { mask.level }
     public var isExotic: Bool { type != .ordinary }
+    
+    public var metrics: CellMetrics {
+        return CellMetrics(bitsCount: bits.length, refsCount: refs.count)
+    }
 
     // Precomputed data
     private var _hashes: [Data] = []

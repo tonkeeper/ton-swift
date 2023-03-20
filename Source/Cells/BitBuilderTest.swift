@@ -67,7 +67,7 @@ final class BitBuilderTest: XCTestCase {
         
         for c in cases {
             let builder = BitBuilder()
-            try builder.writeUint(value: c.0, bits: c.1)
+            try builder.write(uint: c.0, bits: c.1)
             let bits = try builder.build()
             XCTAssertEqual(try bits.toString(), c.2)
         }

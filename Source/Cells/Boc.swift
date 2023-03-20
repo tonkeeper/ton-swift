@@ -157,12 +157,12 @@ func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: BitBuild
     let d1 = getRefsDescriptor(refs: cell.refs, level: cell.level, type: cell.type)
     let d2 = getBitsDescriptor(bits: cell.bits)
     
-    try to.writeUint(value: UInt64(d1), bits: 8)
-    try to.writeUint(value: UInt64(d2), bits: 8)
+    try to.write(uint: d1, bits: 8)
+    try to.write(uint: d2, bits: 8)
     try to.write(data: cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
-        try to.writeUint(value: r, bits: sizeBytes * 8)
+        try to.write(uint: r, bits: sizeBytes * 8)
     }
     
     return to
@@ -202,22 +202,22 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
 
     // Serialize
     var builder = BitBuilder(capacity: UInt16(totalSize))
-    try builder.writeUint(value: UInt32(0xb5ee9c72), bits: 32) // Magic
+    try builder.write(uint: 0xb5ee9c72, bits: 32) // Magic
     try builder.write(bit: hasIdx) // Has index
     try builder.write(bit: hasCrc32c) // Has crc32c
     try builder.write(bit: hasCacheBits) // Has cache bits
-    try builder.writeUint(value: flags, bits: 2) // Flags
-    try builder.writeUint(value: UInt32(sizeBytes), bits: 3) // Size bytes
-    try builder.writeUint(value: UInt32(offsetBytes), bits: 8) // Offset bytes
-    try builder.writeUint(value: UInt32(cellsNum), bits: sizeBytes * 8) // Cells num
-    try builder.writeUint(value: UInt32(1), bits: sizeBytes * 8) // Roots num
-    try builder.writeUint(value: UInt32(0), bits: sizeBytes * 8) // Absent num
-    try builder.writeUint(value: UInt32(totalCellSize), bits: offsetBytes * 8) // Total cell size
-    try builder.writeUint(value: UInt32(0), bits: sizeBytes * 8) // Root id == 0
+    try builder.write(uint: flags, bits: 2) // Flags
+    try builder.write(uint: sizeBytes, bits: 3) // Size bytes
+    try builder.write(uint: offsetBytes, bits: 8) // Offset bytes
+    try builder.write(uint: cellsNum, bits: sizeBytes * 8) // Cells num
+    try builder.write(uint: 1, bits: sizeBytes * 8) // Roots num
+    try builder.write(uint: 0, bits: sizeBytes * 8) // Absent num
+    try builder.write(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
+    try builder.write(uint: 0, bits: sizeBytes * 8) // Root id == 0
 
     if hasIdx {
         for i in 0 ..< cellsNum {
-            try builder.writeUint(value: UInt32(index[i]), bits: offsetBytes * 8)
+            try builder.write(uint: index[i], bits: offsetBytes * 8)
         }
     }
 

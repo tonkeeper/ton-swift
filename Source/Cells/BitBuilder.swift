@@ -70,7 +70,7 @@ public class BitBuilder {
             _length += data.count * 8
         } else {
             for i in 0..<data.count {
-                try writeUint(value: BigInt(data[i]), bits: 8)
+                try write(uint: data[i], bits: 8)
             }
         }
     }
@@ -80,16 +80,11 @@ public class BitBuilder {
     - parameter value: value as bigint or number
     - parameter bits: number of bits to write
     */
-    public func writeUint(value: UInt64, bits: Int) throws {
-        try writeUint(value: BigInt(value), bits: bits)
+    public func write<T>(uint value: T, bits: Int) throws where T: BinaryInteger {
+        return try write(biguint: BigInt(value), bits: bits);
     }
-    public func writeUint(value: UInt32, bits: Int) throws {
-        try writeUint(value: BigInt(value), bits: bits)
-    }
-    public func writeUint(value: BigUInt, bits: Int) throws {
-        try writeUint(value: BigInt(value), bits: bits)
-    }
-    public func writeUint(value: BigInt, bits: Int) throws {
+    
+    public func write(biguint value: BigInt, bits: Int) throws {
         try checkCapacity(bits)
         
         // Special cases when our buffer is aligned
@@ -206,7 +201,7 @@ public class BitBuilder {
             try write(bit: false)
         }
         
-        try writeUint(value: v, bits: bits - 1)
+        try write(uint: v, bits: bits - 1)
     }
     
     /**
@@ -237,7 +232,7 @@ public class BitBuilder {
         // Corner case for zero
         if v == 0 {
             // Write zero size
-            try writeUint(value: UInt64(0), bits: bits)
+            try write(uint: 0, bits: bits)
             return
         }
 
@@ -246,10 +241,10 @@ public class BitBuilder {
         let sizeBits = sizeBytes * 8
 
         // Write size
-        try writeUint(value: UInt32(sizeBytes), bits: bits)
+        try write(uint: sizeBytes, bits: bits)
 
         // Write number
-        try writeUint(value: v, bits: sizeBits)
+        try write(uint: v, bits: sizeBits)
     }
     
     /// Converts builder into BitString

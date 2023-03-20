@@ -21,7 +21,7 @@ public class Builder {
     public var refsCount: Int {
         return refs.count
     }
-    
+        
     /// Remaining bits available
     public var availableBits: Int {
         return 1023 - bitsCount
@@ -30,6 +30,29 @@ public class Builder {
     /// Remaining refs available
     public var availableRefs: Int {
         return 4 - refsCount
+    }
+    
+    /// Returns metrics for the currently stored data
+    public var metrics: CellMetrics {
+        return CellMetrics(bitsCount: bits.length, refsCount: refs.count)
+    }
+    
+    /// Returns metrics for the remaining space in the cell
+    public var remainingMetrics: CellMetrics {
+        return CellMetrics(bitsCount: availableBits, refsCount: availableRefs)
+    }
+
+    /// Tries to fit the cell with the given metrics and returns the remaining space.
+    /// If the cell does not fit, returns `nil`.
+    public func fit(_ cell: CellMetrics) -> CellMetrics? {
+        if availableBits >= cell.bitsCount && availableRefs >= cell.refsCount {
+            return CellMetrics(
+                bitsCount: availableBits - cell.bitsCount,
+                refsCount: availableRefs - cell.refsCount
+            )
+        } else {
+            return nil
+        }
     }
 
     /**
@@ -62,17 +85,17 @@ public class Builder {
      */
     @discardableResult
     public func storeUint(_ value: UInt64, bits: Int) throws -> Self {
-        try self.bits.writeUint(value: value, bits: bits)
+        try self.bits.write(uint: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigUInt, bits: Int) throws -> Self {
-        try self.bits.writeUint(value: value, bits: bits)
+        try self.bits.write(uint: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigInt, bits: Int) throws -> Self {
-        try self.bits.writeUint(value: value, bits: bits)
+        try self.bits.write(uint: value, bits: bits)
         return self
     }
     

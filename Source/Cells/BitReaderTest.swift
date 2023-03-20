@@ -8,8 +8,8 @@ final class BitReaderTest: XCTestCase {
             let a = UInt64.random(in: 0..<10000000)
             let b = UInt64.random(in: 0..<10000000)
             let builder = BitBuilder()
-            try builder.writeUint(value: a, bits: 48)
-            try builder.writeUint(value: b, bits: 48)
+            try builder.write(uint: a, bits: 48)
+            try builder.write(uint: b, bits: 48)
             
             let bits = try builder.build()
             let reader = BitReader(bits: bits)
