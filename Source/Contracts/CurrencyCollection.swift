@@ -12,19 +12,11 @@ struct CurrencyCollection: Readable, Writable {
             value: DictionaryValues.BigVarUint(bits: (5 /* log2(32) */))
         )
         
-        if other.size == 0 {
-            return CurrencyCollection(other: nil, coins: coins)
-        } else {
-            return CurrencyCollection(other: other, coins: coins)
-        }
+        return CurrencyCollection(other: other, coins: coins)
     }
     
     func writeTo(builder: Builder) throws {
         try builder.storeCoins(coins: coins)
-        if let other = other {
-            try builder.storeDict(dict: other)
-        } else {
-            try builder.bits.write(bit: false)
-        }
+        try builder.storeDict(dict: other)
     }
 }
