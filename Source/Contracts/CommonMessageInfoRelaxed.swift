@@ -13,9 +13,13 @@ import Foundation
                 created_lt:uint64
                 created_at:uint32 = CommonMsgInfoRelaxed;
  
+ 
+ 
+ 
  ext_out_msg_info$11 src:MsgAddress
-                    dest:MsgAddressExt
- created_lt:uint64 created_at:uint32 = CommonMsgInfoRelaxed;
+                     dest:MsgAddressExt
+                     created_lt:uint64
+                     created_at:uint32 = CommonMsgInfoRelaxed;
  */
 
 public struct CommonMessageInfoRelaxedInternal {

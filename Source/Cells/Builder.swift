@@ -5,8 +5,6 @@ public class Builder {
     public private(set) var bits: BitBuilder
     public private(set) var refs: [Cell]
     
-    // TBD: public var bits: BitBuilder { get { return self._bits } }
-    
     public init() {
         bits = BitBuilder()
         refs = []
