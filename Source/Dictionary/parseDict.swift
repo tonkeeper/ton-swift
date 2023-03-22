@@ -1,15 +1,6 @@
 import Foundation
 import BigInt
 
-func readUnaryLength(slice: Slice) throws -> UInt64 {
-    var res: UInt64 = 0
-    while try slice.bits.loadBit() {
-        res += 1
-    }
-    
-    return res
-}
-
 func doParse<V>(prefix: String, slice: Slice, n: Int, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
     // Reading label
     let lb0 = try slice.bits.loadBit() ? 1 : 0
