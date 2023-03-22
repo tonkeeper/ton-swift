@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public struct DictionaryKeyBuffer: DictionaryKey {
+public struct DictionaryKeyBuffer: DictionaryKeyCoder {
     public let bytes: Int
     
     public var bits: Int { return bytes*8 }

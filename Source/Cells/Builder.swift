@@ -260,7 +260,7 @@ public class Builder {
     - returns this builder
     */
     @discardableResult
-    func storeDict<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>?, key: DictionaryKey? = nil, value: DictionaryValue? = nil) throws -> Self {
+    func storeDict<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>?, key: DictionaryKeyCoder? = nil, value: DictionaryValueCoder? = nil) throws -> Self {
         if let dict = dict {
             try dict.store(builder: self, key: key, value: value)
         } else {
@@ -276,7 +276,7 @@ public class Builder {
     - returns this builder
     */
     @discardableResult
-    func storeDictDirect<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>, key: DictionaryKey? = nil, value: DictionaryValue? = nil) throws -> Self {
+    func storeDictDirect<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>, key: DictionaryKeyCoder? = nil, value: DictionaryValueCoder? = nil) throws -> Self {
         try dict.storeDirect(builder: self, key: key, value: value)
         return self
     }

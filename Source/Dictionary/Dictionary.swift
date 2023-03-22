@@ -2,77 +2,77 @@ import BigInt
 
 public typealias DictionaryKeyTypes = Hashable
 
-public protocol DictionaryKey {
+public protocol DictionaryKeyCoder {
     var bits: Int { get }
     func serialize(src: any DictionaryKeyTypes) throws -> BigInt
     func parse(src: BigInt) throws -> any DictionaryKeyTypes
 }
 
-public protocol DictionaryValue {
+public protocol DictionaryValueCoder {
     func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
     func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
 
 public enum DictionaryKeys {
-    public static func Address() -> DictionaryKey {
+    public static func Address() -> DictionaryKeyCoder {
         return DictionaryKeyAddress()
     }
 
-    public static func BigInt(bits: Int) -> DictionaryKey {
+    public static func BigInt(bits: Int) -> DictionaryKeyCoder {
         return DictionaryKeyBigInt(bits: bits)
     }
 
-    public static func Int(bits: Int) -> DictionaryKey {
+    public static func Int(bits: Int) -> DictionaryKeyCoder {
         return DictionaryKeyInt(bits: bits)
     }
 
-    public static func BigUint(bits: Int) -> DictionaryKey {
+    public static func BigUint(bits: Int) -> DictionaryKeyCoder {
         return DictionaryKeyBigUInt(bits: bits)
     }
 
-    public static func Uint(bits: Int) -> DictionaryKey {
+    public static func Uint(bits: Int) -> DictionaryKeyCoder {
         return DictionaryKeyUInt(bits: bits)
     }
 
-    public static func Buffer(bytes: Int) -> DictionaryKey {
+    public static func Buffer(bytes: Int) -> DictionaryKeyCoder {
         return DictionaryKeyBuffer(bytes: bytes)
     }
 }
 
 public enum DictionaryValues {
-    public static func BigInt(bits: Int) -> DictionaryValue {
+    public static func BigInt(bits: Int) -> DictionaryValueCoder {
         return DictionaryBigIntValue(bits: bits)
     }
     
-    public static func Int(bits: Int) -> DictionaryValue {
+    public static func Int(bits: Int) -> DictionaryValueCoder {
         return DictionaryIntValue(bits: bits)
     }
     
-    public static func BigUint(bits: Int) -> DictionaryValue {
+    public static func BigUint(bits: Int) -> DictionaryValueCoder {
         return DictionaryBigUIntValue(bits: bits)
     }
     
-    public static func BigVarUint(bits: Int) -> DictionaryValue {
+    public static func BigVarUint(bits: Int) -> DictionaryValueCoder {
         return DictionaryBigVarUIntValue(bits: bits)
     }
     
-    public static func Uint(bits: Int) -> DictionaryValue {
+    public static func Uint(bits: Int) -> DictionaryValueCoder {
         return DictionaryUIntValue(bits: bits)
     }
     
-    public static func Bool() -> DictionaryValue {
+    public static func Bool() -> DictionaryValueCoder {
         return DictionaryBoolValue()
     }
     
-    public static func Address() -> DictionaryValue {
+    public static func Address() -> DictionaryValueCoder {
         return DictionaryAddressValue()
     }
     
-    public static func Cell() -> DictionaryValue {
+    public static func Cell() -> DictionaryValueCoder {
         return DictionaryCellValue()
     }
     
-    public static func Buffer(bytes: Int) -> DictionaryValue {
+    public static func Buffer(bytes: Int) -> DictionaryValueCoder {
         return DictionaryBufferValue(bytes: bytes)
     }
 }
@@ -85,7 +85,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter value: value type
     - returns Dictionary
     */
-    public static func empty(key: DictionaryKey? = nil, value: (any DictionaryValue)? = nil) -> Dictionary {
+    public static func empty(key: DictionaryKeyCoder? = nil, value: (any DictionaryValueCoder)? = nil) -> Dictionary {
         return Dictionary(values: [:], key: key, value: value)
     }
     
@@ -96,7 +96,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter src: slice
     - returns Dictionary
     */
-    public static func load(key: DictionaryKey, value: any DictionaryValue, sc: Slice) throws -> Dictionary {
+    public static func load(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Slice) throws -> Dictionary {
         let cell = try sc.loadMaybeRef()
         if let cell, !cell.isExotic {
             return try loadDirect(key: key, value: value, sc: cell.beginParse())
@@ -105,7 +105,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
     }
     
-    public static func load(key: DictionaryKey, value: any DictionaryValue, sc: Cell) throws -> Dictionary {
+    public static func load(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Cell) throws -> Dictionary {
         if sc.isExotic {
             return .empty(key: key, value: value)
         }
@@ -123,7 +123,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter sc: slice
     - returns Dictionary
     */
-    static func loadDirect(key: DictionaryKey, value: any DictionaryValue, sc: Slice?) throws -> Dictionary {
+    static func loadDirect(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Slice?) throws -> Dictionary {
         guard let sc = sc else {
             return Dictionary.empty(key: key, value: value)
         }
@@ -138,15 +138,15 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         
         return Dictionary(values: prepare, key: key, value: value)
     }
-    static func loadDirect(key: DictionaryKey, value: any DictionaryValue, sc: Cell?) throws -> Dictionary {
+    static func loadDirect(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Cell?) throws -> Dictionary {
         return try loadDirect(key: key, value: value, sc: sc?.beginParse())
     }
     
-    private var key: DictionaryKey?
-    private var value: (any DictionaryValue)?
+    private var key: DictionaryKeyCoder?
+    private var value: (any DictionaryValueCoder)?
     private var map: [String: V]
 
-    private init(values: [String: V], key: DictionaryKey?, value: (any DictionaryValue)?) {
+    private init(values: [String: V], key: DictionaryKeyCoder?, value: (any DictionaryValueCoder)?) {
         self.key = key
         self.value = value
         self.map = values
@@ -185,7 +185,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         return Array(map.values)
     }
     
-    func store(builder: Builder, key: (any DictionaryKey)? = nil, value: (any DictionaryValue)? = nil) throws {
+    func store(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any DictionaryValueCoder)? = nil) throws {
         if size == 0 {
             try builder.bits.write(bit: false)
             return
@@ -225,7 +225,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         try builder.storeRef(cell: dd.endCell())
     }
     
-    func storeDirect(builder: Builder, key: (any DictionaryKey)? = nil, value: (any DictionaryValue)? = nil) throws {
+    func storeDirect(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any DictionaryValueCoder)? = nil) throws {
         if size == 0 {
             throw TonError.custom("Cannot store empty dictionary directly")
         }

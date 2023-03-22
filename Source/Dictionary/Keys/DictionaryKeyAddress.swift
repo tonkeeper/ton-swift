@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public struct DictionaryKeyAddress: DictionaryKey {
+public struct DictionaryKeyAddress: DictionaryKeyCoder {
     public let bits: Int = 267
 
     public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {

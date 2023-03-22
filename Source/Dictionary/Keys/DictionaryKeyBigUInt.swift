@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public struct DictionaryKeyBigUInt: DictionaryKey {
+public struct DictionaryKeyBigUInt: DictionaryKeyCoder {
     public let bits: Int
     
     public init(bits: Int) {
