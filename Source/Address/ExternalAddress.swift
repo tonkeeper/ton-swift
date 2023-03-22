@@ -1,5 +1,4 @@
 import Foundation
-import BigInt
 
 /// External address TL-B definition:
 /// ```

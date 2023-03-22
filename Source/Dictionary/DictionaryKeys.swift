@@ -6,24 +6,19 @@ public typealias DictionaryKeyTypes = Hashable
 /// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
 public protocol DictionaryKeyCoder {
     var bits: Int { get }
-    func serialize(src: any DictionaryKeyTypes) throws -> BigInt
+    func serialize(src: any DictionaryKeyTypes) throws -> BitString
     func parse(src: BigInt) throws -> any DictionaryKeyTypes
 }
 
 public struct DictionaryKeyAddress: DictionaryKeyCoder {
     public let bits: Int = 267
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? Address else {
             throw TonError.custom("Key is not an address")
         }
         
-        return BigInt(
-            try Builder()
-                .store(src)
-                .endCell().beginParse()
-                .bits.preloadUintBig(bits: bits)
-        )
+        return try Builder().store(src).endCell().bits
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
@@ -43,18 +38,15 @@ public struct DictionaryKeyBigInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? BigInt else {
             throw TonError.custom("Key is not a bigint")
         }
         
-        return BigInt(
-            try Builder()
+        return try Builder()
                 .storeInt(src, bits: bits)
                 .endCell()
-                .beginParse()
-                .bits.loadUintBig(bits: bits)
-        )
+                .bits
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
@@ -73,18 +65,15 @@ public struct DictionaryKeyBigUInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? BigUInt else {
             throw TonError.custom("Key is not a biguint")
         }
         
-        return BigInt(
-            try Builder()
+        return try Builder()
                 .storeInt(src, bits: bits)
                 .endCell()
-                .beginParse()
-                .bits.loadUintBig(bits: bits)
-        )
+                .bits
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
@@ -107,16 +96,12 @@ public struct DictionaryKeyBuffer: DictionaryKeyCoder {
         self.bytes = bytes
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? Data else {
             throw TonError.custom("Key is not a buffer")
         }
 
-        return BigInt(
-            try Cell(data: src)
-                .beginParse()
-                .bits.loadUintBig(bits: bytes * 8)
-        )
+        return BitString(data: src)
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
@@ -135,17 +120,14 @@ public struct DictionaryKeyInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? Int else {
             throw TonError.custom("Key is not a int")
         }
-        return BigInt(
-            try Builder()
+        return try Builder()
                 .storeInt(src, bits: bits)
                 .endCell()
-                .beginParse()
-                .bits.loadUintBig(bits: bits)
-        )
+                .bits
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
@@ -165,18 +147,15 @@ public struct DictionaryKeyUInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
+    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
         guard let src = src as? UInt64 else {
             throw TonError.custom("Key is not a uint")
         }
 
-        return BigInt(
-            try Builder()
+        return try Builder()
                 .storeUint(src, bits: bits)
                 .endCell()
-                .beginParse()
-                .bits.loadUintBig(bits: bits)
-        )
+                .bits
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {

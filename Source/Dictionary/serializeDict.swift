@@ -1,11 +1,11 @@
 import Foundation
-import BigInt
 
 //
 // Tree Build
 //
 
-func pad(_ src: String, _ size: Int) -> String {
+// TODO: replace with bitstring padding
+func padLeft(_ src: String, _ size: Int) -> String {
     var src = src
     while src.count < size {
         src = "0" + src
@@ -87,11 +87,11 @@ func buildEdge<T>(_ src: [String: T]) throws -> Edge<T> {
     return Edge(label: label, node: try buildNode(removePrefixMap(src, label.count)))
 }
 
-func buildTree<T>(_ src: [BigInt: T], _ keyLength: Int) throws -> Edge<T> {
+func buildTree<T>(_ src: [BitString: T], _ keyLength: Int) throws -> Edge<T> {
     // Convert map keys
     var converted: [String: T] = [:]
     for (k, v) in src {
-        let padded = pad(String(k, radix: 2), keyLength)
+        let padded = padLeft(k.toBinary(), keyLength)
         converted[padded] = v
     }
 
@@ -229,7 +229,7 @@ func writeEdge<T: DictionaryKeyTypes>(src: Edge<T>, keyLength: Int, serializer: 
     try writeNode(src: src.node, keyLength: keyLength - src.label.count, serializer: serializer, to: to)
 }
 
-func serializeDict<T: DictionaryKeyTypes>(src: [BigInt: T], keyLength: Int, serializer: (T, Builder) throws -> Void, to: Builder) throws {
+func serializeDict<T: DictionaryKeyTypes>(src: [BitString: T], keyLength: Int, serializer: (T, Builder) throws -> Void, to: Builder) throws {
     let tree = try buildTree(src, keyLength)
     try writeEdge(src: tree, keyLength: keyLength, serializer: serializer, to: to)
 }

@@ -3,14 +3,21 @@ import BigInt
 
 final class SerializeDictTest: XCTestCase {
     
+    func int2bits(_ i: Int, bits: Int = 16) -> BitString {
+        return try! Builder()
+            .storeInt(i, bits: bits)
+            .endCell()
+            .bits
+    }
+    
     func testSerializeDict() throws {
         // should build prefix tree
         
         // From docs
-        let map: [BigInt: BigInt] = [
-            13: 169,
-            17: 289,
-            239: 57121
+        let map: [BitString: BigInt] = [
+            int2bits(13): 169,
+            int2bits(17): 289,
+            int2bits(239): 57121
         ]
         
         // Test serialization

@@ -133,7 +133,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
         
         // Prepare map
-        var prepared = [BigInt: V]()
+        var prepared = [BitString: V]()
         for (k, v) in map {
             let src = try deserializeInternalKey(value: k)
             prepared[try resolvedKey.serialize(src: src)] = v
@@ -172,7 +172,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
         
         // Prepare map
-        var prepared = [BigInt: V]()
+        var prepared = [BitString: V]()
         for (k, v) in map {
             let src = try deserializeInternalKey(value: k)
             prepared[try resolvedKey.serialize(src: src)] = v
