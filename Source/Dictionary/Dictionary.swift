@@ -15,65 +15,65 @@ public protocol DictionaryValue {
 
 public enum DictionaryKeys {
     public static func Address() -> DictionaryKey {
-        return createAddressKey()
+        return DictionaryKeyAddress()
     }
 
     public static func BigInt(bits: Int) -> DictionaryKey {
-        return createBigIntKey(bits: bits)
+        return DictionaryKeyBigInt(bits: bits)
     }
 
     public static func Int(bits: Int) -> DictionaryKey {
-        return createIntKey(bits: bits)
+        return DictionaryKeyInt(bits: bits)
     }
 
     public static func BigUint(bits: Int) -> DictionaryKey {
-        return createBigUintKey(bits: bits)
+        return DictionaryKeyBigUInt(bits: bits)
     }
 
     public static func Uint(bits: Int) -> DictionaryKey {
-        return createUintKey(bits: bits)
+        return DictionaryKeyUInt(bits: bits)
     }
 
     public static func Buffer(bytes: Int) -> DictionaryKey {
-        return createBufferKey(bytes: bytes)
+        return DictionaryKeyBuffer(bytes: bytes)
     }
 }
 
 public enum DictionaryValues {
     public static func BigInt(bits: Int) -> DictionaryValue {
-        return createBigIntValue(bits: bits)
+        return DictionaryBigIntValue(bits: bits)
     }
     
     public static func Int(bits: Int) -> DictionaryValue {
-        return createIntValue(bits: bits)
+        return DictionaryIntValue(bits: bits)
     }
     
     public static func BigUint(bits: Int) -> DictionaryValue {
-        return createBigUintValue(bits: bits)
+        return DictionaryBigUIntValue(bits: bits)
     }
     
     public static func BigVarUint(bits: Int) -> DictionaryValue {
-        return createBigVarUintValue(bits: bits)
+        return DictionaryBigVarUIntValue(bits: bits)
     }
     
     public static func Uint(bits: Int) -> DictionaryValue {
-        return createUintValue(bits: bits)
+        return DictionaryUIntValue(bits: bits)
     }
     
     public static func Bool() -> DictionaryValue {
-        return createBooleanValue()
+        return DictionaryBoolValue()
     }
     
     public static func Address() -> DictionaryValue {
-        return createAddressValue()
+        return DictionaryAddressValue()
     }
     
     public static func Cell() -> DictionaryValue {
-        return createCellValue()
+        return DictionaryCellValue()
     }
     
     public static func Buffer(size: Int) -> DictionaryValue {
-        return createBufferValue(size: size)
+        return DictionaryBufferValue(size: size)
     }
 }
 
@@ -260,64 +260,4 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
             try resolvedValue.serialize(src: value, builder: builder)
         }, to: builder)
     }
-}
-
-public func createAddressKey() -> DictionaryKey {
-    return DictionaryKeyAddress()
-}
-
-public func createBigIntKey(bits: Int) -> DictionaryKey {
-    return DictionaryKeyBigInt(bits: bits)
-}
-
-public func createIntKey(bits: Int) -> DictionaryKey {
-    return DictionaryKeyInt(bits: bits)
-}
-
-public func createBigUintKey(bits: Int) -> DictionaryKey {
-    return DictionaryKeyBigUInt(bits: bits)
-}
-
-public func createUintKey(bits: Int) -> DictionaryKey {
-    return DictionaryKeyUInt(bits: bits)
-}
-
-public func createBufferKey(bytes: Int) -> DictionaryKey {
-    return DictionaryKeyBuffer(bytes: bytes)
-}
-
-public func createIntValue(bits: Int) -> DictionaryIntValue {
-    return DictionaryIntValue(bits: bits)
-}
-
-public func createBigIntValue(bits: Int) -> DictionaryBigIntValue {
-    return DictionaryBigIntValue(bits: bits)
-}
-
-public func createUintValue(bits: Int) -> DictionaryUIntValue {
-    return DictionaryUIntValue(bits: bits)
-}
-
-public func createBigUintValue(bits: Int) -> DictionaryBigUIntValue {
-    return DictionaryBigUIntValue(bits: bits)
-}
-
-public func createBigVarUintValue(bits: Int) -> DictionaryBigVarUIntValue {
-    return DictionaryBigVarUIntValue(bits: bits)
-}
-
-public func createBooleanValue() -> DictionaryBoolValue {
-    return DictionaryBoolValue()
-}
-
-public func createAddressValue() -> DictionaryAddressValue {
-    return DictionaryAddressValue()
-}
-
-public func createCellValue() -> DictionaryCellValue {
-    return DictionaryCellValue()
-}
-
-public func createBufferValue(size: Int) -> DictionaryBufferValue {
-    return DictionaryBufferValue(size: size)
 }
