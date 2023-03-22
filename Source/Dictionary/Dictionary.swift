@@ -35,7 +35,7 @@ public enum DictionaryKeys {
     }
 
     public static func Buffer(bytes: Int) -> DictionaryKey {
-        return createBufferKey(bits: bytes)
+        return createBufferKey(bytes: bytes)
     }
 }
 
@@ -282,8 +282,8 @@ public func createUintKey(bits: Int) -> DictionaryKey {
     return DictionaryKeyUInt(bits: bits)
 }
 
-public func createBufferKey(bits: Int) -> DictionaryKey {
-    return DictionaryKeyBuffer(bits: bits)
+public func createBufferKey(bytes: Int) -> DictionaryKey {
+    return DictionaryKeyBuffer(bytes: bytes)
 }
 
 public func createIntValue(bits: Int) -> DictionaryIntValue {

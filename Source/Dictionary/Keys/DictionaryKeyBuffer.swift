@@ -2,10 +2,13 @@ import Foundation
 import BigInt
 
 public struct DictionaryKeyBuffer: DictionaryKey {
-    public let bits: Int
+    public let bytes: Int
     
-    public init(bits: Int) {
-        self.bits = bits * 8
+    public var bits: Int { return bytes*8 }
+    
+    public init(bytes: Int) {
+        // We store bytes to preserve the alignment information
+        self.bytes = bytes
     }
 
     public func serialize(src: any DictionaryKeyTypes) throws -> BigInt {
@@ -16,13 +19,13 @@ public struct DictionaryKeyBuffer: DictionaryKey {
         return BigInt(
             try Cell(data: src)
                 .beginParse()
-                .bits.loadUintBig(bits: bits * 8)
+                .bits.loadUintBig(bits: bytes * 8)
         )
     }
 
     public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
         return try Builder()
-            .storeUint(src, bits: bits * 8)
+            .storeUint(src, bits: bytes * 8)
             .endCell()
             .beginParse()
             .bits.loadBytes(bits)
