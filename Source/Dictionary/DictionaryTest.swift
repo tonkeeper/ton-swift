@@ -20,8 +20,8 @@ final class DictionaryTest: XCTestCase {
             .endCell()
         
         let dict: Dictionary<UInt64, UInt64> = try Dictionary.loadDirect(
-            key: DictionaryKeys.Uint(bits: 16),
-            value: DictionaryValues.Uint(bits: 16),
+            key: DictionaryKeyUInt(bits: 16),
+            value: DictionaryValueUInt(bits: 16),
             sc: try root.beginParse()
         )
         XCTAssertEqual(try dict.get(key: 13), 169)
@@ -37,7 +37,7 @@ final class DictionaryTest: XCTestCase {
             .storeDictDirect(dict: dict)
             .endCell()
         let packed2 = try Builder()
-            .storeDictDirect(dict: fromEmpty, key: DictionaryKeys.Uint(bits: 16), value: DictionaryValues.Uint(bits: 16))
+            .storeDictDirect(dict: fromEmpty, key: DictionaryKeyUInt(bits: 16), value: DictionaryValueUInt(bits: 16))
             .endCell()
         
         XCTAssertEqual(packed, root)
@@ -46,7 +46,7 @@ final class DictionaryTest: XCTestCase {
         // should parse config
         let decodedData = Data(base64Encoded: config)!
         let cell = try Cell.fromBoc(src: decodedData)[0]
-        let configs: Dictionary<Int, Cell> = try cell.beginParse().loadDictDirect(key: DictionaryKeys.Int(bits: 32), value: DictionaryValues.Cell())
+        let configs: Dictionary<Int, Cell> = try cell.beginParse().loadDictDirect(key: DictionaryKeyInt(bits: 32), value: DictionaryValueCell())
         let ids = [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 28, 29, 31, 32, 34, 71, 72, -999, -71]
         let keys = try configs.keys()
         for i in ids {
