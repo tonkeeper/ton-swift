@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-func doParse<V>(prefix: String, slice: Slice, n: Int, res: inout [BigInt: V], extractor: (Slice) throws -> V) throws {
+func doParse<V>(prefix: String, slice: Slice, n: Int, res: inout [BitString: V], extractor: (Slice) throws -> V) throws {
     // Reading label
     let lb0 = try slice.bits.loadBit() ? 1 : 0
     var prefixLength: Int = 0
@@ -36,7 +36,8 @@ func doParse<V>(prefix: String, slice: Slice, n: Int, res: inout [BigInt: V], ex
     }
     
     if n - prefixLength == 0 {
-        res[BigInt(pp, radix: 2)!] = try extractor(slice)
+        // TODO: replace this with true original bitstring w/o parsing
+        res[try! BitString(binaryString: pp)] = try extractor(slice)
     } else {
         let left = try slice.loadRef()
         let right = try slice.loadRef()
@@ -50,8 +51,8 @@ func doParse<V>(prefix: String, slice: Slice, n: Int, res: inout [BigInt: V], ex
     }
 }
 
-func parseDict<V>(sc: Slice?, keySize: Int, extractor: @escaping (Slice) throws -> V) throws -> [BigInt: V] {
-    var res = [BigInt: V]()
+func parseDict<V>(sc: Slice?, keySize: Int, extractor: @escaping (Slice) throws -> V) throws -> [BitString: V] {
+    var res = [BitString: V]()
     if let sc = sc {
         try doParse(prefix: "", slice: sc, n: keySize, res: &res, extractor: extractor)
     }

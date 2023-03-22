@@ -7,7 +7,7 @@ public typealias DictionaryKeyTypes = Hashable
 public protocol DictionaryKeyCoder {
     var bits: Int { get }
     func serialize(src: any DictionaryKeyTypes) throws -> BitString
-    func parse(src: BigInt) throws -> any DictionaryKeyTypes
+    func parse(src: BitString) throws -> any DictionaryKeyTypes
 }
 
 public struct DictionaryKeyAddress: DictionaryKeyCoder {
@@ -21,12 +21,9 @@ public struct DictionaryKeyAddress: DictionaryKeyCoder {
         return try Builder().store(src).endCell().bits
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        let a:Address = try Builder()
-            .storeUint(src, bits: bits)
-            .endCell()
-            .beginParse()
-            .loadType()
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        guard src.length == self.bits else { throw TonError.custom("Bitstring length mismatch. Got \(src.length) bits, expected \(bits)") }
+        let a:Address = try Cell(bits: src).beginParse().loadType()
         return a
     }
 }
@@ -49,12 +46,8 @@ public struct DictionaryKeyBigInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
-            .storeUint(src, bits: bits)
-            .endCell()
-            .beginParse()
-            .bits.loadIntBig(bits: bits)
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        return try Cell(bits: src).beginParse().bits.loadIntBig(bits: bits)
     }
 }
 
@@ -76,12 +69,8 @@ public struct DictionaryKeyBigUInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
-            .storeUint(src, bits: bits)
-            .endCell()
-            .beginParse()
-            .bits.loadIntBig(bits: bits)
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        return try Cell(bits: src).beginParse().bits.loadIntBig(bits: bits)
     }
 }
 
@@ -104,10 +93,8 @@ public struct DictionaryKeyBuffer: DictionaryKeyCoder {
         return BitString(data: src)
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
-            .storeUint(src, bits: bytes * 8)
-            .endCell()
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        return try Cell(bits: src)
             .beginParse()
             .bits.loadBytes(bits)
     }
@@ -130,12 +117,8 @@ public struct DictionaryKeyInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
-            .storeUint(src, bits: bits)
-            .endCell()
-            .beginParse()
-            .bits.loadInt(bits: bits)
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        return try Cell(bits: src).beginParse().bits.loadInt(bits: bits)
     }
 }
 
@@ -158,11 +141,7 @@ public struct DictionaryKeyUInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BigInt) throws -> any DictionaryKeyTypes {
-        return try Builder()
-            .storeUint(src, bits: bits)
-            .endCell()
-            .beginParse()
-            .bits.loadUint(bits: bits)
+    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
+        return try Cell(bits: src).beginParse().bits.loadUint(bits: bits)
     }
 }

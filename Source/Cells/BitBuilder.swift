@@ -34,7 +34,6 @@ public class BitBuilder {
         self.capacity = cap
     }
     
-    
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     public func write(bit: Int) throws {
         try checkCapacity(1)

@@ -10,6 +10,11 @@ public class Builder {
         refs = []
     }
     
+    public convenience init(_ bits: BitString) throws {
+        self.init()
+        try self.bits.write(bits: bits)
+    }
+    
     /// Number of written bits
     public var bitsCount: Int {
         return bits.length

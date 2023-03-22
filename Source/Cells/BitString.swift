@@ -54,6 +54,13 @@ public struct BitString: Hashable {
         self._offset = 0
         self._length = data.count * 8
     }
+    
+    /// Constructs BitString from a binary string of 1s and 0s.
+    public init(binaryString: String) throws {
+        let b = BitBuilder()
+        try b.write(binaryString: binaryString)
+        self = try b.build()
+    }
 
     /**
      Returns the bit at the specified index
