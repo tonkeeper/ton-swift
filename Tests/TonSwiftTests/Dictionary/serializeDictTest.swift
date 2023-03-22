@@ -1,5 +1,6 @@
 import XCTest
 import BigInt
+@testable import TonSwift
 
 final class SerializeDictTest: XCTestCase {
     

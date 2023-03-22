@@ -99,3 +99,7 @@ Example/ton-swift-example.xcodeproj/project.xcworkspace
 Example/ton-swift-example.xcodeproj/xcshareddata
 Example/ton-swift-example.xcworkspace/xcshareddata
 *.xcworkspacedata
+
+.build
+.swiftpm
+Package.resolved
