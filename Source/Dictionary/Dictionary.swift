@@ -72,8 +72,8 @@ public enum DictionaryValues {
         return DictionaryCellValue()
     }
     
-    public static func Buffer(size: Int) -> DictionaryValue {
-        return DictionaryBufferValue(size: size)
+    public static func Buffer(bytes: Int) -> DictionaryValue {
+        return DictionaryBufferValue(bytes: bytes)
     }
 }
 

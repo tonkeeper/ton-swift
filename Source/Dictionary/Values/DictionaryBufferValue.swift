@@ -1,10 +1,10 @@
 import Foundation
 
 public struct DictionaryBufferValue: DictionaryValue {
-    public let size: Int
+    public let bytes: Int
     
-    public init(size: Int) {
-        self.size = size
+    public init(bytes: Int) {
+        self.bytes = bytes
     }
     
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
@@ -12,7 +12,7 @@ public struct DictionaryBufferValue: DictionaryValue {
             throw TonError.custom("Wrong src type. Expected buffer")
         }
         
-        guard src.count == size else {
+        guard src.count == bytes else {
             throw TonError.custom("Invalid buffer size")
         }
         
@@ -20,6 +20,6 @@ public struct DictionaryBufferValue: DictionaryValue {
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.bits.loadBytes(size)
+        return try src.bits.loadBytes(bytes)
     }
 }
