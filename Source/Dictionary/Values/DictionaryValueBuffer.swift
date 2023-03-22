@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DictionaryBufferValue: DictionaryValueCoder {
+public struct DictionaryValueBuffer: DictionaryValueCoder {
     public let bytes: Int
     
     public init(bytes: Int) {

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DictionaryBoolValue: DictionaryValueCoder {
+public struct DictionaryValueBool: DictionaryValueCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Bool else {
             throw TonError.custom("Wrong src type. Expected bool")

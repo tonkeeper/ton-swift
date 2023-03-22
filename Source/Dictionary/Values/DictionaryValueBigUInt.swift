@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public struct DictionaryBigIntValue: DictionaryValueCoder {
+public struct DictionaryValueBigUInt: DictionaryValueCoder {
     public let bits: Int
     
     public init(bits: Int) {
@@ -9,14 +9,14 @@ public struct DictionaryBigIntValue: DictionaryValueCoder {
     }
     
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
-        guard let src = src as? BigInt else {
-            throw TonError.custom("Wrong src type. Expected bigint")
+        guard let src = src as? BigUInt else {
+            throw TonError.custom("Wrong src type. Expected biguint")
         }
         
-        try builder.storeInt(src, bits: bits)
+        try builder.storeUint(src, bits: bits)
     }
     
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
-        return try src.bits.loadIntBig(bits: bits)
+        return try src.bits.loadUintBig(bits: bits)
     }
 }

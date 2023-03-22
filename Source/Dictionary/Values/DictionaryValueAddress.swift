@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DictionaryAddressValue: DictionaryValueCoder {
+public struct DictionaryValueAddress: DictionaryValueCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Address else {
             throw TonError.custom("Wrong src type. Expected Address")

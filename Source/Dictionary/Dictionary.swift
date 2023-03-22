@@ -41,39 +41,39 @@ public enum DictionaryKeys {
 
 public enum DictionaryValues {
     public static func BigInt(bits: Int) -> DictionaryValueCoder {
-        return DictionaryBigIntValue(bits: bits)
+        return DictionaryValueBigInt(bits: bits)
     }
     
     public static func Int(bits: Int) -> DictionaryValueCoder {
-        return DictionaryIntValue(bits: bits)
+        return DictionaryValueInt(bits: bits)
     }
     
     public static func BigUint(bits: Int) -> DictionaryValueCoder {
-        return DictionaryBigUIntValue(bits: bits)
+        return DictionaryValueBigUInt(bits: bits)
     }
     
     public static func BigVarUint(bits: Int) -> DictionaryValueCoder {
-        return DictionaryBigVarUIntValue(bits: bits)
+        return DictionaryValueBigVarUInt(bits: bits)
     }
     
     public static func Uint(bits: Int) -> DictionaryValueCoder {
-        return DictionaryUIntValue(bits: bits)
+        return DictionaryValueUInt(bits: bits)
     }
     
     public static func Bool() -> DictionaryValueCoder {
-        return DictionaryBoolValue()
+        return DictionaryValueBool()
     }
     
     public static func Address() -> DictionaryValueCoder {
-        return DictionaryAddressValue()
+        return DictionaryValueAddress()
     }
     
     public static func Cell() -> DictionaryValueCoder {
-        return DictionaryCellValue()
+        return DictionaryValueCell()
     }
     
     public static func Buffer(bytes: Int) -> DictionaryValueCoder {
-        return DictionaryBufferValue(bytes: bytes)
+        return DictionaryValueBuffer(bytes: bytes)
     }
 }
 
