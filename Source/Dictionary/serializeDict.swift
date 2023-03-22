@@ -105,11 +105,7 @@ func writeLabelShort(_ src: String, to builder: Builder) throws -> Builder {
     // Header
     try builder.bits.write(bit: false)
 
-    // Unary length
-    for _ in 0..<src.count {
-        try builder.bits.write(bit: true)
-    }
-    try builder.bits.write(bit: false)
+    try builder.store(Unary(src.count))
 
     // Value
     for c in src {

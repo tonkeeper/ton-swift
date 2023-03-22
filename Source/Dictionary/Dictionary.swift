@@ -129,7 +129,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
 
         let slice = sc
-        let values = try parseDict(sc: slice, keySize: UInt64(key.bits), extractor: value.parse)
+        let values = try parseDict(sc: slice, keySize: key.bits, extractor: value.parse)
         var prepare = [String: V]()
         for (k, v) in values {
             let keyValue = try key.parse(src: k)
