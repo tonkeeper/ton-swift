@@ -62,11 +62,15 @@ public struct BitString: Hashable {
      - throws error: if index is out of bounds
      - returns true if the bit is set, false otherwise
      */
-    public func at(index: Int) throws -> Bool {
+    public func at(_ index: Int) throws -> Bool {
         guard index <= _length && index >= 0 else {
             throw TonError.indexOutOfBounds(index)
         }
         
+        return uncheckedAt(index)
+    }
+    
+    private func uncheckedAt(_ index: Int) -> Bool {
         let byteIndex = (_offset + index) >> 3
         let bitIndex = 7 - ((_offset + index) % 8) // NOTE: We are using big endian
         
@@ -116,12 +120,8 @@ public struct BitString: Hashable {
         return _data.subdata(in: start...end)
     }
     
-    /**
-     Format to canonical string
-     
-     - returns formatted bits as a string
-     */
-    public func toString() throws -> String {
+    /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
+    public func toHex() throws -> String {
         let padded = Data(try self.bitsToPaddedBuffer())
         
         if _length % 4 == 0 {
@@ -139,6 +139,20 @@ public struct BitString: Hashable {
                 return hex + "_"
             }
         }
+    }
+    
+    /// Formats the bitstring in binary digits.
+    public func toBinary() -> String {
+        var s = ""
+        for i in 0..<length {
+            s.append(uncheckedAt(i) ? "1" : "0")
+        }
+        return s
+    }
+    
+    /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
+    public func toString() throws -> String {
+        return try toHex()
     }
     
     private func checkOffset(offset: Int, length: Int) throws {
@@ -166,7 +180,6 @@ public struct BitString: Hashable {
 
 }
 
-// MARK: - Equatable
 extension BitString: Equatable {
     
     /**
@@ -182,8 +195,8 @@ extension BitString: Equatable {
         
         do {
             for i in 0..<lhs._length {
-                let lhsI = try lhs.at(index: i)
-                let rhsI = try rhs.at(index: i)
+                let lhsI = try lhs.at(i)
+                let rhsI = try rhs.at(i)
                 
                 if lhsI != rhsI {
                     return false

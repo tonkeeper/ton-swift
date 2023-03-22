@@ -2,23 +2,21 @@ import XCTest
 
 final class DictionaryTest: XCTestCase {
     
-    private func storeBits(builder: Builder, src: String) throws -> Builder {
-        for s in src {
-            try builder.bits.write(bit: s != "0")
-        }
-        
-        return builder
+    private func builderFrom(_ src: String) throws -> Builder {
+        let b = Builder()
+        try b.bits.write(binaryString: src)
+        return b
     }
     
     func testDictionary() throws {
         // should parse and serialize dict from example
         
-        let root = try storeBits(builder: Builder(), src: "11001000")
-            .storeRef(cell: try storeBits(builder: Builder(), src: "011000")
-                .storeRef(cell: try storeBits(builder: Builder(), src: "1010011010000000010101001"))
-                .storeRef(cell: try storeBits(builder: Builder(), src: "1010000010000000100100001"))
+        let root = try builderFrom("11001000")
+            .storeRef(cell: try builderFrom("011000")
+                .storeRef(cell: try builderFrom("1010011010000000010101001"))
+                .storeRef(cell: try builderFrom("1010000010000000100100001"))
             )
-            .storeRef(cell: try storeBits(builder: Builder(), src: "1011111011111101111100100001"))
+            .storeRef(cell: try builderFrom("1011111011111101111100100001"))
             .endCell()
         
         let dict: Dictionary<UInt64, UInt64> = try Dictionary.loadDirect(
