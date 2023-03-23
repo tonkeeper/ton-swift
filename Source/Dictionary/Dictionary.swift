@@ -5,7 +5,8 @@ public typealias DictionaryKeyTypes = Hashable
 /// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
 public protocol DictionaryKeyCoder {
     var bits: Int { get }
-    func serialize(src: any DictionaryKeyTypes) throws -> BitString
+    //func serialize(src: any DictionaryKeyTypes) throws -> BitString
+    func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
     func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
 
@@ -154,7 +155,10 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         var prepared = [BitString: V]()
         for (k, v) in map {
             let src = try deserializeInternalKey(value: k)
-            prepared[try resolvedKey.serialize(src: src)] = v
+            let builder = Builder()
+            try resolvedKey.serialize(src: src, builder: builder)
+            let bitstring = try builder.endCell().bits
+            prepared[bitstring] = v
         }
         
         // Store
@@ -193,7 +197,10 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         var prepared = [BitString: V]()
         for (k, v) in map {
             let src = try deserializeInternalKey(value: k)
-            prepared[try resolvedKey.serialize(src: src)] = v
+            let builder = Builder()
+            try resolvedKey.serialize(src: src, builder: builder)
+            let bitstring = try builder.endCell().bits
+            prepared[bitstring] = v
         }
         
         // Store

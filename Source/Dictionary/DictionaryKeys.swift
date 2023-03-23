@@ -4,12 +4,12 @@ import BigInt
 public struct DictionaryKeyAddress: DictionaryKeyCoder {
     public let bits: Int = 267
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Address else {
             throw TonError.custom("Key is not an address")
         }
         
-        return try Builder().store(src).endCell().bits
+        try builder.store(src)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
@@ -25,15 +25,12 @@ public struct DictionaryKeyBigInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? BigInt else {
             throw TonError.custom("Key is not a bigint")
         }
         
-        return try Builder()
-                .storeInt(src, bits: bits)
-                .endCell()
-                .bits
+        try builder.storeInt(src, bits: bits)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
@@ -48,15 +45,11 @@ public struct DictionaryKeyBigUInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? BigUInt else {
             throw TonError.custom("Key is not a biguint")
         }
-        
-        return try Builder()
-                .storeInt(src, bits: bits)
-                .endCell()
-                .bits
+        try builder.storeInt(src, bits: bits)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
@@ -75,12 +68,11 @@ public struct DictionaryKeyBuffer: DictionaryKeyCoder {
         self.bytes = bytes
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Data else {
             throw TonError.custom("Key is not a buffer")
         }
-
-        return BitString(data: src)
+        try builder.bits.write(data: src)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
@@ -95,14 +87,11 @@ public struct DictionaryKeyInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Int else {
             throw TonError.custom("Key is not a int")
         }
-        return try Builder()
-                .storeInt(src, bits: bits)
-                .endCell()
-                .bits
+        try builder.storeInt(src, bits: bits)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
@@ -118,15 +107,12 @@ public struct DictionaryKeyUInt: DictionaryKeyCoder {
         self.bits = bits
     }
 
-    public func serialize(src: any DictionaryKeyTypes) throws -> BitString {
+    public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? UInt64 else {
             throw TonError.custom("Key is not a uint")
         }
 
-        return try Builder()
-                .storeUint(src, bits: bits)
-                .endCell()
-                .bits
+        try builder.storeUint(src, bits: bits)
     }
 
     public func parse(src: Slice) throws -> any DictionaryKeyTypes {
