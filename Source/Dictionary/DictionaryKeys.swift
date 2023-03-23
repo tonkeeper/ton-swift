@@ -7,7 +7,7 @@ public typealias DictionaryKeyTypes = Hashable
 public protocol DictionaryKeyCoder {
     var bits: Int { get }
     func serialize(src: any DictionaryKeyTypes) throws -> BitString
-    func parse(src: BitString) throws -> any DictionaryKeyTypes
+    func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
 
 public struct DictionaryKeyAddress: DictionaryKeyCoder {
@@ -21,9 +21,8 @@ public struct DictionaryKeyAddress: DictionaryKeyCoder {
         return try Builder().store(src).endCell().bits
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        guard src.length == self.bits else { throw TonError.custom("Bitstring length mismatch. Got \(src.length) bits, expected \(bits)") }
-        let a:Address = try Cell(bits: src).beginParse().loadType()
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        let a:Address = try src.loadType()
         return a
     }
 }
@@ -46,8 +45,8 @@ public struct DictionaryKeyBigInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        return try Cell(bits: src).beginParse().bits.loadIntBig(bits: bits)
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        return try src.bits.loadIntBig(bits: bits)
     }
 }
 
@@ -69,8 +68,8 @@ public struct DictionaryKeyBigUInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        return try Cell(bits: src).beginParse().bits.loadIntBig(bits: bits)
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        return try src.bits.loadIntBig(bits: bits)
     }
 }
 
@@ -93,10 +92,8 @@ public struct DictionaryKeyBuffer: DictionaryKeyCoder {
         return BitString(data: src)
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        return try Cell(bits: src)
-            .beginParse()
-            .bits.loadBytes(bits)
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        return try src.bits.loadBytes(bits)
     }
 }
 
@@ -117,8 +114,8 @@ public struct DictionaryKeyInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        return try Cell(bits: src).beginParse().bits.loadInt(bits: bits)
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        return try src.bits.loadInt(bits: bits)
     }
 }
 
@@ -141,7 +138,7 @@ public struct DictionaryKeyUInt: DictionaryKeyCoder {
                 .bits
     }
 
-    public func parse(src: BitString) throws -> any DictionaryKeyTypes {
-        return try Cell(bits: src).beginParse().bits.loadUint(bits: bits)
+    public func parse(src: Slice) throws -> any DictionaryKeyTypes {
+        return try src.bits.loadUint(bits: bits)
     }
 }

@@ -29,6 +29,8 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     }
     
     public static func load(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Cell) throws -> Dictionary {
+        // TODO: maybe it would be better to add type "AnyCell" and keep "Cell" for non-exotic cell and avoid these decisions here.
+        // Steve Korshakov says the reason for this is that pruned branches should yield empty dicts somewhere down the line.
         if sc.isExotic {
             return .empty(key: key, value: value)
         }
@@ -55,7 +57,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         let values = try parseDict(sc: slice, keySize: key.bits, extractor: value.parse)
         var prepare = [String: V]()
         for (k, v) in values {
-            let keyValue = try key.parse(src: k)
+            let keyValue = try key.parse(src: Cell(bits: k).beginParse())
             prepare[try serializeInternalKey(value: keyValue)] = v as? V
         }
         
