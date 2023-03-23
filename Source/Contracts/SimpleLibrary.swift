@@ -20,7 +20,7 @@ public func storeSimpleLibrary(src: SimpleLibrary, builder: Builder) throws {
     try builder.storeRef(cell: src.root)
 }
 
-public struct SimpleLibraryValue: DictionaryValueCoder {
+public struct SimpleLibraryValue: TypeCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? SimpleLibrary else {
             throw TonError.custom("Wrong src type. Expected simple library")

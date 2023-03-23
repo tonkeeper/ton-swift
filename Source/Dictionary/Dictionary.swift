@@ -3,15 +3,12 @@ import BigInt
 public typealias DictionaryKeyTypes = Hashable
 
 /// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
-public protocol DictionaryKeyCoder {
+public protocol DictionaryKeyCoder: TypeCoder {
     var bits: Int { get }
-    //func serialize(src: any DictionaryKeyTypes) throws -> BitString
-    func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
-    func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
 
 /// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
-public protocol DictionaryValueCoder {
+public protocol TypeCoder {
     func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
     func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
@@ -25,7 +22,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter value: value type
     - returns Dictionary
     */
-    public static func empty(key: DictionaryKeyCoder? = nil, value: (any DictionaryValueCoder)? = nil) -> Dictionary {
+    public static func empty(key: DictionaryKeyCoder? = nil, value: (any TypeCoder)? = nil) -> Dictionary {
         return Dictionary(values: [:], key: key, value: value)
     }
     
@@ -36,7 +33,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter src: slice
     - returns Dictionary
     */
-    public static func load(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Slice) throws -> Dictionary {
+    public static func load(key: DictionaryKeyCoder, value: any TypeCoder, sc: Slice) throws -> Dictionary {
         let cell = try sc.loadMaybeRef()
         if let cell, !cell.isExotic {
             return try loadDirect(key: key, value: value, sc: cell.beginParse())
@@ -45,7 +42,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         }
     }
     
-    public static func load(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Cell) throws -> Dictionary {
+    public static func load(key: DictionaryKeyCoder, value: any TypeCoder, sc: Cell) throws -> Dictionary {
         // TODO: maybe it would be better to add type "AnyCell" and keep "Cell" for non-exotic cell and avoid these decisions here.
         // Steve Korshakov says the reason for this is that pruned branches should yield empty dicts somewhere down the line.
         if sc.isExotic {
@@ -65,7 +62,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     - parameter sc: slice
     - returns Dictionary
     */
-    static func loadDirect(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Slice?) throws -> Dictionary {
+    static func loadDirect(key: DictionaryKeyCoder, value: any TypeCoder, sc: Slice?) throws -> Dictionary {
         guard let sc = sc else {
             return Dictionary.empty(key: key, value: value)
         }
@@ -80,15 +77,15 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         
         return Dictionary(values: prepare, key: key, value: value)
     }
-    static func loadDirect(key: DictionaryKeyCoder, value: any DictionaryValueCoder, sc: Cell?) throws -> Dictionary {
+    static func loadDirect(key: DictionaryKeyCoder, value: any TypeCoder, sc: Cell?) throws -> Dictionary {
         return try loadDirect(key: key, value: value, sc: sc?.beginParse())
     }
     
     private var key: DictionaryKeyCoder?
-    private var value: (any DictionaryValueCoder)?
+    private var value: (any TypeCoder)?
     private var map: [String: V]
 
-    private init(values: [String: V], key: DictionaryKeyCoder?, value: (any DictionaryValueCoder)?) {
+    private init(values: [String: V], key: DictionaryKeyCoder?, value: (any TypeCoder)?) {
         self.key = key
         self.value = value
         self.map = values
@@ -127,7 +124,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         return Array(map.values)
     }
     
-    func store(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any DictionaryValueCoder)? = nil) throws {
+    func store(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any TypeCoder)? = nil) throws {
         if size == 0 {
             try builder.bits.write(bit: false)
             return
@@ -170,7 +167,7 @@ public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
         try builder.storeRef(cell: dd.endCell())
     }
     
-    func storeDirect(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any DictionaryValueCoder)? = nil) throws {
+    func storeDirect(builder: Builder, key: (any DictionaryKeyCoder)? = nil, value: (any TypeCoder)? = nil) throws {
         if size == 0 {
             throw TonError.custom("Cannot store empty dictionary directly")
         }

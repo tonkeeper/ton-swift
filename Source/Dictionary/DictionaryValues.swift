@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public struct DictionaryValueAddress: DictionaryValueCoder {
+public struct DictionaryValueAddress: TypeCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Address else {
             throw TonError.custom("Wrong src type. Expected Address")
@@ -16,7 +16,7 @@ public struct DictionaryValueAddress: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueBigInt: DictionaryValueCoder {
+public struct DictionaryValueBigInt: TypeCoder {
     public let bits: Int
     
     public init(bits: Int) {
@@ -36,7 +36,7 @@ public struct DictionaryValueBigInt: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueBigUInt: DictionaryValueCoder {
+public struct DictionaryValueBigUInt: TypeCoder {
     public let bits: Int
     
     public init(bits: Int) {
@@ -56,7 +56,7 @@ public struct DictionaryValueBigUInt: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueBigVarUInt: DictionaryValueCoder {
+public struct DictionaryValueBigVarUInt: TypeCoder {
     public let bits: Int
     
     public init(bits: Int) {
@@ -76,7 +76,7 @@ public struct DictionaryValueBigVarUInt: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueBool: DictionaryValueCoder {
+public struct DictionaryValueBool: TypeCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Bool else {
             throw TonError.custom("Wrong src type. Expected bool")
@@ -90,7 +90,7 @@ public struct DictionaryValueBool: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueBuffer: DictionaryValueCoder {
+public struct DictionaryValueBuffer: TypeCoder {
     public let bytes: Int
     
     public init(bytes: Int) {
@@ -114,7 +114,7 @@ public struct DictionaryValueBuffer: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueCell: DictionaryValueCoder {
+public struct DictionaryValueCell: TypeCoder {
     public func serialize(src: any DictionaryKeyTypes, builder: Builder) throws {
         guard let src = src as? Cell else {
             throw TonError.custom("Wrong src type. Expected cell")
@@ -128,7 +128,7 @@ public struct DictionaryValueCell: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueInt: DictionaryValueCoder {
+public struct DictionaryValueInt: TypeCoder {
     public let bits: Int
     
     public init(bits: Int) {
@@ -148,7 +148,7 @@ public struct DictionaryValueInt: DictionaryValueCoder {
     }
 }
 
-public struct DictionaryValueUInt: DictionaryValueCoder {
+public struct DictionaryValueUInt: TypeCoder {
     public let bits: Int
     
     public init(bits: Int) {
