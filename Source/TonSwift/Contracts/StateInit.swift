@@ -53,7 +53,7 @@ public struct StateInit: Writable, Readable {
         let code = try slice.loadMaybeRef()
         let data = try slice.loadMaybeRef()
         
-        let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeys.BigUint(bits: 256), value: SimpleLibraryValue())
+        let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeyBigUInt(bits: 256), value: SimpleLibraryValue())
         
         return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
     }

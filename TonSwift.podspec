@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.frameworks = 'XCTest'
 
   s.test_spec 'Tests' do |test_spec|
-    test_spec.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
+    test_spec.source_files = ["Tests/*.{swift,h}", "Tests/**/*.{swift,c,h}", "Tests/**/**/*.{swift,c,h}"]
   end
   
 end

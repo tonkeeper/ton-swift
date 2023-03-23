@@ -36,7 +36,7 @@ public class BitReader {
 
     /// Load a single bit.
     public func loadBit() throws -> Bool {
-        let r = try _bits.at(index: _offset)
+        let r = try _bits.at(_offset)
         _offset += 1
         return r
     }
@@ -48,7 +48,7 @@ public class BitReader {
 
     /// Preload a single bit without advancing the cursor.
     public func preloadBit() throws -> Bool {
-        return try _bits.at(index: _offset)
+        return try _bits.at(_offset)
     }
 
     /// Loads the specified number of bits in a `BitString`.
@@ -152,7 +152,7 @@ public class BitReader {
         // Skip padding
         var length = bits
         while true {
-            if try _bits.at(index: _offset + length - 1) {
+            if try _bits.at(_offset + length - 1) {
                 length -= 1
                 break
             } else {
@@ -267,10 +267,10 @@ public class BitReader {
             return 0
         }
         
-        let sign = try _bits.at(index: offset)
+        let sign = try _bits.at(offset)
         var res = BigInt(0)
         for i in 0..<bits - 1 {
-            if try _bits.at(index: offset + 1 + i) {
+            if try _bits.at(offset + 1 + i) {
                 res += BigInt(1) << BigInt(bits - i - 1 - 1)
             }
         }
@@ -287,7 +287,7 @@ public class BitReader {
         
         var res = BigUInt(0)
         for i in 0..<bits {
-            if try _bits.at(index: offset + i) {
+            if try _bits.at(offset + i) {
                 res += 1 << BigUInt(bits - i - 1)
             }
         }
@@ -298,10 +298,10 @@ public class BitReader {
     private func _preloadInt(bits: Int, offset: Int) throws -> Int64 {
         guard bits != 0 else { return 0 }
         
-        let sign = try _bits.at(index: offset)
+        let sign = try _bits.at(offset)
         var res = Int64(0)
         for i in 0..<bits - 1 {
-            if try _bits.at(index: offset + 1 + i) {
+            if try _bits.at(offset + 1 + i) {
                 res += 1 << Int64(bits - i - 1 - 1)
             }
         }
@@ -318,7 +318,7 @@ public class BitReader {
         
         var res = UInt64(0)
         for i in 0..<bits {
-            if try _bits.at(index: offset + i) {
+            if try _bits.at(offset + i) {
                 res += 1 << UInt64(bits - i - 1)
             }
         }

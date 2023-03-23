@@ -26,7 +26,7 @@ public struct CommonMessageInfoRelaxedInternal {
     let ihrDisabled: Bool
     let bounce: Bool
     let bounced: Bool
-    let src: Address?
+    let src: AnyAddress
     let dest: Address
     let value: CurrencyCollection
     let ihrFee: Coins
@@ -36,7 +36,7 @@ public struct CommonMessageInfoRelaxedInternal {
 }
 
 public struct CommonMessageInfoRelaxedExternalOut {
-    let src: Address?
+    let src: AnyAddress
     let dest: ExternalAddress?
     let createdLt: UInt64
     let createdAt: UInt32
@@ -65,7 +65,7 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
                     ihrDisabled: ihrDisabled,
                     bounce: bounce,
                     bounced: bounced,
-                    src: try src.asInternal(),
+                    src: src,
                     dest: dest,
                     value: value,
                     ihrFee: ihrFee,
@@ -88,7 +88,7 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
             
             return CommonMessageInfoRelaxed.externalOutInfo(
                 info: .init(
-                    src: try src.asInternal(),
+                    src: src,
                     dest: try dest.asExternal(),
                     createdLt: createdLt,
                     createdAt: createdAt
@@ -104,8 +104,8 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
             try builder.bits.write(bit: info.ihrDisabled)
             try builder.bits.write(bit: info.bounce)
             try builder.bits.write(bit: info.bounced)
-            try builder.store(AnyAddress.from(info.src))
-            try builder.store(AnyAddress.from(info.dest))
+            try builder.store(info.src)
+            try builder.store(AnyAddress(info.dest))
             try builder.store(info.value)
             try builder.storeCoins(coins: info.ihrFee)
             try builder.storeCoins(coins: info.forwardFee)
@@ -115,8 +115,8 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
         case .externalOutInfo(let info):
             try builder.bits.write(bit:true)
             try builder.bits.write(bit:true)
-            try builder.store(AnyAddress.from(info.src))
-            try builder.store(AnyAddress.from(info.dest))
+            try builder.store(info.src)
+            try builder.store(AnyAddress(info.dest))
             try builder.storeUint(info.createdLt, bits: 64)
             try builder.storeUint(UInt64(info.createdAt), bits: 32)
         }

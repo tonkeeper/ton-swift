@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "TonSwift", targets: ["TonSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/attaswift/BigInt", exact: "5.3.0")
+        .package(url: "https://github.com/attaswift/BigInt", .exact("5.3.0"))
     ],
     targets: [
         .target(

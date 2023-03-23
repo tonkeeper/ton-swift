@@ -21,27 +21,26 @@ enum AnyAddress {
     case internalAddr(Address)
     case externalAddr(ExternalAddress)
     
-    public static func from(_ addr: Address) -> Self {
-        return .internalAddr(addr)
+    init(_ addr: Address) {
+        self = .internalAddr(addr)
     }
-    
-    public static func from(_ maybeAddr: Address?) -> Self {
+    init(_ maybeAddr: Address?) {
         if let addr = maybeAddr {
-            return .internalAddr(addr)
+            self = .internalAddr(addr)
         } else {
-            return .none
+            self = .none
         }
     }
     
-    public static func from(_ addr: ExternalAddress) -> Self {
-        return .externalAddr(addr)
+    init(_ addr: ExternalAddress) {
+        self = .externalAddr(addr)
     }
     
-    public static func from(_ maybeAddr: ExternalAddress?) -> Self {
+    init(_ maybeAddr: ExternalAddress?) {
         if let addr = maybeAddr {
-            return .externalAddr(addr)
+            self = .externalAddr(addr)
         } else {
-            return .none
+            self = .none
         }
     }
     

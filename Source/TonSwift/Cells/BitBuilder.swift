@@ -34,7 +34,6 @@ public class BitBuilder {
         self.capacity = cap
     }
     
-    
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     public func write(bit: Int) throws {
         try checkCapacity(1)
@@ -54,9 +53,21 @@ public class BitBuilder {
     /// Writes bits from a bitstring
     public func write(bits: BitString) throws {
         for i in 0..<bits.length {
-            try write(bit: bits.at(index: i))
+            try write(bit: bits.at(i))
         }
     }
+    
+    /// Writes bits from a textual string of binary digits
+    public func write(binaryString: String) throws {
+        for s in binaryString {
+            if s != "0" && s != "1" {
+                throw TonError.custom("Bitstring must contain only 0s and 1s. Invalid character: \(s)")
+            }
+            try write(bit: s == "1" ? 1 : 0)
+        }
+    }
+    
+    
     
     /// Writes bytes from the src data.
     func write(data: Data) throws {

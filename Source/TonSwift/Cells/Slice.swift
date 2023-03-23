@@ -101,7 +101,7 @@ public class Slice {
     - parameter value: value description
     - returns Dictionary<K, V>
     */
-    public func loadDict<K: DictionaryKeyTypes, V>(key: DictionaryKey, value: DictionaryValue) throws -> Dictionary<K, V> {
+    public func loadDict<K: DictionaryKeyTypes, V>(key: DictionaryKeyCoder, value: DictionaryValueCoder) throws -> Dictionary<K, V> {
         return try Dictionary.load(key: key, value: value, sc: self)
     }
     
@@ -111,7 +111,7 @@ public class Slice {
     - parameter value: value description
     - returns Dictionary<K, V>
     */
-    public func loadDictDirect<K: DictionaryKeyTypes, V>(key: DictionaryKey, value: DictionaryValue) throws -> Dictionary<K, V> {
+    public func loadDictDirect<K: DictionaryKeyTypes, V>(key: DictionaryKeyCoder, value: DictionaryValueCoder) throws -> Dictionary<K, V> {
         return try Dictionary.loadDirect(key: key, value: value, sc: self)
     }
     
