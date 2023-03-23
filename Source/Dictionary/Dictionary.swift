@@ -1,5 +1,21 @@
 import BigInt
 
+public typealias DictionaryKeyTypes = Hashable
+
+/// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
+public protocol DictionaryKeyCoder {
+    var bits: Int { get }
+    func serialize(src: any DictionaryKeyTypes) throws -> BitString
+    func parse(src: Slice) throws -> any DictionaryKeyTypes
+}
+
+/// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
+public protocol DictionaryValueCoder {
+    func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
+    func parse(src: Slice) throws -> any DictionaryKeyTypes
+}
+
+
 public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     
     /**
