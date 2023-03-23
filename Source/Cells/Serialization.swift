@@ -10,6 +10,10 @@ public protocol Readable {
     static func readFrom(slice: Slice) throws -> Self
 }
 
+/// Types implementing both reading and writing
+public protocol Codeable: Readable, Writable {
+}
+
 /*
 /// Represents a description of a type for serialization.
 /// This protocol should be implemented by "type descriptors", or meta-types, not the actual value types.

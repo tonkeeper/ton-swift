@@ -13,7 +13,80 @@ public protocol TypeCoder {
     func parse(src: Slice) throws -> any DictionaryKeyTypes
 }
 
+/// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
+public protocol DictionaryKeyCoderV2: TypeCoderV2 {
+    var bits: Int { get }
+}
 
+/// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
+public protocol TypeCoderV2 {
+    associatedtype ValueType: Codeable
+    func serialize(src: any DictionaryKeyTypes, builder: Builder) throws
+    func parse(src: Slice) throws -> any DictionaryKeyTypes
+}
+
+
+public class DictionaryCoder<K: DictionaryKeyCoderV2, V: TypeCoderV2> where K.ValueType: Hashable {
+    let keyCoder: K
+    let valueCoder: V
+    
+    init(_ keyCoder: K, _ valueCoder: V) {
+        self.keyCoder = keyCoder
+        self.valueCoder = valueCoder
+    }
+    
+    /// Returns an empty dictionary
+    public func empty() -> DictionaryV2<K,V> {
+        return DictionaryV2(coder: self)
+    }
+    
+    /// Loads dictionary from slice
+    public func load(slice: Slice) throws -> DictionaryV2<K,V> {
+        let cell = try slice.loadMaybeRef()
+        if let cell, !cell.isExotic {
+            return try loadRoot(slice: cell.beginParse())
+        } else {
+            return empty()
+        }
+    }
+    
+    /// Loads dictionary from a cell
+    public func load(cell: Cell) throws -> DictionaryV2<K,V> {
+        // TODO: maybe it would be better to add type "AnyCell" and keep "Cell" for non-exotic cell and avoid these decisions here.
+        // Steve Korshakov says the reason for this is that pruned branches should yield empty dicts somewhere down the line.
+        if cell.isExotic {
+            return empty()
+        }
+        return try load(slice: try cell.beginParse())
+    }
+
+    /// Loads root of the dictionary directly from a slice
+    public func loadRoot(slice: Slice) throws -> DictionaryV2<K,V> {
+        throw TonError.custom("NOT IMPLEMENTED")
+//        let values = try parseDict(sc: slice, keySize: key.bits, extractor: value.parse)
+//        var prepare = [String: V]()
+//        for (k, v) in values {
+//            let keyValue = try key.parse(src: Cell(bits: k).beginParse())
+//            prepare[try serializeInternalKey(value: keyValue)] = v as? V
+//        }
+//
+//        return Dictionary(values: prepare, key: key, value: value)
+    }
+}
+
+public class DictionaryV2<K: DictionaryKeyCoderV2, V: TypeCoderV2> where K.ValueType: Hashable {
+    private let coder: DictionaryCoder<K,V>
+    private var contents: [K.ValueType: V.ValueType]
+    
+    public init(coder: DictionaryCoder<K,V>, contents: [K.ValueType: V.ValueType] = [:]) {
+        self.coder = coder
+        self.contents = contents
+    }
+}
+
+
+
+/// Legacy implementation
 public class Dictionary<K: DictionaryKeyTypes, V: Hashable> {
     
     /**
