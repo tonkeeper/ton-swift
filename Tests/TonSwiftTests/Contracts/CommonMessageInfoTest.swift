@@ -1,4 +1,5 @@
 import XCTest
+@testable import TonSwift
 
 final class CommonMessageInfoTest: XCTestCase {
     

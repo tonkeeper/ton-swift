@@ -1,5 +1,5 @@
-
 import XCTest
+@testable import TonSwift
 
 final class SendModeTest: XCTestCase {
 
