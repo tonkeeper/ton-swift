@@ -1,4 +1,5 @@
 import BigInt
+import Foundation
 
 public struct WalletTransferData {
     public let seqno: UInt64
