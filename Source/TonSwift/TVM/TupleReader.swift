@@ -1,10 +1,10 @@
 import Foundation
 import BigInt
 
-class TupleReader {
+public class TupleReader {
     private var items: [Tuple]
     
-    init(items: [Tuple]) {
+    public init(items: [Tuple]) {
         self.items = items
     }
     
@@ -50,16 +50,16 @@ class TupleReader {
         return value
     }
     
-    public func readNumber() throws -> Double {
-        return Double(try readBigNumber())
+    public func readNumber() throws -> UInt64 {
+        return UInt64(try readBigNumber())
     }
     
-    public func readNumberOpt() throws -> Double? {
+    public func readNumberOpt() throws -> UInt64? {
         guard let r = try readBigNumberOpt() else {
             return nil
         }
         
-        return Double(r)
+        return UInt64(r)
     }
     
     public func readBoolean() throws -> Bool {

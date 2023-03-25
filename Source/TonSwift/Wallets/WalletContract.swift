@@ -1,13 +1,14 @@
 import BigInt
 
-struct WalletTransferData {
-    let seqno: UInt64
-    let secretKey: Data
-    let messages: [MessageRelaxed]?
-    let sendMode: SendMode?
+public struct WalletTransferData {
+    public let seqno: UInt64
+    public let secretKey: Data
+    public let messages: [MessageRelaxed]
+    public let sendMode: SendMode
+    public let timeout: UInt64?
 }
 
-protocol WalletContract: Contract {
+public protocol WalletContract: Contract {
     func getBalance(provider: ContractProvider) async throws -> BigInt
     func getSeqno(provider: ContractProvider) async throws -> UInt64
     func send(provider: ContractProvider, message: Cell) async throws
@@ -17,21 +18,21 @@ protocol WalletContract: Contract {
 }
 
 extension WalletContract {
-    func getBalance(provider: ContractProvider) async throws -> BigInt {
+    public func getBalance(provider: ContractProvider) async throws -> BigInt {
         let state = try await provider.getState()
         return state.balance
     }
     
-    func send(provider: ContractProvider, message: Cell) async throws {
+    public func send(provider: ContractProvider, message: Cell) async throws {
         try await provider.external(message: message)
     }
     
-    func sendTransfer(provider: ContractProvider, args: WalletTransferData) async throws {
+    public func sendTransfer(provider: ContractProvider, args: WalletTransferData) async throws {
         let transfer = try createTransfer(args: args)
         try await send(provider: provider, message: transfer)
     }
     
-    func sender(provider: ContractProvider, secretKey: Data) async throws -> Sender {
+    public func sender(provider: ContractProvider, secretKey: Data) async throws -> Sender {
         return Sender(
             address: nil,
             send: { args in
@@ -47,9 +48,11 @@ extension WalletContract {
                     seqno: seqno,
                     secretKey: secretKey,
                     messages: [message],
-                    sendMode: args.sendMode
+                    sendMode: args.sendMode,
+                    timeout: nil
                 )
                 let transfer = try self.createTransfer(args: args)
+                try await send(provider: provider, message: transfer)
             }
         )
     }

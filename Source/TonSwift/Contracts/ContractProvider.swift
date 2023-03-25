@@ -1,6 +1,6 @@
 import Foundation
 
-protocol ContractProvider {
+public protocol ContractProvider {
     func getState() async throws -> ContractState
     func get(name: String, args: [Tuple]) async throws -> TupleReader
     func external(message: Cell) async throws

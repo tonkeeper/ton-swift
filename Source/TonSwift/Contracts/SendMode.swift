@@ -3,7 +3,7 @@ import Foundation
 /// Various raw options for sending a message that affect error handling,
 /// paying fees and sending the value.
 /// This struct is a wrapper around sendmode flags that prevents accidental misuse.
-struct SendMode {
+public struct SendMode {
     /// Pays message fwd/ihr fees separately.
     /// If the flag is not set, those fees are subtracted from the message value.
     public let payMsgFees: Bool
@@ -30,7 +30,7 @@ struct SendMode {
 }
 
 extension SendMode: RawRepresentable {
-    init?(rawValue: UInt8) {
+    public init?(rawValue: UInt8) {
         if rawValue & SendModeInvalidFlags > 0 {
             return nil // these bits are not used and must be set to zero
         }
@@ -43,7 +43,7 @@ extension SendMode: RawRepresentable {
         self.ignoreErrors = (rawValue & SendModeIgnoreErrors > 0)
     }
 
-    var rawValue: UInt8 {
+    public var rawValue: UInt8 {
         var m: UInt8 = value.rawValue
         if payMsgFees { m |= SendModePayMsgFees }
         if ignoreErrors { m |= SendModeIgnoreErrors }
@@ -51,7 +51,7 @@ extension SendMode: RawRepresentable {
     }
 }
 
-enum SendValueOptions {
+public enum SendValueOptions {
     /// Default choice: send the value specified for the message (minus the possible fees).
     case messageValue
 
@@ -66,9 +66,9 @@ enum SendValueOptions {
 }
 
 extension SendValueOptions: RawRepresentable {
-    typealias RawValue = UInt8
+    public typealias RawValue = UInt8
 
-    init?(rawValue: UInt8) {
+    public init?(rawValue: UInt8) {
         if rawValue & SendModeConflictingFlags == SendModeConflictingFlags {
             return nil // cannot set conflicting bits
         }
@@ -85,7 +85,7 @@ extension SendValueOptions: RawRepresentable {
         }
     }
 
-    var rawValue: UInt8 {
+    public var rawValue: UInt8 {
         switch self {
         case .messageValue: return 0
         case .addInboundValue: return SendModeAddRemainingInboundValue
