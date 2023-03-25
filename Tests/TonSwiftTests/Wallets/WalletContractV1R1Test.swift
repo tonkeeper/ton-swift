@@ -1,5 +1,6 @@
 import XCTest
 import TweetNacl
+@testable import TonSwift
 
 final class WalletContractV1R1Test: XCTestCase {
     
