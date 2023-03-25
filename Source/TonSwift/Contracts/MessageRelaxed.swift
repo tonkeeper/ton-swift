@@ -1,4 +1,5 @@
 import Foundation
+import BigInt
 
 /*
  Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L151
@@ -60,5 +61,27 @@ public struct MessageRelaxed: Readable, Writable {
             try builder.bits.write(bit: 1)
             try builder.storeRef(cell: body)
         }
+    }
+    
+    public static func `internal`(to: Address, value: BigUInt, bounce: Bool, stateInit: StateInit?, body: Cell) -> MessageRelaxed {
+        return MessageRelaxed(
+            info: .internalInfo(
+                info:
+                    CommonMessageInfoRelaxedInternal(
+                        ihrDisabled: true,
+                        bounce: bounce,
+                        bounced: false,
+                        src: .none,
+                        dest: to,
+                        value: CurrencyCollection(other: nil, coins: Coins(amount: value)),
+                        ihrFee: Coins(amount: 0),
+                        forwardFee: Coins(amount: 0),
+                        createdLt: 0,
+                        createdAt: 0
+                    )
+            ),
+            stateInit: stateInit,
+            body: body
+        )
     }
 }

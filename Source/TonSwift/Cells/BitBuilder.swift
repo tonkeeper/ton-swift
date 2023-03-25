@@ -66,9 +66,7 @@ public class BitBuilder {
             try write(bit: s == "1" ? 1 : 0)
         }
     }
-    
-    
-    
+
     /// Writes bytes from the src data.
     func write(data: Data) throws {
         try checkCapacity(data.count*8)

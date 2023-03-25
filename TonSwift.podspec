@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
 
   s.dependency 'BigInt'
+  s.dependency 'TweetNacl'
   s.frameworks = 'XCTest'
 
   s.test_spec 'Tests' do |test_spec|

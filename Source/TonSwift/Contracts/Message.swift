@@ -61,4 +61,19 @@ public struct Message: Readable, Writable {
             try builder.storeRef(cell: body)
         }
     }
+    
+    public static func external(to: Address, stateInit: StateInit?, body: Cell = .empty) -> Message {
+        return Message(
+            info: .externalInInfo(
+                info: CommonMessageInfoExternalIn(
+                    src: nil,
+                    dest: to,
+                    importFee: Coins(amount: 0)
+                )
+            ),
+            stateInit: stateInit,
+            body: body
+        )
+    }
+    
 }
