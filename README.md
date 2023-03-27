@@ -36,9 +36,6 @@ Ready for use on iOS 13+.
 pod 'TonSwift', :git => 'git@github.com:tonkeeper/ton-swift.git', :branch => 'main'
 ```
 
-### Manually
-If you prefer not to use any of dependency managers, you can integrate manually. Put `Source` folder in your Xcode project. Make sure to enable `Copy items if needed` and `Create groups`.
-
 # Authors
 
 * [Sergey Kotov](kotov@tonkeeper.com)
