@@ -16,7 +16,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] Snake data
 - [x] Signatures
 - [x] Wallet V3R1, V3R2
-- [ ] Wallet V4R1, V4R2
+- [x] Wallet V4R1, V4R2
 - [ ] Data signatures [TEP/PR104](https://github.com/ton-blockchain/TEPs/pull/104)
 - [ ] Subscription V1
 - [ ] Jettons
