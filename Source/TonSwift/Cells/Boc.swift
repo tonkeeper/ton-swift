@@ -201,7 +201,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     ) * 8
 
     // Serialize
-    var builder = BitBuilder(capacity: UInt16(totalSize))
+    var builder = BitBuilder(capacity: totalSize)
     try builder.write(uint: 0xb5ee9c72, bits: 32) // Magic
     try builder.write(bit: hasIdx) // Has index
     try builder.write(bit: hasCrc32c) // Has crc32c

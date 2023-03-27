@@ -5,10 +5,7 @@ import BigInt
 final class ParseDictTest: XCTestCase {
     
     private func storeBits(builder: Builder, src: String) throws -> Builder {
-        for s in src {
-            try builder.bits.write(bit: s != "0")
-        }
-        
+        try builder.bits.write(binaryString: src)
         return builder
     }
     

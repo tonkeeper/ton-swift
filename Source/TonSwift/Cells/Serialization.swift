@@ -14,26 +14,36 @@ public protocol Readable {
 public protocol Codeable: Readable, Writable {
 }
 
-/*
-/// Represents a description of a type for serialization.
-/// This protocol should be implemented by "type descriptors", or meta-types, not the actual value types.
-public protocol TypeSerialization {
-    /// Type of the returned value
-    associatedtype ValueType
-    
-    ///
-    var bits: Int { get }
-    func write(value: ValueType, to: Builder) throws
-    func read(from: Slice) throws -> ValueType
+/// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
+/// This protocol allows implement dependent types because the exact instance would have runtime parameter such as bitlength for the values of this type.
+public protocol TypeCoder {
+    associatedtype T: Codeable
+    func serialize(src: T, builder: Builder) throws
+    func parse(src: Slice) throws -> T
 }
 
-/// Type description for "self-contained" types that do know their size statically.
-/// Simple types such as `Address` or `Data` store their sizes,
-/// but integers require either explicit wrapper that contains bit-size, or a custom `TypeSerialization` descriptor.
-public struct StaticType: TypeSerialization {
-    
+/// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
+public protocol KnownSizeCoder: TypeCoder {
+    var bits: Int { get }
 }
-*/
+
+public extension TypeCoder {
+    /// Serializes type to Cell
+    func serializeToCell(_ src: T) throws -> Cell {
+        let b = Builder()
+        try serialize(src: src, builder: b)
+        return try b.endCell()
+    }
+}
+
+public extension KnownSizeCoder {
+    /// Serializes type to bitstring
+    func serializeToBitstring(_ src: T) throws -> BitString {
+        let b = Builder()
+        try serialize(src: src, builder: b)
+        return try b.endCell().bits
+    }
+}
 
 /// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
 public struct Unary: Readable, Writable {

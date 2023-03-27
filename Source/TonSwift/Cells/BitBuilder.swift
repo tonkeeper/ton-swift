@@ -26,12 +26,23 @@ public class BitBuilder {
     }
     
     /// Initialize the BitBuilder with a given capacity.
-    /// The backing buffer will be allocated right away, so the capacity is limited to 64Kbit at the API level.
-    public init(capacity: UInt16 = 1023) {
+    public init(capacity: Int = 1023) {
         let cap = Int(capacity)
         _buffer = Data(count: (cap + 7) / 8)
         _length = 0
         self.capacity = cap
+    }
+    
+    /// Initialize a copy of BitBuilder via internal state
+    private init(unchecked:(capacity: Int, buffer: Data, length: Int)) {
+        _buffer = unchecked.buffer
+        _length = unchecked.length
+        self.capacity = unchecked.capacity
+    }
+    
+    /// Clones slice at its current state.
+    public func clone() -> BitBuilder {
+        return BitBuilder(unchecked: (capacity: capacity, buffer: _buffer, length: _length))
     }
     
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
@@ -56,7 +67,18 @@ public class BitBuilder {
             try write(bit: bits.at(i))
         }
     }
-    
+
+    /// Writes bits from a literal sequence of numbers
+    public func write(bits: Int...) throws {
+        try checkCapacity(bits.count)
+        for bit in bits {
+            if bit > 0 {
+                _buffer[_length / 8] |= 1 << (7 - (_length % 8))
+            }
+            _length += 1
+        }
+    }
+
     /// Writes bits from a textual string of binary digits
     public func write(binaryString: String) throws {
         for s in binaryString {
@@ -257,11 +279,13 @@ public class BitBuilder {
     }
     
     /// Converts builder into BitString
+    /// TODO: make this non-fallible
     public func build() throws -> BitString {
         return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
     /// Converts to data if the bitstring contains a whole number of bytes.
+    /// If the bitstring is not byte-aligned, returns error.
     public func toData() throws -> Data {
         if !aligned {
             throw TonError.custom("BitBuilder buffer is not byte-aligned")

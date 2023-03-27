@@ -15,6 +15,16 @@ public class Builder {
         try self.bits.write(bits: bits)
     }
     
+    private init(unchecked: (bits: BitBuilder, refs: [Cell])) {
+        bits = unchecked.bits
+        refs = unchecked.refs
+    }
+    
+    /// Clones slice at its current state.
+    public func clone() -> Builder {
+        return Builder(unchecked: (bits: self.bits.clone(), refs: self.refs))
+    }
+    
     /// Number of written bits
     public var bitsCount: Int {
         return bits.length
@@ -286,10 +296,8 @@ public class Builder {
         return self
     }
     
-    /**
-     Complete cell
-    - returns cell
-    */
+    /// Completes cell
+    /// TODO: make this non-fallible
     public func endCell() throws -> Cell {
         return try Cell(bits: bits.build(), refs: refs)
     }
