@@ -27,7 +27,7 @@ public final class WalletContractV2: WalletContract {
         }
         
         let cell = try Cell.fromBoc(src: Data(base64Encoded: bocString)!)[0]
-        let data = try Builder().storeUint(UInt64(0), bits: 32)
+        let data = try Builder().storeUint(UInt64(0), bits: 32) // Seqno
         try data.bits.write(data: publicKey)
         
         self.stateInit = StateInit(code: cell, data: try data.endCell())
