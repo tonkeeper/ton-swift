@@ -63,7 +63,7 @@ public struct MessageRelaxed: Readable, Writable {
         }
     }
     
-    public static func `internal`(to: Address, value: BigUInt, bounce: Bool, stateInit: StateInit?, body: Cell) -> MessageRelaxed {
+    public static func `internal`(to: Address, value: BigUInt, bounce: Bool = true, stateInit: StateInit? = nil, body: Cell = .empty) -> MessageRelaxed {
         return MessageRelaxed(
             info: .internalInfo(
                 info:
