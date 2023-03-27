@@ -36,19 +36,6 @@ public final class WalletContractV1: WalletContract {
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
     
-    public func getSeqno(provider: ContractProvider) async throws -> UInt64 {
-        let state = try await provider.getState()
-        if case .active(_, let data) = state.state {
-            if let data, revision == .r1 {
-                return try Cell.fromBoc(src: data)[0].beginParse().bits.loadUint(bits: 32)
-            } else {
-                return try await provider.get(name: "seqno", args: []).readNumber()
-            }
-        } else {
-            return 0
-        }
-    }
-    
     public func createTransfer(args: WalletTransferData) throws -> Cell {
         let signingMessage = try Builder().storeUint(args.seqno, bits: 32)
         
