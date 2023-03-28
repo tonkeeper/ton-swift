@@ -158,7 +158,7 @@ public struct Cell: Hashable {
                 break
             }
         }
-        var s = indent + (isExotic ? t : "x") + "{" + (try bits.toString()) + "}"
+        var s = indent + (isExotic ? t : "x") + "{" + (bits.toString()) + "}"
         for i in refs {
             s += "\n" + (try i.toString(indent: indent + " "))
         }
@@ -359,7 +359,7 @@ func getRepr(bits: BitString, refs: [Cell], level: UInt32, type: CellType) throw
     reprCursor += 1
 
     // Write bits
-    repr.replaceSubrange(reprCursor..<reprCursor + bitsLen, with: try bits.bitsToPaddedBuffer())
+    repr.replaceSubrange(reprCursor..<reprCursor + bitsLen, with: bits.bitsToPaddedBuffer())
     reprCursor += bitsLen
 
     // Write refs

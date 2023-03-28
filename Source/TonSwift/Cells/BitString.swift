@@ -26,7 +26,7 @@ public struct BitString: Hashable {
         guard length >= 0 else {
             throw TonError.custom("Length cannot be negative")
         }
-        guard (offset + length) > data.count * 8 else {
+        guard (offset + length) <= data.count * 8 else {
             throw TonError.custom("Offset and length out of bounds for the data")
         }
         self._data = data
@@ -154,8 +154,8 @@ public struct BitString: Hashable {
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
-    public func toHex() throws -> String {
-        let padded = Data(try self.bitsToPaddedBuffer())
+    public func toHex() -> String {
+        let padded = Data(self.bitsToPaddedBuffer())
         
         if _length % 4 == 0 {
             let s = padded[0..<(self._length + 7) / 8].hexString().uppercased()
@@ -184,8 +184,8 @@ public struct BitString: Hashable {
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
-    public func toString() throws -> String {
-        return try toHex()
+    public func toString() -> String {
+        return toHex()
     }
     
     private func checkOffset(offset: Int, length: Int) throws {
@@ -204,20 +204,20 @@ public struct BitString: Hashable {
     }
     
     /// Pads bitstring with `10*` bits.
-    public func bitsToPaddedBuffer() throws -> Data {
+    public func bitsToPaddedBuffer() -> Data {
         let builder = BitBuilder(capacity: (self.length + 7) / 8 * 8)
-        try builder.write(bits: self)
+        try! builder.write(bits: self)
 
         let padding = (self.length + 7) / 8 * 8 - self.length
         for i in 0..<padding {
             if i == 0 {
-                try builder.write(bit: true)
+                try! builder.write(bit: true)
             } else {
-                try builder.write(bit: false)
+                try! builder.write(bit: false)
             }
         }
         
-        return try builder.toData()
+        return try! builder.toData() // we guarantee alignment in this method
     }
 }
 

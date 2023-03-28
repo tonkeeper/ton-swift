@@ -14,7 +14,7 @@ final class BitStringTest: XCTestCase {
         XCTAssertFalse(try bs.at(5))
         XCTAssertTrue(try bs.at(6))
         XCTAssertFalse(try bs.at(7))
-        XCTAssertEqual(try bs.toString(), "AA")
+        XCTAssertEqual(bs.toString(), "AA")
         
         // should equals
         let a = BitString(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
@@ -24,17 +24,17 @@ final class BitStringTest: XCTestCase {
         XCTAssertEqual(b, a)
         XCTAssertEqual(a, c)
         XCTAssertEqual(c, a)
-        XCTAssertEqual(try a.toString(), "AA")
-        XCTAssertEqual(try b.toString(), "AA")
-        XCTAssertEqual(try c.toString(), "AA")
+        XCTAssertEqual(a.toString(), "AA")
+        XCTAssertEqual(b.toString(), "AA")
+        XCTAssertEqual(c.toString(), "AA")
         
         // should format strings
-        XCTAssertEqual(try BitString(data: Data([0b00000000]), unchecked: (offset: 0, length: 1)).toString(), "4_")
-        XCTAssertEqual(try BitString(data: Data([0b10000000]), unchecked: (offset: 0, length: 1)).toString(), "C_")
-        XCTAssertEqual(try BitString(data: Data([0b11000000]), unchecked: (offset: 0, length: 2)).toString(), "E_")
-        XCTAssertEqual(try BitString(data: Data([0b11100000]), unchecked: (offset: 0, length: 3)).toString(), "F_")
-        XCTAssertEqual(try BitString(data: Data([0b11100000]), unchecked: (offset: 0, length: 4)).toString(), "E")
-        XCTAssertEqual(try BitString(data: Data([0b11101000]), unchecked: (offset: 0, length: 5)).toString(), "EC_")
+        XCTAssertEqual(try BitString(data: Data([0b00000000]), offset: 0, length: 1).toString(), "4_")
+        XCTAssertEqual(try BitString(data: Data([0b10000000]), offset: 0, length: 1).toString(), "C_")
+        XCTAssertEqual(try BitString(data: Data([0b11000000]), offset: 0, length: 2).toString(), "E_")
+        XCTAssertEqual(try BitString(data: Data([0b11100000]), offset: 0, length: 3).toString(), "F_")
+        XCTAssertEqual(try BitString(data: Data([0b11100000]), offset: 0, length: 4).toString(), "E")
+        XCTAssertEqual(try BitString(data: Data([0b11101000]), offset: 0, length: 5).toString(), "EC_")
         
         // should do subbuffers
         let bs1 = BitString(data: Data([1, 2, 3, 4, 5, 6, 7, 8]), unchecked:(offset: 0, length: 64))
@@ -104,7 +104,7 @@ final class BitStringTest: XCTestCase {
             XCTAssertEqual(r.toBinary(), bin)
             
             // Check the hex string
-            XCTAssertEqual(try r.toString(), hex)
+            XCTAssertEqual(r.toString(), hex)
         }
     }
 }

@@ -11,8 +11,8 @@ public struct ExternalAddress {
         self.value = value
     }
 
-    public func toString() throws -> String {
-        return "External<\(value.length):\(try value.toString())>"
+    public func toString() -> String {
+        return "External<\(value.length):\(value.toString())>"
     }
     
     public static func mock(seed: String) throws -> Self {
