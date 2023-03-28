@@ -14,6 +14,12 @@ public protocol Readable {
 public protocol Codeable: Readable, Writable {
 }
 
+/// Types implement KnownSize protocol when they have statically-known size in bits
+public protocol StaticSize {
+    /// Size of the type in bits
+    static var sizeInBits: Int { get }
+}
+
 /// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
 /// This protocol allows implement dependent types because the exact instance would have runtime parameter such as bitlength for the values of this type.
 public protocol TypeCoder {
@@ -22,9 +28,20 @@ public protocol TypeCoder {
     func parse(src: Slice) throws -> T
 }
 
-/// Every type that can be used as a dictionary key has an accompanying coder object configured to read that type.
-public protocol KnownSizeCoder: TypeCoder {
-    var bits: Int { get }
+extension Codeable {
+    static func defaultCoder() -> some TypeCoder {
+        DefaultCoder<Self>()
+    }
+}
+
+public class DefaultCoder<X: Codeable>: TypeCoder {
+    typealias T = X
+    func serialize(src: T, builder: Builder) throws {
+        try src.writeTo(builder: builder)
+    }
+    func parse(src: Slice) throws -> T {
+        return try T.readFrom(slice: src)
+    }
 }
 
 public extension TypeCoder {
@@ -33,15 +50,6 @@ public extension TypeCoder {
         let b = Builder()
         try serialize(src: src, builder: b)
         return try b.endCell()
-    }
-}
-
-public extension KnownSizeCoder {
-    /// Serializes type to bitstring
-    func serializeToBitstring(_ src: T) throws -> BitString {
-        let b = Builder()
-        try serialize(src: src, builder: b)
-        return try b.endCell().bits
     }
 }
 

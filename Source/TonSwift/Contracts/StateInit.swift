@@ -11,9 +11,9 @@ public struct StateInit: Writable, Readable {
     var special: TickTock?
     var code: Cell?
     var data: Cell?
-    var libraries: Dictionary<BigUInt, SimpleLibrary>?
+    var libraries: Dictionary<BigUInt, SimpleLibrary>
 
-    init(splitDepth: UInt32? = nil, special: TickTock? = nil, code: Cell? = nil, data: Cell? = nil, libraries: Dictionary<BigUInt, SimpleLibrary>? = nil) {
+    init(splitDepth: UInt32? = nil, special: TickTock? = nil, code: Cell? = nil, data: Cell? = nil, libraries: Dictionary<BigUInt, SimpleLibrary> = .empty()) {
         self.splitDepth = splitDepth;
         self.special = special;
         self.code = code;

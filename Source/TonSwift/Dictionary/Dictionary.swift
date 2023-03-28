@@ -1,49 +1,126 @@
 import Foundation
 
+/// Type of dictionary where keys have a statically known length.
+/// To work with dynamically known key lengths, use `DictionaryCoder` to load and store dictionaries.
+public struct Dictionary<K,V>: Codeable where K: Hashable & Codeable & StaticSize, V: Codeable {
+    typealias Key = K
+    typealias Value = V
+    
+    /// Underlying key-value map. You are free to read and modify it directly.
+    public var map: [K:V]
+    
+    public static func empty() -> [K:V] { return [:] }
+
+    public func writeTo(builder: Builder) throws {
+        try DictionaryCoder(
+            keyLength: K.sizeInBits,
+            DefaultCoder<K>(),
+            DefaultCoder<V>()
+        ).store(map: map, builder: builder)
+    }
+    
+    public func writeRootTo(builder: Builder) throws {
+        try DictionaryCoder(
+            keyLength: K.sizeInBits,
+            DefaultCoder<K>(),
+            DefaultCoder<V>()
+        ).storeRoot(map: map, builder: builder)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Dictionary<K, V> {
+        let coder = DictionaryCoder(
+            keyLength: K.sizeInBits,
+            DefaultCoder<K>(),
+            DefaultCoder<V>()
+        )
+        return Dictionary(map: try coder.load(slice: slice))
+    }
+    
+    public static func readRootFrom(slice: Slice) throws -> Dictionary<K,V> {
+        let coder = DictionaryCoder(
+            keyLength: K.sizeInBits,
+            DefaultCoder<K>(),
+            DefaultCoder<V>()
+        )
+        return Dictionary(map: try coder.loadRoot(slice: slice))
+    }
+}
+
+
+
 /// Coder for the dictionaries that stores the coding rules for keys and values.
-public class DictionaryCoder<K: KnownSizeCoder, V: TypeCoder> where K.T: Hashable {
+/// Use this explicit API when working with dynamically-sized dictionary keys.
+/// In all other cases use `Dictionary<K,V>` type where the key size is known at compile time.
+public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
+    let keyLength: Int
     let keyCoder: K
     let valueCoder: V
     
-    init(_ keyCoder: K, _ valueCoder: V) {
+    init(keyLength: Int, _ keyCoder: K, _ valueCoder: V) {
+        self.keyLength = keyLength
         self.keyCoder = keyCoder
         self.valueCoder = valueCoder
     }
-    
-    /// Returns an empty dictionary
-    public func empty() -> Dictionary<K,V> {
-        return Dictionary(coder: self)
-    }
-    
+        
     /// Loads dictionary from slice
-    public func load(slice: Slice) throws -> Dictionary<K,V> {
+    public func load(slice: Slice) throws -> [K.T:V.T] {
         let cell = try slice.loadMaybeRef()
         if let cell, !cell.isExotic {
             return try loadRoot(slice: cell.beginParse())
         } else {
-            return empty()
+            return [:]
         }
     }
     
     /// Loads dictionary from a cell
-    public func load(cell: Cell) throws -> Dictionary<K,V> {
+    public func load(cell: Cell) throws -> [K.T:V.T] {
         // TODO: maybe it would be better to add type "AnyCell" and keep "Cell" for non-exotic cell and avoid these decisions here.
         // Steve Korshakov says the reason for this is that pruned branches should yield empty dicts somewhere down the line.
         if cell.isExotic {
-            return empty()
+            return [:]
         }
         return try load(slice: try cell.beginParse())
     }
 
     /// Loads root of the dictionary directly from a slice
-    public func loadRoot(slice: Slice) throws -> Dictionary<K,V> {
+    public func loadRoot(slice: Slice) throws -> [K.T:V.T] {
         var map = [K.T: V.T]()
-        try doParse(prefix: BitBuilder(), slice: slice, n: keyCoder.bits, result: &map)
-        return Dictionary(coder: self, contents: map)
+        try doParse(prefix: BitBuilder(), slice: slice, n: keyLength, result: &map)
+        return map
     }
     
+    func store(map: [K.T: V.T], builder: Builder) throws {
+        if map.count == 0 {
+            try builder.bits.write(bit: 0)
+        } else {
+            try builder.bits.write(bit: 1)
+            let subcell = Builder()
+            try storeRoot(map: map, builder: subcell)
+            try builder.storeRef(cell: try subcell.endCell())
+        }
+    }
+    
+    func storeRoot(map: [K.T: V.T], builder: Builder) throws {
+        if map.count == 0 {
+            throw TonError.custom("Cannot store empty dictionary directly")
+        }
+                
+        // Serialize keys
+        var paddedMap: [BitString: V.T] = [:]
+        for (k, v) in map {
+            let b = Builder()
+            try keyCoder.serialize(src: k, builder: b)
+            let keybits = try b.endCell().bits
+            let paddedKey = keybits.padLeft(keyLength)
+            paddedMap[paddedKey] = v
+        }
 
-    func doParse(prefix: BitBuilder, slice: Slice, n: Int, result: inout [K.T: V.T]) throws {
+        // Calculate root label
+        let rootEdge = try buildEdge(paddedMap)
+        try writeEdge(src: rootEdge, keyLength: keyLength, valueCoder: valueCoder, to: builder)
+    }
+    
+    private func doParse(prefix: BitBuilder, slice: Slice, n: Int, result: inout [K.T: V.T]) throws {
         // Reading label
         let k = bitsForInt(n)
         var pfxlen: Int = 0
@@ -94,80 +171,6 @@ public class DictionaryCoder<K: KnownSizeCoder, V: TypeCoder> where K.T: Hashabl
     }
 }
 
-public struct Dictionary<K: KnownSizeCoder, V: TypeCoder> where K.T: Hashable {
-    private let coder: DictionaryCoder<K,V>
-    private var map: [K.T: V.T]
-    
-    public init(coder: DictionaryCoder<K,V>, contents: [K.T: V.T] = [:]) {
-        self.coder = coder
-        self.map = contents
-    }
-    
-    var size: Int {
-        return map.count
-    }
-    
-    func get(key: K.T) -> V.T? {
-        return map[key]
-    }
-    
-    func has(key: K.T) -> Bool {
-        return map.contains(where: { $0.key == key })
-    }
-    
-    mutating func set(key: K.T, value: V.T) {
-        map[key] = value
-    }
-    
-    mutating func delete(key: K.T) -> Bool {
-        return (map.removeValue(forKey: key) != nil)
-    }
-    
-    mutating func clear() {
-        map = [:]
-    }
-    
-    func keys() -> [K.T] {
-        return Array(map.keys).map { $0 }
-    }
-    
-    func values() -> [V.T] {
-        return Array(map.values)
-    }
-    
-    func store(builder: Builder) throws {
-        if size == 0 {
-            try builder.bits.write(bit: 0)
-        } else {
-            try builder.bits.write(bit: 1)
-            let subcell = Builder()
-            try storeRoot(builder: subcell)
-            try builder.storeRef(cell: try subcell.endCell())
-        }
-    }
-    
-    func storeRoot(builder: Builder) throws {
-        if size == 0 {
-            throw TonError.custom("Cannot store empty dictionary directly")
-        }
-        
-        let keyCoder = self.coder.keyCoder;
-        
-        // Serialize keys
-        var paddedMap: [BitString: V.T] = [:]
-        for (k, v) in map {
-            let paddedKey = try keyCoder.serializeToBitstring(k).padLeft(keyCoder.bits)
-            paddedMap[paddedKey] = v
-        }
-
-        // Calculate root label
-        let rootEdge = try buildEdge(paddedMap)
-        try writeEdge(src: rootEdge, keyLength: keyCoder.bits, valueCoder: coder.valueCoder, to: builder)
-    }
-}
-
-
-
 
 enum Node<T> {
     case fork(left: Edge<T>, right: Edge<T>)
@@ -217,23 +220,18 @@ func forkMap<T>(_ src: [BitString: T]) throws -> (left: [BitString: T], right: [
 }
 
 func buildNode<T>(_ src: [BitString: T]) throws -> Node<T> {
-    if src.isEmpty {
-        throw TonError.custom("Internal inconsistency")
-    }
+    try invariant(!src.isEmpty)
     if src.count == 1 {
         return .leaf(value: src.values.first!)
+    } else {
+        let (left, right) = try forkMap(src)
+        return .fork(left: try buildEdge(left), right: try buildEdge(right))
     }
-    let (left, right) = try forkMap(src)
-    
-    return .fork(left: try buildEdge(left), right: try buildEdge(right))
 }
 
 func buildEdge<T>(_ src: [BitString: T]) throws -> Edge<T> {
-    if src.isEmpty {
-        throw TonError.custom("Internal inconsistency")
-    }
+    try invariant(!src.isEmpty)
     let label = findCommonPrefix(src: Array(src.keys))
-    
     return Edge(label: label, node: try buildNode(removePrefixMap(src, label.length)))
 }
 
@@ -293,44 +291,26 @@ func bitsForInt(_ n: Int) -> Int {
 func writeLabel(src: BitString, keyLength: Int, to: Builder) throws {
     let k = bitsForInt(keyLength)
     let n = src.length
-    
-    // Case A: all bits are the same
-    if let bit = src.repeatsSameBit() {
-        // short mode '0' requires 2n+2 bits (always used for n=0)
-        // long mode  '10' requires 2+k+n bits (used only for n<=1)
-        // same mode  '11' requires 3+k bits (for n>=2, k<2n-1)
-        if n > 1 && k < 2 * n - 1 {
-            // same mode '11'
-            try to.bits.write(bits: 1, 1)       // header
-            try to.bits.write(bit: bit)         // value
-            try to.bits.write(uint: n, bits: k) // length
-        } else if k < n {
-            // long mode '10'
-            try to.bits.write(bits: 1, 0)       // header
-            try to.bits.write(uint: n, bits: k) // length
-            try to.bits.write(bits: src)        // the string itself
-        } else {
-            // short mode '0'
-            try to.bits.write(bit: 0)    // header
-            try to.store(Unary(n))       // unary length prefix: 1{n}0
-            try to.bits.write(bits: src) // the string itself
-        }
-    // Case B: bits are not the same
-    } else {
-        // We have two options:
-        // - short mode '0' requires 2n+2 bits
-        // - long mode '10', requires 2+k+n bits
-        if k < n {
-            // long mode '10'
-            try to.bits.write(bits: 1, 0) // header
-            try to.bits.write(uint: n, bits: k) // length
-            try to.bits.write(bits: src) // the string itself
-        } else {
-            // short mode '0'
-            try to.bits.write(bit: 0)    // header
-            try to.store(Unary(n))       // unary length prefix: 1{n}0
-            try to.bits.write(bits: src) // the string itself
-        }
+   
+    // The goal is to choose the shortest encoding.
+    // In case of a tie, choose a lexicographically shorter one.
+    // Therefore, `short$0` comes ahead of `long$10` which is ahead of `same$11`.
+    //
+    // short mode '0' requires 2n+2 bits (always used for n=0)
+    // long mode '10' requires 2+k+n bits (used only for n<=1)
+    // same mode '11' requires 3+k bits (for n>=2, k<2n-1)
+    if let bit = src.repeatsSameBit(), n > 1 && k < 2 * n - 1 { // same mode '11'
+        try to.bits.write(bits: 1, 1)       // header
+        try to.bits.write(bit: bit)         // value
+        try to.bits.write(uint: n, bits: k) // length
+    } else if k < n { // long mode '10'
+        try to.bits.write(bits: 1, 0)       // header
+        try to.bits.write(uint: n, bits: k) // length
+        try to.bits.write(bits: src)        // the string itself
+    } else { // short mode '0'
+        try to.bits.write(bit: 0)     // header
+        try to.store(Unary(n))        // unary length prefix: 1{n}0
+        try to.bits.write(bits: src)  // the string itself
     }
 }
 
@@ -384,3 +364,44 @@ func findCommonPrefix(src: some Collection<BitString>) -> BitString {
 fileprivate func invariant(_ cond: Bool) throws {
     if !cond { throw TonError.custom("Internal inconsistency") }
 }
+
+
+//protocol DictionaryInterface {
+//    associatedtype Key: Hashable
+//    associatedtype Value
+//    var map: [Key: Value] { get set }
+//}
+//
+//extension DictionaryInterface {
+//    var size: Int {
+//        return map.count
+//    }
+//
+//    func get(key: Key) -> Value? {
+//        return map[key]
+//    }
+//
+//    func has(key: Key) -> Bool {
+//        return map.contains(where: { $0.key == key })
+//    }
+//
+//    mutating func set(key: Key, value: Value) {
+//        map[key] = value
+//    }
+//
+//    mutating func delete(key: Key) -> Bool {
+//        return (map.removeValue(forKey: key) != nil)
+//    }
+//
+//    mutating func clear() {
+//        map = [:]
+//    }
+//
+//    func keys() -> [Key] {
+//        return Array(map.keys).map { $0 }
+//    }
+//
+//    func values() -> [Value] {
+//        return Array(map.values)
+//    }
+//}
