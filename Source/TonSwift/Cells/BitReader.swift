@@ -245,12 +245,12 @@ public class BitReader {
     
     /// Load coins value
     func loadCoins() throws -> Coins {
-        return Coins(amount: try loadVarUintBig(bits: 4))
+        return Coins(try loadVarUintBig(bits: 4))
     }
     
     /// Preload coins value
     func preloadCoins() throws -> Coins {
-        return Coins(amount: try preloadVarUintBig(bits: 4))
+        return Coins(try preloadVarUintBig(bits: 4))
     }
     
     

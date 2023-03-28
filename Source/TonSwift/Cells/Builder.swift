@@ -269,33 +269,6 @@ public class Builder {
         return self
     }
     
-    /**
-     Store dictionary in this builder
-    - parameter dict: dictionary to store
-    - returns this builder
-    */
-    @discardableResult
-    func storeDict<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>?, key: DictionaryKeyCoder? = nil, value: TypeCoder? = nil) throws -> Self {
-        if let dict = dict {
-            try dict.store(builder: self, key: key, value: value)
-        } else {
-            try bits.write(bit: 0 != 0)
-        }
-        
-        return self
-    }
-    
-    /**
-     Store dictionary in this builder directly
-    - parameter dict: dictionary to store
-    - returns this builder
-    */
-    @discardableResult
-    func storeDictDirect<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>, key: DictionaryKeyCoder? = nil, value: TypeCoder? = nil) throws -> Self {
-        try dict.storeDirect(builder: self, key: key, value: value)
-        return self
-    }
-    
     /// Completes cell
     /// TODO: make this non-fallible
     public func endCell() throws -> Cell {

@@ -9,11 +9,11 @@ public struct Dictionary<K,V>: Codeable where K: Hashable & Codeable & StaticSiz
     /// Underlying key-value map. You are free to read and modify it directly.
     public var map: [K:V]
     
-    public static func empty() -> [K:V] { return [:] }
+    public static func empty() -> Self { return Self(map:[:]) }
 
     public func writeTo(builder: Builder) throws {
         try DictionaryCoder(
-            keyLength: K.sizeInBits,
+            keyLength: K.bitWidth,
             DefaultCoder<K>(),
             DefaultCoder<V>()
         ).store(map: map, builder: builder)
@@ -21,7 +21,7 @@ public struct Dictionary<K,V>: Codeable where K: Hashable & Codeable & StaticSiz
     
     public func writeRootTo(builder: Builder) throws {
         try DictionaryCoder(
-            keyLength: K.sizeInBits,
+            keyLength: K.bitWidth,
             DefaultCoder<K>(),
             DefaultCoder<V>()
         ).storeRoot(map: map, builder: builder)
@@ -29,7 +29,7 @@ public struct Dictionary<K,V>: Codeable where K: Hashable & Codeable & StaticSiz
     
     public static func readFrom(slice: Slice) throws -> Dictionary<K, V> {
         let coder = DictionaryCoder(
-            keyLength: K.sizeInBits,
+            keyLength: K.bitWidth,
             DefaultCoder<K>(),
             DefaultCoder<V>()
         )
@@ -38,13 +38,61 @@ public struct Dictionary<K,V>: Codeable where K: Hashable & Codeable & StaticSiz
     
     public static func readRootFrom(slice: Slice) throws -> Dictionary<K,V> {
         let coder = DictionaryCoder(
-            keyLength: K.sizeInBits,
+            keyLength: K.bitWidth,
             DefaultCoder<K>(),
             DefaultCoder<V>()
         )
         return Dictionary(map: try coder.loadRoot(slice: slice))
     }
 }
+//
+///// Type of dictionary where keys have a statically known length.
+///// To work with dynamically known key lengths, use `DictionaryCoder` to load and store dictionaries.
+//public protocol StaticKeyDictionary: Codeable {
+//    associatedtype Key: Codeable & StaticSize
+//    associatedtype Value: Codeable
+//    
+//    func writeRootTo(builder: Builder) throws
+//    static func readRootFrom(slice: Slice) throws -> Self
+//}
+//
+//extension Dictionary: StaticKeyDictionary where Key: Codeable & StaticSize, Value: Codeable {
+//    
+//    public func writeTo(builder: Builder) throws {
+//        try DictionaryCoder(
+//            keyLength: Key.bitWidth,
+//            DefaultCoder<Key>(),
+//            DefaultCoder<Value>()
+//        ).store(map: self, builder: builder)
+//    }
+//    
+//    public func writeRootTo(builder: Builder) throws {
+//        try DictionaryCoder(
+//            keyLength: Key.bitWidth,
+//            DefaultCoder<Key>(),
+//            DefaultCoder<Value>()
+//        ).storeRoot(map: self, builder: builder)
+//    }
+//    
+//    public static func readFrom(slice: Slice) throws -> Self {
+//        let coder = DictionaryCoder(
+//            keyLength: Key.bitWidth,
+//            DefaultCoder<Key>(),
+//            DefaultCoder<Value>()
+//        )
+//        return try coder.load(slice: slice)
+//    }
+//    
+//    public static func readRootFrom(slice: Slice) throws -> Self {
+//        let coder = DictionaryCoder(
+//            keyLength: Key.bitWidth,
+//            DefaultCoder<Key>(),
+//            DefaultCoder<Value>()
+//        )
+//        return try coder.loadRoot(slice: slice)
+//    }
+//
+//}
 
 
 

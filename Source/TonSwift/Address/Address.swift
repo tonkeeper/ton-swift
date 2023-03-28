@@ -77,7 +77,10 @@ extension Address: Equatable {
 ///             workchain_id:int32
 ///             address:(bits addr_len)            = MsgAddressInt;
 /// ```
-extension Address: Writable, Readable {
+extension Address: Codeable, StaticSize {
+    
+    public static var bitWidth: Int = 267
+    
     public func writeTo(builder b: Builder) throws {
         try b.bits.write(uint: 2, bits: 2) // $10
         try b.bits.write(uint: 0, bits: 1)

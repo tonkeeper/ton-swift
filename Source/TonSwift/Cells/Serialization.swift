@@ -17,13 +17,13 @@ public protocol Codeable: Readable, Writable {
 /// Types implement KnownSize protocol when they have statically-known size in bits
 public protocol StaticSize {
     /// Size of the type in bits
-    static var sizeInBits: Int { get }
+    static var bitWidth: Int { get }
 }
 
 /// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
 /// This protocol allows implement dependent types because the exact instance would have runtime parameter such as bitlength for the values of this type.
 public protocol TypeCoder {
-    associatedtype T: Codeable
+    associatedtype T
     func serialize(src: T, builder: Builder) throws
     func parse(src: Slice) throws -> T
 }
@@ -35,11 +35,11 @@ extension Codeable {
 }
 
 public class DefaultCoder<X: Codeable>: TypeCoder {
-    typealias T = X
-    func serialize(src: T, builder: Builder) throws {
+    public typealias T = X
+    public func serialize(src: T, builder: Builder) throws {
         try src.writeTo(builder: builder)
     }
-    func parse(src: Slice) throws -> T {
+    public func parse(src: Slice) throws -> T {
         return try T.readFrom(slice: src)
     }
 }
@@ -53,26 +53,30 @@ public extension TypeCoder {
     }
 }
 
-/// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
-public struct Unary: Readable, Writable {
-    public let value: Int
+
+public class BytesCoder: TypeCoder {
+    public typealias T = Data
+    let size: Int
     
-    init(_ v: Int) {
-        value = v
+    init(size: Int) {
+        self.size = size
     }
     
+    public func serialize(src: T, builder: Builder) throws {
+        try builder.bits.write(data: src)
+    }
+    public func parse(src: Slice) throws -> T {
+        return try src.bits.loadBytes(self.size)
+    }
+}
+
+
+extension Cell: Codeable {
     public func writeTo(builder: Builder) throws {
-        for _ in 0..<value {
-            try builder.bits.write(bit: true)
-        }
-        try builder.bits.write(bit: false)
+        try builder.storeRef(cell: self)
     }
     
-    public static func readFrom(slice: Slice) throws -> Self {
-        var v: Int = 0
-        while try slice.bits.loadBit() {
-            v += 1
-        }
-        return Unary(v)
+    public static func readFrom(slice: Slice) throws -> Cell {
+        return try slice.loadRef()
     }
 }

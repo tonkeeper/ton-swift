@@ -1,8 +1,14 @@
 import Foundation
 import BigInt
 
+/// 128-bit integer representing base TON currency: toncoins (aka `grams` in block.tlb).
 public struct Coins {
     var amount: BigUInt
+    
+    init(_ a: some BinaryInteger) {
+        // we use signed integer here because of `0` literal is a signed Int.
+        self.amount = BigUInt(a)
+    }
 }
 
 extension Coins: RawRepresentable {
@@ -17,15 +23,12 @@ extension Coins: RawRepresentable {
     }
 }
 
-extension Coins: Writable {
+extension Coins: Codeable {
     public func writeTo(builder: Builder) throws {
         try builder.storeVarUint(value: self.amount, bits: 4)
     }
-}
-
-extension Coins: Readable {
     public static func readFrom(slice: Slice) throws -> Coins {
-        return Coins(amount: try slice.bits.loadVarUintBig(bits: 4))
+        return Coins(try slice.bits.loadVarUintBig(bits: 4))
     }
 }
 

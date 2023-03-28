@@ -20,11 +20,7 @@ final class DictionaryTest: XCTestCase {
             .storeRef(cell: try builderFrom("1011111011111101111100100001"))
             .endCell()
         
-        let dict: Dictionary<UInt64, UInt64> = try Dictionary.loadDirect(
-            key: DictionaryKeyUInt(bits: 16),
-            value: DictionaryValueUInt(bits: 16),
-            sc: try root.beginParse()
-        )
+        let dict: Dictionary<UInt16, UInt16> = try root.beginParse().loadType();
         XCTAssertEqual(try dict.get(key: 13), 169)
         XCTAssertEqual(try dict.get(key: 17), 289)
         XCTAssertEqual(try dict.get(key: 239), 57121)

@@ -94,28 +94,7 @@ public class Slice {
             return nil
         }
     }
-        
-    /**
-     Loads dictionary
-    - parameter key: key description
-    - parameter value: value description
-    - returns Dictionary<K, V>
-    */
-    public func loadDict<K: DictionaryKeyTypes, V>(key: DictionaryKeyCoder, value: TypeCoder) throws -> Dictionary<K, V> {
-        return try Dictionary.load(key: key, value: value, sc: self)
-    }
-    
-    /**
-     Loads dictionary directly from current slice
-    - parameter key: key description
-    - parameter value: value description
-    - returns Dictionary<K, V>
-    */
-    public func loadDictDirect<K: DictionaryKeyTypes, V>(key: DictionaryKeyCoder, value: TypeCoder) throws -> Dictionary<K, V> {
-        return try Dictionary.loadDirect(key: key, value: value, sc: self)
-    }
-    
-    
+
     /// Checks if the cell is fully processed without unread bits or refs.
     public func endParse() throws {
         if remainingBits > 0 || remainingRefs > 0 {

@@ -7,22 +7,23 @@ import BigInt
 /// extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;
 /// currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
 /// ```
-struct CurrencyCollection: Readable, Writable {
-    let other: Dictionary<Int, BigUInt>?
+struct CurrencyCollection: Codeable {
     let coins: Coins
+    let other: Dictionary<UInt32, VarUInt248>
+    
+    init(coins: Coins, other: Dictionary<UInt32, VarUInt248> = .empty()) {
+        self.coins = coins
+        self.other = other
+    }
     
     static func readFrom(slice: Slice) throws -> CurrencyCollection {
         let coins = try slice.loadCoins()
-        let other: Dictionary<Int, BigUInt> = try slice.loadDict(
-            key: DictionaryKeyUInt(bits: 32),
-            value: DictionaryValueBigVarUInt(bits: (5 /* log2(32) */))
-        )
-        
-        return CurrencyCollection(other: other, coins: coins)
+        let other: Dictionary<UInt32, VarUInt248> = try slice.loadType()
+        return CurrencyCollection(coins: coins, other: other)
     }
     
     func writeTo(builder: Builder) throws {
         try builder.storeCoins(coins: coins)
-        try builder.storeDict(dict: other)
+        try builder.store(other)
     }
 }
