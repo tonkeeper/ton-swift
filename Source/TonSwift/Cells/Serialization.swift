@@ -70,13 +70,35 @@ public class BytesCoder: TypeCoder {
     }
 }
 
-
+// Cell is encoded as a separate ref
 extension Cell: Codeable {
     public func writeTo(builder: Builder) throws {
         try builder.storeRef(cell: self)
     }
     
-    public static func readFrom(slice: Slice) throws -> Cell {
+    public static func readFrom(slice: Slice) throws -> Self {
         return try slice.loadRef()
+    }
+}
+
+// Slice is encoded inline
+extension Slice: Codeable {
+    public func writeTo(builder: Builder) throws {
+        try builder.storeSlice(src: self)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return slice.clone() as! Self
+    }
+}
+
+// Builder is encoded inline
+extension Builder: Codeable {
+    public func writeTo(builder: Builder) throws {
+        try builder.storeSlice(src: endCell().beginParse())
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return try slice.clone().asBuilder() as! Self
     }
 }

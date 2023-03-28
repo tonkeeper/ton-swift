@@ -183,22 +183,32 @@ public class BitBuilder {
         }
     }
     
+    
+    func write(int value: any BinaryInteger, bits: Int) throws {
+        try write(bigint: BigInt(value), bits: bits)
+    }
+    
     /**
+     DEPRECATED API
      Write int value
     - parameter value: value as bigint or number
     - parameter bits: number of bits to write
     */
     func writeInt(_ value: Any, bits: Int) throws {
-        var v: BigInt
         if let value = value as? BigInt {
-            v = value
+            try write(bigint: value, bits: bits)
         } else if let value = value as? Int {
-            v = BigInt(value)
+            try write(bigint: BigInt(value), bits: bits)
         } else if let value = value as? any BinaryInteger {
-            v = BigInt(value)
+            try write(bigint: BigInt(value), bits: bits)
         } else {
             throw TonError.custom("Invalid value. Got \(value)")
         }
+        
+    }
+    
+    func write(bigint value: BigInt, bits: Int) throws {
+        var v = value
         if bits < 0 {
             throw TonError.custom("Invalid bit length. Got \(bits)")
         }
@@ -247,6 +257,7 @@ public class BitBuilder {
      Wrtie var uint value, used for serializing coins
     - parameter value: value to write as bigint or number
     - parameter bits: header bits to write size
+     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify actual bounds of the incoming number
     */
     func writeVarUint(value: UInt64, bits: Int) throws {
         try writeVarUint(value: BigUInt(value), bits: bits)

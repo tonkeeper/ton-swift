@@ -94,6 +94,16 @@ public class Slice {
             return nil
         }
     }
+    
+    /// Reads a dictionary from the slice.
+    public func loadDict<T>() throws -> T where T: CodeableDictionary {
+        return try T.readFrom(slice: self)
+    }
+
+    /// Reads the non-empty dictionary root directly from this slice.
+    public func loadDictRoot<T>() throws -> T where T: CodeableDictionary {
+        return try T.readRootFrom(slice: self)
+    }
 
     /// Checks if the cell is fully processed without unread bits or refs.
     public func endParse() throws {

@@ -171,6 +171,7 @@ public class BitReader {
      Load varuint value
     - parameter bits: number of bits to read the size
     - returns read value as bigint
+     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
     */
     func loadVarUint(bits: Int) throws -> UInt64 {
         let size = Int(try loadUint(bits: bits))
@@ -181,6 +182,7 @@ public class BitReader {
      Load varuint value
     - parameter bits: number of bits to read the size
     - returns read value as bigint
+     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
     */
     func loadVarUintBig(bits: Int) throws -> BigUInt {
         let size = Int(try loadUint(bits: bits))
@@ -191,6 +193,7 @@ public class BitReader {
      Preload varuint value
     - parameter bits: number of bits to read the size
     - returns read value as bigint
+     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
     */
     func preloadVarUint(bits: Int) throws -> UInt64 {
         let size = Int(try _preloadUint(bits: bits, offset: _offset))
@@ -201,11 +204,13 @@ public class BitReader {
      Preload varuint value
     - parameter bits: number of bits to read the size
     - returns read value as bigint
+     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
     */
     func preloadVarUintBig(bits: Int) throws -> BigUInt {
         let size = Int(try _preloadUint(bits: bits, offset: _offset))
         return BigUInt(try _preloadUint(bits: size * 8, offset: _offset + bits))
     }
+    
     
     /// Loads an optional boolean.
     public func loadMaybeBoolean() throws -> Bool? {

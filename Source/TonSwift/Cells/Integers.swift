@@ -56,6 +56,8 @@ public struct UInt256: Hashable, Codeable, StaticSize {
     }
 }
 
+// Unsigned short integers
+
 extension UInt8: Codeable, StaticSize {
     public static var bitWidth: Int = 8
     
@@ -104,32 +106,79 @@ extension UInt64: Codeable, StaticSize {
     }
 }
 
+// Signed short integers
+
+extension Int8: Codeable, StaticSize {
+    public static var bitWidth: Int = 8
+    
+    public func writeTo(builder: Builder) throws {
+        try builder.bits.write(int: self, bits: Self.bitWidth)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+    }
+}
+
+extension Int16: Codeable, StaticSize {
+    public static var bitWidth: Int = 16
+    
+    public func writeTo(builder: Builder) throws {
+        try builder.bits.write(int: self, bits: Self.bitWidth)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+    }
+}
+
+extension Int32: Codeable, StaticSize {
+    public static var bitWidth: Int = 32
+    
+    public func writeTo(builder: Builder) throws {
+        try builder.bits.write(int: self, bits: Self.bitWidth)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+    }
+}
+
+extension Int64: Codeable, StaticSize {
+    public static var bitWidth: Int = 64
+    
+    public func writeTo(builder: Builder) throws {
+        try builder.bits.write(int: self, bits: Self.bitWidth)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+    }
+}
+
+
 
 //
 // Dynamically-sized integers
 //
 
-/// Up-to-31-byte (248-bit) unsigned integer
+/// Up-to-31-byte (248-bit) unsigned integer (5-bit length prefix)
 public struct VarUInt248: Hashable, Codeable {
     public var value: BigUInt
-    
     public func writeTo(builder: Builder) throws {
         try builder.storeVarUint(value: value, bits: 5)
     }
-    
     public static func readFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.bits.loadVarUintBig(bits: 5))
     }
 }
 
-/// Up-to-15-byte (120-bit) unsigned integer
+/// Up-to-15-byte (120-bit) unsigned integer (4-bit length prefix)
 public struct VarUInt120: Hashable, Codeable {
     public var value: BigUInt
-    
     public func writeTo(builder: Builder) throws {
         try builder.storeVarUint(value: value, bits: 4)
     }
-    
     public static func readFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.bits.loadVarUintBig(bits: 4))
     }
@@ -178,6 +227,7 @@ public struct UIntCoder: TypeCoder {
 /// var_uint$_ {n:#} len:(#< n) value:(uint (len * 8)) = VarUInteger n;
 /// var_int$_  {n:#} len:(#< n) value:(int (len * 8))  = VarInteger n;
 /// ```
+/// TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
 public struct VarUIntCoder: TypeCoder {
     public typealias T = BigUInt
     
@@ -195,7 +245,6 @@ public struct VarUIntCoder: TypeCoder {
         return try src.bits.loadVarUintBig(bits: prefixbits)
     }
 }
-
 
 
 

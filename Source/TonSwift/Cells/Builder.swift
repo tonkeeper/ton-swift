@@ -268,6 +268,18 @@ public class Builder {
         
         return self
     }
+
+    @discardableResult
+    public func storeDict(_ dict: any CodeableDictionary) throws -> Self {
+        try dict.writeTo(builder: self)
+        return self
+    }
+
+    @discardableResult
+    public func storeDictRoot(_ dict: any CodeableDictionary) throws -> Self {
+        try dict.writeRootTo(builder: self)
+        return self
+    }
     
     /// Completes cell
     /// TODO: make this non-fallible
@@ -281,12 +293,5 @@ public class Builder {
     */
     public func asCell() throws -> Cell {
         return try endCell()
-    }
-}
-
-// MARK: - Writable
-extension Builder: Writable {
-    public func writeTo(builder: Builder) throws {
-        try storeSlice(src: try builder.endCell().beginParse())
     }
 }

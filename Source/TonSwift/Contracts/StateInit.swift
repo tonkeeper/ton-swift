@@ -11,13 +11,13 @@ public struct StateInit: Writable, Readable {
     var special: TickTock?
     var code: Cell?
     var data: Cell?
-    var libraries: Dictionary<UInt256, SimpleLibrary>
+    var libraries: [UInt256: SimpleLibrary]
 
     init(splitDepth: UInt32? = nil,
          special: TickTock? = nil,
          code: Cell? = nil,
          data: Cell? = nil,
-         libraries: Dictionary<UInt256, SimpleLibrary> = .empty()) {
+         libraries: [UInt256: SimpleLibrary] = [:]) {
         self.splitDepth = splitDepth;
         self.special = special;
         self.code = code;
@@ -57,7 +57,7 @@ public struct StateInit: Writable, Readable {
         let code = try slice.loadMaybeRef()
         let data = try slice.loadMaybeRef()
         
-        let libraries: Dictionary<UInt256, SimpleLibrary> = try slice.loadType()
+        let libraries: [UInt256: SimpleLibrary] = try slice.loadType()
         
         return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
     }
