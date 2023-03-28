@@ -9,7 +9,7 @@ final class CommonMessageInfoTest: XCTestCase {
             info: .init(
                 src: try ExternalAddress.mock(seed: "src"),
                 dest: Address.mock(workchain: 0, seed: "dest"),
-                importFee: Coins(amount: 0)
+                importFee: Coins(0)
             )
         )
         

@@ -68,7 +68,7 @@ public struct Message: Readable, Writable {
                 info: CommonMessageInfoExternalIn(
                     src: nil,
                     dest: to,
-                    importFee: Coins(amount: 0)
+                    importFee: Coins(0)
                 )
             ),
             stateInit: stateInit,

@@ -63,7 +63,7 @@ enum AnyAddress {
     }
 }
 
-extension AnyAddress: Writable, Readable {
+extension AnyAddress: Codeable {
     func writeTo(builder: Builder) throws {
         switch self {
         case .none:

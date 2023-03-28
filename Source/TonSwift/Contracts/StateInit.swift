@@ -11,9 +11,13 @@ public struct StateInit: Writable, Readable {
     var special: TickTock?
     var code: Cell?
     var data: Cell?
-    var libraries: Dictionary<BigUInt, SimpleLibrary>?
+    var libraries: [UInt256: SimpleLibrary]
 
-    init(splitDepth: UInt32? = nil, special: TickTock? = nil, code: Cell? = nil, data: Cell? = nil, libraries: Dictionary<BigUInt, SimpleLibrary>? = nil) {
+    init(splitDepth: UInt32? = nil,
+         special: TickTock? = nil,
+         code: Cell? = nil,
+         data: Cell? = nil,
+         libraries: [UInt256: SimpleLibrary] = [:]) {
         self.splitDepth = splitDepth;
         self.special = special;
         self.code = code;
@@ -38,7 +42,7 @@ public struct StateInit: Writable, Readable {
         
         try builder.storeMaybeRef(cell: self.code)
         try builder.storeMaybeRef(cell: self.data)
-        try builder.storeDict(dict: self.libraries)
+        try builder.store(self.libraries)
     }
     
     static public func readFrom(slice: Slice) throws -> StateInit {
@@ -53,7 +57,7 @@ public struct StateInit: Writable, Readable {
         let code = try slice.loadMaybeRef()
         let data = try slice.loadMaybeRef()
         
-        let libraries: Dictionary<BigUInt, SimpleLibrary> = try slice.loadDict(key: DictionaryKeyBigUInt(bits: 256), value: SimpleLibraryValue())
+        let libraries: [UInt256: SimpleLibrary] = try slice.loadType()
         
         return StateInit(splitDepth: splitDepth, special: special, code: code, data: data, libraries: libraries)
     }
@@ -75,6 +79,27 @@ struct TickTock: Writable, Readable {
         return TickTock(
             tick: try slice.bits.loadBit(),
             tock: try slice.bits.loadBit()
+        )
+    }
+}
+
+// Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L145
+// simple_lib$_ public:Bool root:^Cell = SimpleLib;
+
+public struct SimpleLibrary: Hashable {
+    var `public`: Bool
+    var root: Cell
+}
+
+extension SimpleLibrary: Codeable {
+    public func writeTo(builder: Builder) throws {
+        try builder.bits.write(bit: self.public)
+        try builder.storeRef(cell: self.root)
+    }
+    public static func readFrom(slice: Slice) throws -> SimpleLibrary {
+        return Self(
+            public: try slice.bits.loadBit(),
+            root: try slice.loadRef()
         )
     }
 }

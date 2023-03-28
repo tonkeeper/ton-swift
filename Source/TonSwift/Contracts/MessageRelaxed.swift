@@ -73,9 +73,9 @@ public struct MessageRelaxed: Readable, Writable {
                         bounced: false,
                         src: .none,
                         dest: to,
-                        value: CurrencyCollection(other: nil, coins: Coins(amount: value)),
-                        ihrFee: Coins(amount: 0),
-                        forwardFee: Coins(amount: 0),
+                        value: CurrencyCollection(coins: Coins(value)),
+                        ihrFee: Coins(0),
+                        forwardFee: Coins(0),
                         createdLt: 0,
                         createdAt: 0
                     )

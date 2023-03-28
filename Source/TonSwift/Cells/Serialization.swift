@@ -14,47 +14,91 @@ public protocol Readable {
 public protocol Codeable: Readable, Writable {
 }
 
-/*
-/// Represents a description of a type for serialization.
-/// This protocol should be implemented by "type descriptors", or meta-types, not the actual value types.
-public protocol TypeSerialization {
-    /// Type of the returned value
-    associatedtype ValueType
-    
-    ///
-    var bits: Int { get }
-    func write(value: ValueType, to: Builder) throws
-    func read(from: Slice) throws -> ValueType
+/// Types implement KnownSize protocol when they have statically-known size in bits
+public protocol StaticSize {
+    /// Size of the type in bits
+    static var bitWidth: Int { get }
 }
 
-/// Type description for "self-contained" types that do know their size statically.
-/// Simple types such as `Address` or `Data` store their sizes,
-/// but integers require either explicit wrapper that contains bit-size, or a custom `TypeSerialization` descriptor.
-public struct StaticType: TypeSerialization {
-    
+/// Every type that can be used as a dictionary value has an accompanying coder object configured to read that type.
+/// This protocol allows implement dependent types because the exact instance would have runtime parameter such as bitlength for the values of this type.
+public protocol TypeCoder {
+    associatedtype T
+    func serialize(src: T, builder: Builder) throws
+    func parse(src: Slice) throws -> T
 }
-*/
 
-/// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
-public struct Unary: Readable, Writable {
-    public let value: Int
+extension Codeable {
+    static func defaultCoder() -> some TypeCoder {
+        DefaultCoder<Self>()
+    }
+}
+
+public class DefaultCoder<X: Codeable>: TypeCoder {
+    public typealias T = X
+    public func serialize(src: T, builder: Builder) throws {
+        try src.writeTo(builder: builder)
+    }
+    public func parse(src: Slice) throws -> T {
+        return try T.readFrom(slice: src)
+    }
+}
+
+public extension TypeCoder {
+    /// Serializes type to Cell
+    func serializeToCell(_ src: T) throws -> Cell {
+        let b = Builder()
+        try serialize(src: src, builder: b)
+        return try b.endCell()
+    }
+}
+
+
+public class BytesCoder: TypeCoder {
+    public typealias T = Data
+    let size: Int
     
-    init(_ v: Int) {
-        value = v
+    init(size: Int) {
+        self.size = size
     }
     
+    public func serialize(src: T, builder: Builder) throws {
+        try builder.bits.write(data: src)
+    }
+    public func parse(src: Slice) throws -> T {
+        return try src.bits.loadBytes(self.size)
+    }
+}
+
+// Cell is encoded as a separate ref
+extension Cell: Codeable {
     public func writeTo(builder: Builder) throws {
-        for _ in 0..<value {
-            try builder.bits.write(bit: true)
-        }
-        try builder.bits.write(bit: false)
+        try builder.storeRef(cell: self)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        var v: Int = 0
-        while try slice.bits.loadBit() {
-            v += 1
-        }
-        return Unary(v)
+        return try slice.loadRef()
+    }
+}
+
+// Slice is encoded inline
+extension Slice: Codeable {
+    public func writeTo(builder: Builder) throws {
+        try builder.storeSlice(src: self)
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return slice.clone() as! Self
+    }
+}
+
+// Builder is encoded inline
+extension Builder: Codeable {
+    public func writeTo(builder: Builder) throws {
+        try builder.storeSlice(src: endCell().beginParse())
+    }
+    
+    public static func readFrom(slice: Slice) throws -> Self {
+        return try slice.clone().asBuilder() as! Self
     }
 }

@@ -194,7 +194,7 @@ final class BitBuilderTest: XCTestCase {
         
         for c in cases {
             let builder = BitBuilder()
-            try builder.writeCoins(coins: Coins(amount: BigUInt(c[0])!))
+            try builder.writeCoins(coins: Coins(BigUInt(c[0])!))
             let bits = try builder.build()
             XCTAssertEqual(try bits.toString(), c[1])
         }

@@ -15,6 +15,16 @@ public class Builder {
         try self.bits.write(bits: bits)
     }
     
+    private init(unchecked: (bits: BitBuilder, refs: [Cell])) {
+        bits = unchecked.bits
+        refs = unchecked.refs
+    }
+    
+    /// Clones slice at its current state.
+    public func clone() -> Builder {
+        return Builder(unchecked: (bits: self.bits.clone(), refs: self.refs))
+    }
+    
     /// Number of written bits
     public var bitsCount: Int {
         return bits.length
@@ -258,38 +268,21 @@ public class Builder {
         
         return self
     }
-    
-    /**
-     Store dictionary in this builder
-    - parameter dict: dictionary to store
-    - returns this builder
-    */
+
     @discardableResult
-    func storeDict<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>?, key: DictionaryKeyCoder? = nil, value: TypeCoder? = nil) throws -> Self {
-        if let dict = dict {
-            try dict.store(builder: self, key: key, value: value)
-        } else {
-            try bits.write(bit: 0 != 0)
-        }
-        
+    public func storeDict(_ dict: any CodeableDictionary) throws -> Self {
+        try dict.writeTo(builder: self)
+        return self
+    }
+
+    @discardableResult
+    public func storeDictRoot(_ dict: any CodeableDictionary) throws -> Self {
+        try dict.writeRootTo(builder: self)
         return self
     }
     
-    /**
-     Store dictionary in this builder directly
-    - parameter dict: dictionary to store
-    - returns this builder
-    */
-    @discardableResult
-    func storeDictDirect<K: DictionaryKeyTypes, V>(dict: Dictionary<K, V>, key: DictionaryKeyCoder? = nil, value: TypeCoder? = nil) throws -> Self {
-        try dict.storeDirect(builder: self, key: key, value: value)
-        return self
-    }
-    
-    /**
-     Complete cell
-    - returns cell
-    */
+    /// Completes cell
+    /// TODO: make this non-fallible
     public func endCell() throws -> Cell {
         return try Cell(bits: bits.build(), refs: refs)
     }
@@ -300,12 +293,5 @@ public class Builder {
     */
     public func asCell() throws -> Cell {
         return try endCell()
-    }
-}
-
-// MARK: - Writable
-extension Builder: Writable {
-    public func writeTo(builder: Builder) throws {
-        try storeSlice(src: try builder.endCell().beginParse())
     }
 }

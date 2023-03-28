@@ -8,18 +8,17 @@ public struct BitString: Hashable {
     private let _length: Int
     private let _data: Data
     
-    /**
-     - returns the length of the bitstring in bits
-     */
+    /// The length of the bitstring in bits
     public var length: Int { _length }
     
-    /**
-     Constructing BitString from a buffer with specified offset and length without checking consistency.
-     
-     - parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
-     - parameter `unchecked.offset`: offset in bits from the start of the buffer
-     - parameter `unchecked.length`: length of the bitstring in bits
-     */
+    /// Constructs an empty bitstring
+    public init() {
+        self._data = Data()
+        self._offset = 0
+        self._length = 0
+    }
+    
+    /// Constructs BitString from a buffer with specified offset and length and checs for consistency.
     public init(data: Data, offset: Int, length: Int) throws {
         guard offset >= 0 else {
             throw TonError.custom("Offset cannot be negative")
@@ -36,7 +35,7 @@ public struct BitString: Hashable {
     }
     
     /**
-     Constructing BitString from a buffer with specified offset and length without checking consistency.
+     Constructs BitString from a buffer with specified offset and length without checking consistency.
      
      - parameter data: data that contains the bitstring data. NOTE: We are expecting this buffer to be NOT modified
      - parameter `unchecked.offset`: offset in bits from the start of the buffer
@@ -61,6 +60,7 @@ public struct BitString: Hashable {
         try b.write(binaryString: binaryString)
         self = try b.build()
     }
+    
 
     /**
      Returns the bit at the specified index
@@ -74,14 +74,35 @@ public struct BitString: Hashable {
             throw TonError.indexOutOfBounds(index)
         }
         
-        return uncheckedAt(index)
+        return at(unchecked: index)
     }
     
-    private func uncheckedAt(_ index: Int) -> Bool {
+    /// Performs access to a bit at a given index without checking bounds.
+    /// Use only in the internal implementation.
+    internal func at(unchecked index: Int) -> Bool {
         let byteIndex = (_offset + index) >> 3
         let bitIndex = 7 - ((_offset + index) % 8) // NOTE: We are using big endian
         
         return (_data[byteIndex] & (1 << bitIndex)) != 0
+    }
+    
+    /// Returns `.some(bit)` if the string is empty of consists of a repeating bit.
+    /// Empty strings return `.some(false)`.
+    /// Otherwise returns `nil`.
+    public func repeatsSameBit() -> Optional<Bool> {
+        if length == 0 {
+            return .some(false)
+        }
+        let firstbit = at(unchecked: 0)
+        if length == 1 {
+            return .some(firstbit)
+        }
+        for i in 1..<length {
+            if at(unchecked: i) != firstbit {
+                return nil
+            }
+        }
+        return .some(firstbit)
     }
     
     /**
@@ -102,13 +123,13 @@ public struct BitString: Hashable {
         return BitString(data: _data, unchecked:(offset: _offset + offset, length: length))
     }
     
-    /**
-     Get a subscring of the bitstring
-     
-     - parameter offset: offset in bits from the start of the buffer
-     - parameter length: length of the bitstring in bits
-     - returns buffer if the bitstring is aligned to bytes, null otherwise
-     */
+    /// Returns a byte-aligned substring given the `offset` and `length` in bits (same as in `substring` method).
+    /// Fails if the range in the given offset is not byte-aligned.
+    ///
+    /// Note that a bitstring may be backed by a shared buffer with non-aligned offset;
+    /// in such case the alignment is checked for the sum of internal offset and provided offset.
+    ///
+    /// TODO: might be useful to re-align bitstring in such case and only require that `length` is byte-aligned.
     public func subbuffer(offset: Int, length: Int) throws -> Data? {
         try checkOffset(offset: offset, length: length)
         
@@ -125,6 +146,11 @@ public struct BitString: Hashable {
         let end = start + (length >> 3)
         
         return _data.subdata(in: start...end)
+    }
+    
+    /// Drops first `n` bits from the bitstring.
+    public func dropFirst(_ n: Int) throws -> BitString {
+        return try substring(offset: n, length: self.length - n)
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
@@ -152,7 +178,7 @@ public struct BitString: Hashable {
     public func toBinary() -> String {
         var s = ""
         for i in 0..<length {
-            s.append(uncheckedAt(i) ? "1" : "0")
+            s.append(at(unchecked:i) ? "1" : "0")
         }
         return s
     }
@@ -168,9 +194,18 @@ public struct BitString: Hashable {
         }
     }
     
+    public func padLeft(_ n: Int = 0) -> BitString {
+        let b = BitBuilder(capacity: max(n, self.length))
+        for _ in self.length..<n {
+            try! b.write(bit: 0)
+        }
+        try! b.write(bits: self)
+        return try! b.build()
+    }
     
+    /// Pads bitstring with `10*` bits.
     public func bitsToPaddedBuffer() throws -> Data {
-        let builder = BitBuilder(capacity: UInt16((self.length + 7) / 8 * 8))
+        let builder = BitBuilder(capacity: (self.length + 7) / 8 * 8)
         try builder.write(bits: self)
 
         let padding = (self.length + 7) / 8 * 8 - self.length
@@ -184,7 +219,19 @@ public struct BitString: Hashable {
         
         return try builder.toData()
     }
+}
 
+/// Bitstring implements lexicographic comparison.
+extension BitString: Comparable {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        for i in 0..<min(lhs.length, rhs.length) {
+            let l = lhs.at(unchecked: i)
+            let r = rhs.at(unchecked: i)
+            if !l && r { return true }
+            if l && !r { return false }
+        }
+        return lhs.length <= rhs.length // shorter string comes first, tie is in favor of the LHS
+    }
 }
 
 extension BitString: Equatable {

@@ -1,28 +1,35 @@
 import Foundation
 import BigInt
 
-/// Implements CurrencyCollection per TLB schema:
+/// Implements ExtraCurrencyCollection per TLB schema:
 ///
 /// ```
 /// extra_currencies$_ dict:(HashmapE 32 (VarUInteger 32)) = ExtraCurrencyCollection;
+/// ```
+typealias ExtraCurrencyCollection = [UInt32: VarUInt248]
+
+/// Implements CurrencyCollection per TLB schema:
+///
+/// ```
 /// currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
 /// ```
-struct CurrencyCollection: Readable, Writable {
-    let other: Dictionary<Int, BigUInt>?
+struct CurrencyCollection: Codeable {
     let coins: Coins
+    let other: ExtraCurrencyCollection
+    
+    init(coins: Coins, other: ExtraCurrencyCollection = [:]) {
+        self.coins = coins
+        self.other = other
+    }
     
     static func readFrom(slice: Slice) throws -> CurrencyCollection {
         let coins = try slice.loadCoins()
-        let other: Dictionary<Int, BigUInt> = try slice.loadDict(
-            key: DictionaryKeyUInt(bits: 32),
-            value: DictionaryValueBigVarUInt(bits: (5 /* log2(32) */))
-        )
-        
-        return CurrencyCollection(other: other, coins: coins)
+        let other: ExtraCurrencyCollection = try slice.loadType()
+        return CurrencyCollection(coins: coins, other: other)
     }
     
     func writeTo(builder: Builder) throws {
         try builder.storeCoins(coins: coins)
-        try builder.storeDict(dict: other)
+        try builder.store(other)
     }
 }
