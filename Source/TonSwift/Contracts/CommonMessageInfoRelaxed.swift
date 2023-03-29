@@ -100,10 +100,10 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
     public func writeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
-            try builder.bits.write(bit: false)
-            try builder.bits.write(bit: info.ihrDisabled)
-            try builder.bits.write(bit: info.bounce)
-            try builder.bits.write(bit: info.bounced)
+            try builder.write(bit: false)
+            try builder.write(bit: info.ihrDisabled)
+            try builder.write(bit: info.bounce)
+            try builder.write(bit: info.bounced)
             try builder.store(info.src)
             try builder.store(AnyAddress(info.dest))
             try builder.store(info.value)
@@ -113,8 +113,8 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
             try builder.storeUint(UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
-            try builder.bits.write(bit:true)
-            try builder.bits.write(bit:true)
+            try builder.write(bit:true)
+            try builder.write(bit:true)
             try builder.store(info.src)
             try builder.store(AnyAddress(info.dest))
             try builder.storeUint(info.createdLt, bits: 64)

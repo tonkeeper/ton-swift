@@ -153,7 +153,7 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     return roots
 }
 
-func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: BitBuilder) throws -> BitBuilder {
+func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: Builder) throws -> Builder {
     let d1 = getRefsDescriptor(refs: cell.refs, level: cell.level, type: cell.type)
     let d2 = getBitsDescriptor(bits: cell.bits)
     
@@ -201,7 +201,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     ) * 8
 
     // Serialize
-    var builder = BitBuilder(capacity: totalSize)
+    var builder = Builder(capacity: totalSize)
     try builder.write(uint: 0xb5ee9c72, bits: 32) // Magic
     try builder.write(bit: hasIdx) // Has index
     try builder.write(bit: hasCrc32c) // Has crc32c
@@ -231,11 +231,11 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     }
 
     if hasCrc32c {
-        let crc32 = (try builder.toData()).crc32c()
+        let crc32 = (try builder.alignedBitstring()).crc32c()
         try builder.write(data: crc32)
     }
 
-    let res = try builder.toData()
+    let res = try builder.alignedBitstring()
     if res.count != totalSize / 8 {
         throw TonError.custom("Internal error")
     }

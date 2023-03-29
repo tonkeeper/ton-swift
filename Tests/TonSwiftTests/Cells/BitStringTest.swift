@@ -96,9 +96,7 @@ final class BitStringTest: XCTestCase {
         ]
         
         for (bin, hex) in cases {
-            let builder = BitBuilder()
-            try builder.write(binaryString: bin)
-            let r = try builder.build()
+            let r = try Builder().write(binaryString: bin).bitstring()
             
             // Check that string is valid
             XCTAssertEqual(r.toBinary(), bin)

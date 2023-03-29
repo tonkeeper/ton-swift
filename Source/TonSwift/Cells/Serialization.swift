@@ -63,7 +63,7 @@ public class BytesCoder: TypeCoder {
     }
     
     public func serialize(src: T, builder: Builder) throws {
-        try builder.bits.write(data: src)
+        try builder.write(data: src)
     }
     public func parse(src: Slice) throws -> T {
         return try src.loadBytes(self.size)

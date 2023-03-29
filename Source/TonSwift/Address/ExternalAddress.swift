@@ -25,7 +25,7 @@ extension ExternalAddress: Codeable {
     public func writeTo(builder: Builder) throws {
         try builder.storeUint(UInt64(1), bits: 2)
         try builder.storeUint(UInt64(self.value.length), bits: 9)
-        try builder.bits.write(bits: self.value)
+        try builder.write(bits: self.value)
     }
     
     public static func readFrom(slice: Slice) throws -> ExternalAddress {

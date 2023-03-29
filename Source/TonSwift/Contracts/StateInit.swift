@@ -27,17 +27,17 @@ public struct StateInit: Writable, Readable {
     
     public func writeTo(builder: Builder) throws {
         if let splitDepth = self.splitDepth {
-            try builder.bits.write(bit: true)
+            try builder.write(bit: true)
             try builder.storeUint(UInt64(splitDepth), bits: 5)
         } else {
-            try builder.bits.write(bit: false)
+            try builder.write(bit: false)
         }
         
         if let ticktock = self.special {
-            try builder.bits.write(bit: true)
+            try builder.write(bit: true)
             try builder.store(ticktock)
         } else {
-            try builder.bits.write(bit: false)
+            try builder.write(bit: false)
         }
         
         try builder.storeMaybeRef(cell: self.code)
@@ -71,8 +71,8 @@ struct TickTock: Writable, Readable {
     var tock: Bool
     
     func writeTo(builder: Builder) throws {
-        try builder.bits.write(bit: self.tick)
-        try builder.bits.write(bit: self.tock)
+        try builder.write(bit: self.tick)
+        try builder.write(bit: self.tock)
     }
     
     static func readFrom(slice: Slice) throws -> TickTock {
@@ -93,7 +93,7 @@ public struct SimpleLibrary: Hashable {
 
 extension SimpleLibrary: Codeable {
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(bit: self.public)
+        try builder.write(bit: self.public)
         try builder.storeRef(cell: self.root)
     }
     public static func readFrom(slice: Slice) throws -> SimpleLibrary {

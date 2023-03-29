@@ -1,5 +1,12 @@
 import Foundation
 
+/// Number of bits that fits into a cell
+public let BitsPerCell = 1023
+
+/// Number of refs that fits into a cell
+public let RefsPerCell = 4
+
+
 public enum CellType: Int {
     case ordinary = -1
     case prunedBranch = 1
@@ -49,11 +56,11 @@ public struct Cell: Hashable {
         if exotic {
             self.basic = try BasicCell.exotic(bits: bits, refs: refs)
         } else {
-            if refs.count > 4 {
+            if refs.count > RefsPerCell {
                 throw TonError.custom("Invalid number of references")
             }
-            if bits.length > 1023 {
-                throw TonError.custom("Bits overflow: \(bits.length) > 1023")
+            if bits.length > BitsPerCell {
+                throw TonError.custom("Bits overflow: \(bits.length) > \(BitsPerCell)")
             }
             
             self.basic = BasicCell(type: .ordinary, bits: bits, refs: refs)

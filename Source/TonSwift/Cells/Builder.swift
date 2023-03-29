@@ -1,22 +1,16 @@
 import Foundation
 import BigInt
 
-public typealias BitBuilder = Builder
-
 public class Builder {
     public let capacity: Int
     private var _buffer: Data
     private var _length: Int
     
     public private(set) var refs: [Cell]
-    
-    // tmp stub
-    public var bits: BitBuilder {
-        return self
-    }
-    
-    /// Initialize the BitBuilder with a given capacity.
-    public init(capacity: Int = 1023) {
+        
+    /// Initialize the Builder with a given capacity.
+    /// Note: Builder can be used to construct larger bitstrings, not only 1023-bit Cells. E.g. to build a BoC.
+    public init(capacity: Int = BitsPerCell) {
         self.capacity = capacity
         _buffer = Data(count: (capacity + 7) / 8)
         _length = 0
@@ -25,7 +19,7 @@ public class Builder {
     
     public convenience init(_ bits: BitString) throws {
         self.init()
-        try self.bits.write(bits: bits)
+        try self.write(bits: bits)
     }
     
     private init(capacity: Int, buffer: Data, length: Int, refs: [Cell]) {
@@ -64,17 +58,17 @@ public class Builder {
     
     /// Remaining bits available
     public var availableBits: Int {
-        return 1023 - bitsCount
+        return capacity - bitsCount
     }
     
     /// Remaining refs available
     public var availableRefs: Int {
-        return 4 - refsCount
+        return RefsPerCell - refsCount
     }
     
     /// Returns metrics for the currently stored data
     public var metrics: CellMetrics {
-        return CellMetrics(bitsCount: bits.length, refsCount: refs.count)
+        return CellMetrics(bitsCount: bitsCount, refsCount: refsCount)
     }
     
     /// Returns metrics for the remaining space in the cell
@@ -103,17 +97,17 @@ public class Builder {
      */
     @discardableResult
     public func storeInt(_ value: Int, bits: Int) throws -> Self {
-        try self.bits.writeInt(value, bits: bits)
+        try self.writeInt(value, bits: bits)
         return self
     }
     @discardableResult
     public func storeInt(_ value: BigUInt, bits: Int) throws -> Self {
-        try self.bits.writeInt(value, bits: bits)
+        try self.writeInt(value, bits: bits)
         return self
     }
     @discardableResult
     public func storeInt(_ value: BigInt, bits: Int) throws -> Self {
-        try self.bits.writeInt(value, bits: bits)
+        try self.writeInt(value, bits: bits)
         return self
     }
     
@@ -125,17 +119,17 @@ public class Builder {
      */
     @discardableResult
     public func storeUint(_ value: UInt64, bits: Int) throws -> Self {
-        try self.bits.write(uint: value, bits: bits)
+        try self.write(uint: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigUInt, bits: Int) throws -> Self {
-        try self.bits.write(uint: value, bits: bits)
+        try self.write(uint: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeUint(_ value: BigInt, bits: Int) throws -> Self {
-        try self.bits.write(uint: value, bits: bits)
+        try self.write(uint: value, bits: bits)
         return self
     }
     
@@ -147,12 +141,12 @@ public class Builder {
      */
     @discardableResult
     public func storeVarUint(value: UInt64, bits: Int) throws -> Self {
-        try self.bits.writeVarUint(value: value, bits: bits)
+        try self.writeVarUint(value: value, bits: bits)
         return self
     }
     @discardableResult
     public func storeVarUint(value: BigUInt, bits: Int) throws -> Self {
-        try self.bits.writeVarUint(value: value, bits: bits)
+        try self.writeVarUint(value: value, bits: bits)
         return self
     }
     
@@ -163,7 +157,7 @@ public class Builder {
      */
     @discardableResult
     public func storeCoins(coins: Coins) throws -> Self {
-        try self.bits.writeCoins(coins: coins)
+        try self.writeCoins(coins: coins)
         return self
     }
     
@@ -175,10 +169,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeCoins(coins: Coins?) throws -> Self {
         if let coins {
-            try bits.write(bit: true)
+            try write(bit: true)
             try storeCoins(coins: coins)
         } else {
-            try bits.write(bit: false)
+            try write(bit: false)
         }
         
         return self
@@ -218,10 +212,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeRef(cell: Cell?) throws -> Self {
         if let cell = cell {
-            try bits.write(bit: true)
+            try write(bit: true)
             try storeRef(cell: cell)
         } else {
-            try bits.write(bit: false)
+            try write(bit: false)
         }
         
         return self
@@ -229,10 +223,10 @@ public class Builder {
     @discardableResult
     public func storeMaybeRef(cell: Builder?) throws -> Self {
         if let cell = cell {
-            try bits.write(bit: true)
+            try write(bit: true)
             try storeRef(cell: cell)
         } else {
-            try bits.write(bit: false)
+            try write(bit: false)
         }
         
         return self
@@ -246,7 +240,7 @@ public class Builder {
     public func storeSlice(src: Slice) throws -> Self {
         let c = src.clone()
         if c.remainingBits > 0 {
-            try bits.write(bits: c.loadBits(c.remainingBits))
+            try write(bits: c.loadBits(c.remainingBits))
         }
         while c.remainingRefs > 0 {
             try storeRef(cell: c.loadRef())
@@ -261,10 +255,10 @@ public class Builder {
      */
     public func storeMaybeSlice(src: Slice?) throws {
         if let src = src {
-            try bits.write(bit: true)
+            try write(bit: true)
             try storeSlice(src: src)
         } else {
-            try bits.write(bit: false)
+            try write(bit: false)
         }
     }
     
@@ -287,10 +281,10 @@ public class Builder {
     @discardableResult
     public func storeMaybe(_ object: Writable?) throws -> Self {
         if let object = object {
-            try bits.write(bit: true)
+            try write(bit: true)
             try store(object)
         } else {
-            try bits.write(bit: false)
+            try write(bit: false)
         }
         
         return self
@@ -311,7 +305,8 @@ public class Builder {
     /// Completes cell
     /// TODO: make this non-fallible
     public func endCell() throws -> Cell {
-        return try Cell(bits: bits.build(), refs: refs)
+        let bits = BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+        return try Cell(bits: bits, refs: refs)
     }
     
     /**
@@ -324,7 +319,8 @@ public class Builder {
     
 
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
-    public func write(bit: Int) throws {
+    @discardableResult
+    public func write(bit: Int) throws -> Self {
         try checkCapacity(1)
         
         if bit > 0 {
@@ -332,22 +328,27 @@ public class Builder {
         }
         
         _length += 1
+        return self
     }
     
     /// Writes bit as a boolean (true => 1, false => 0)
-    public func write(bit: Bool) throws {
-        try write(bit: bit ? 1 : 0)
+    @discardableResult
+    public func write(bit: Bool) throws -> Self {
+        return try write(bit: bit ? 1 : 0)
     }
     
     /// Writes bits from a bitstring
-    public func write(bits: BitString) throws {
+    @discardableResult
+    public func write(bits: BitString) throws -> Self {
         for i in 0..<bits.length {
             try write(bit: bits.at(i))
         }
+        return self
     }
 
     /// Writes bits from a literal sequence of numbers
-    public func write(bits: Int...) throws {
+    @discardableResult
+    public func write(bits: Int...) throws -> Self {
         try checkCapacity(bits.count)
         for bit in bits {
             if bit > 0 {
@@ -355,20 +356,24 @@ public class Builder {
             }
             _length += 1
         }
+        return self
     }
 
     /// Writes bits from a textual string of binary digits
-    public func write(binaryString: String) throws {
+    @discardableResult
+    public func write(binaryString: String) throws -> Self {
         for s in binaryString {
             if s != "0" && s != "1" {
                 throw TonError.custom("Bitstring must contain only 0s and 1s. Invalid character: \(s)")
             }
             try write(bit: s == "1" ? 1 : 0)
         }
+        return self
     }
 
     /// Writes bytes from the src data.
-    func write(data: Data) throws {
+    @discardableResult
+    func write(data: Data) throws -> Self {
         try checkCapacity(data.count*8)
         
         // Special case for aligned offsets
@@ -382,6 +387,7 @@ public class Builder {
                 try write(uint: data[i], bits: 8)
             }
         }
+        return self
     }
     
     /**
@@ -389,11 +395,13 @@ public class Builder {
     - parameter value: value as bigint or number
     - parameter bits: number of bits to write
     */
-    public func write<T>(uint value: T, bits: Int) throws where T: BinaryInteger {
-        return try write(biguint: BigInt(value), bits: bits);
+    @discardableResult
+    public func write<T>(uint value: T, bits: Int) throws  -> Self where T: BinaryInteger {
+        return try write(biguint: BigInt(value), bits: bits)
     }
     
-    public func write(biguint value: BigInt, bits: Int) throws {
+    @discardableResult
+    public func write(biguint value: BigInt, bits: Int) throws -> Self {
         try checkCapacity(bits)
         
         // Special cases when our buffer is aligned
@@ -408,7 +416,7 @@ public class Builder {
                 _buffer[_length / 8] = UInt8(value)
                 _length += 8
                 
-                return
+                return self
             }
             
             // Special case for 16 bits
@@ -421,7 +429,7 @@ public class Builder {
                 _buffer[_length / 8 + 1] = UInt8(v & 0xff)
                 _length += 16
                 
-                return
+                return self
             }
         }
         
@@ -430,7 +438,7 @@ public class Builder {
             if value != 0 {
                 throw TonError.custom("value is not zero for \(bits) bits. Got \(value)")
             } else {
-                return
+                return self
             }
         }
         
@@ -459,11 +467,13 @@ public class Builder {
                 try write(bit: false)
             }
         }
+        return self
     }
     
     
-    func write(int value: any BinaryInteger, bits: Int) throws {
-        try write(bigint: BigInt(value), bits: bits)
+    @discardableResult
+    func write(int value: any BinaryInteger, bits: Int) throws -> Self {
+        return try write(bigint: BigInt(value), bits: bits)
     }
     
     /**
@@ -485,7 +495,8 @@ public class Builder {
         
     }
     
-    func write(bigint value: BigInt, bits: Int) throws {
+    @discardableResult
+    func write(bigint value: BigInt, bits: Int) throws -> Self {
         var v = value
         if bits < 0 {
             throw TonError.custom("Invalid bit length. Got \(bits)")
@@ -495,7 +506,7 @@ public class Builder {
             if v != 0 {
                 throw TonError.custom("Value is not zero for \(bits) bits. Got \(v)")
             } else {
-                return
+                return self
             }
         }
         
@@ -504,7 +515,7 @@ public class Builder {
                 throw TonError.custom("Value is not zero or -1 for \(bits) bits. Got \(v)")
             } else {
                 try write(bit: v == -1)
-                return
+                return self
             }
         }
         
@@ -521,14 +532,16 @@ public class Builder {
         }
         
         try write(uint: v, bits: bits - 1)
+        return self
     }
     
     /**
      Write coins in var uint format
      - parameter amount: amount to write
     */
-    func writeCoins(coins: Coins) throws {
-        try writeVarUint(value: coins.amount, bits: 4)
+    @discardableResult
+    func writeCoins(coins: Coins) throws -> Self {
+        return try writeVarUint(value: coins.amount, bits: 4)
     }
         
     /**
@@ -537,10 +550,12 @@ public class Builder {
     - parameter bits: header bits to write size
      TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify actual bounds of the incoming number
     */
-    func writeVarUint(value: UInt64, bits: Int) throws {
-        try writeVarUint(value: BigUInt(value), bits: bits)
+    @discardableResult
+    func writeVarUint(value: UInt64, bits: Int) throws -> Self {
+        return try writeVarUint(value: BigUInt(value), bits: bits)
     }
-    func writeVarUint(value: BigUInt, bits: Int) throws {
+    @discardableResult
+    func writeVarUint(value: BigUInt, bits: Int) throws -> Self {
         let v = BigUInt(value)
         if bits < 0 {
             throw TonError.custom("Invalid bit length. Got \(bits)")
@@ -553,7 +568,7 @@ public class Builder {
         if v == 0 {
             // Write zero size
             try write(uint: 0, bits: bits)
-            return
+            return self
         }
 
         // Calculate size
@@ -565,26 +580,27 @@ public class Builder {
 
         // Write number
         try write(uint: v, bits: sizeBits)
+        
+        return self
     }
     
     /// Converts builder into BitString
-    /// TODO: make this non-fallible
-    public func build() throws -> BitString {
+    public func bitstring() -> BitString {
         return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
     /// Converts to data if the bitstring contains a whole number of bytes.
     /// If the bitstring is not byte-aligned, returns error.
-    public func toData() throws -> Data {
+    public func alignedBitstring() throws -> Data {
         if !aligned {
-            throw TonError.custom("BitBuilder buffer is not byte-aligned")
+            throw TonError.custom("Builder buffer is not byte-aligned")
         }
         return _buffer.subdata(in: 0..._length / 8)
     }
 
     private func checkCapacity(_ bits: Int) throws {
         if availableBits < bits || bits < 0 {
-            throw TonError.custom("BitBuilder overflow: need to write \(bits), but available \(availableBits)")
+            throw TonError.custom("Builder overflow: need to write \(bits), but available \(availableBits)")
         }
     }
 

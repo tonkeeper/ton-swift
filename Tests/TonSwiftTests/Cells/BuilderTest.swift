@@ -12,7 +12,7 @@ final class BuilderTest: XCTestCase {
             try builder.storeUint(a, bits: 48)
             try builder.storeUint(b, bits: 48)
             
-            let bits = try builder.endCell().bits
+            let bits = builder.bitstring()
             let reader = Slice(bits: bits)
             XCTAssertEqual(try reader.preloadUint(bits: 48), a)
             XCTAssertEqual(try reader.loadUint(bits: 48), a)

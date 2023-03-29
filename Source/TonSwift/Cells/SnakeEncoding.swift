@@ -19,7 +19,7 @@ extension Slice {
         if self.remainingRefs != 0 && self.remainingRefs != 1 {
             throw TonError.custom("Invalid number of refs: \(self.remainingRefs)")
         }
-        if self.remainingRefs == 1 && (1023 - self.remainingBits) > 7 {
+        if self.remainingRefs == 1 && (BitsPerCell - self.remainingBits) > 7 {
             throw TonError.custom("Invalid string length: \(self.remainingBits / 8)")
         }
 
@@ -49,11 +49,11 @@ extension Builder {
             if src.count > bytes {
                 let a = src.subdata(in: 0..<bytes)
                 let t = src.subdata(in: bytes..<src.endIndex)
-                try self.bits.write(data: a)
+                try self.write(data: a)
                 let cell = try (try Builder().writeSnakeData(t)).endCell();
                 try self.storeRef(cell: cell)
             } else {
-                try self.bits.write(data: src)
+                try self.write(data: src)
             }
         }
         return self

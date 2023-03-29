@@ -39,26 +39,26 @@ public struct MessageRelaxed: Readable, Writable {
         try builder.store(info)
         
         if let stateInit {
-            try builder.bits.write(bit: 2)
+            try builder.write(bit: 2)
             let initCell = try Builder().store(stateInit)
             
             // check if we fit the cell inline with 2 bits for the stateinit and the body
             if let space = builder.fit(initCell.metrics), space.bitsCount >= 2 {
-                try builder.bits.write(bit: 0)
+                try builder.write(bit: 0)
                 try builder.store(initCell)
             } else {
-                try builder.bits.write(bit: 1)
+                try builder.write(bit: 1)
                 try builder.storeRef(cell: initCell)
             }
         } else {
-            try builder.bits.write(bit: 0)
+            try builder.write(bit: 0)
         }
         
         if let space = builder.fit(body.metrics), space.bitsCount >= 1 {
-            try builder.bits.write(bit: 0)
+            try builder.write(bit: 0)
             try builder.store(body.asBuilder())
         } else {
-            try builder.bits.write(bit: 1)
+            try builder.write(bit: 1)
             try builder.storeRef(cell: body)
         }
     }

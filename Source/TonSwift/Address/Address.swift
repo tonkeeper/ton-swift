@@ -82,10 +82,10 @@ extension Address: Codeable, StaticSize {
     public static var bitWidth: Int = 267
     
     public func writeTo(builder b: Builder) throws {
-        try b.bits.write(uint: 2, bits: 2) // $10
-        try b.bits.write(uint: 0, bits: 1)
-        try b.bits.writeInt(Int(self.workchain), bits: 8)
-        try b.bits.write(data: self.hash)
+        try b.write(uint: 2, bits: 2) // $10
+        try b.write(uint: 0, bits: 1)
+        try b.writeInt(Int(self.workchain), bits: 8)
+        try b.write(data: self.hash)
     }
     
     public static func readFrom(slice: Slice) throws -> Address {

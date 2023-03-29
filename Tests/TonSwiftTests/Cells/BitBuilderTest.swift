@@ -67,9 +67,7 @@ final class BitBuilderTest: XCTestCase {
         ]
         
         for c in cases {
-            let builder = BitBuilder()
-            try builder.write(uint: c.0, bits: c.1)
-            let bits = try builder.build()
+            let bits = try Builder().write(uint: c.0, bits: c.1).bitstring()
             XCTAssertEqual(bits.toString(), c.2)
         }
     }
@@ -130,9 +128,9 @@ final class BitBuilderTest: XCTestCase {
         ]
         
         for c in cases {
-            let builder = BitBuilder()
+            let builder = Builder()
             try builder.writeInt(c.0, bits: c.1)
-            let bits = try builder.build()
+            let bits = builder.bitstring()
             XCTAssertEqual(bits.toString(), c.2)
         }
     }
@@ -193,9 +191,9 @@ final class BitBuilderTest: XCTestCase {
         ]
         
         for c in cases {
-            let builder = BitBuilder()
-            try builder.writeCoins(coins: Coins(BigUInt(c[0])!))
-            let bits = try builder.build()
+            let bits = try Builder()
+                .writeCoins(coins: Coins(BigUInt(c[0])!))
+                .bitstring()
             XCTAssertEqual(bits.toString(), c[1])
         }
     }
@@ -258,7 +256,7 @@ final class BitBuilderTest: XCTestCase {
         for c in cases {
             let builder = Builder()
             try builder.store(Address.parse(c[0]))
-            let bits = try builder.endCell().bits
+            let bits = builder.bitstring()
             XCTAssertEqual(bits.toString(), c[1])
         }
     }

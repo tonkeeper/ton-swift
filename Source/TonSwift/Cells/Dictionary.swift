@@ -78,15 +78,15 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
     /// Loads root of the dictionary directly from a slice
     public func loadRoot(_ slice: Slice) throws -> [K.T:V.T] {
         var map = [K.T: V.T]()
-        try doParse(prefix: BitBuilder(), slice: slice, n: keyLength, result: &map)
+        try doParse(prefix: Builder(), slice: slice, n: keyLength, result: &map)
         return map
     }
     
     func store(map: [K.T: V.T], builder: Builder) throws {
         if map.count == 0 {
-            try builder.bits.write(bit: 0)
+            try builder.write(bit: 0)
         } else {
-            try builder.bits.write(bit: 1)
+            try builder.write(bit: 1)
             let subcell = Builder()
             try storeRoot(map: map, builder: subcell)
             try builder.storeRef(cell: try subcell.endCell())
@@ -103,7 +103,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         for (k, v) in map {
             let b = Builder()
             try keyCoder.serialize(src: k, builder: b)
-            let keybits = try b.endCell().bits
+            let keybits = b.bitstring()
             let paddedKey = keybits.padLeft(keyLength)
             paddedMap[paddedKey] = v
         }
@@ -113,7 +113,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         try writeEdge(src: rootEdge, keyLength: keyLength, valueCoder: valueCoder, to: builder)
     }
     
-    private func doParse(prefix: BitBuilder, slice: Slice, n: Int, result: inout [K.T: V.T]) throws {
+    private func doParse(prefix: Builder, slice: Slice, n: Int, result: inout [K.T: V.T]) throws {
         // Reading label
         let k = bitsForInt(n)
         var pfxlen: Int = 0
@@ -142,7 +142,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         // We did read the whole prefix and reached the leaf:
         // parse the value and store it in the dictionary.
         if n - pfxlen == 0 {
-            let fullkey = try prefix.build()
+            let fullkey = prefix.bitstring()
             let parsedKey = try keyCoder.parse(src: Cell(bits: fullkey).beginParse())
             result[parsedKey] = try valueCoder.parse(src: slice)
         } else {
@@ -294,17 +294,17 @@ func writeLabel(src: BitString, keyLength: Int, to: Builder) throws {
     // long mode '10' requires 2+k+n bits (used only for n<=1)
     // same mode '11' requires 3+k bits (for n>=2, k<2n-1)
     if let bit = src.repeatsSameBit(), n > 1 && k < 2 * n - 1 { // same mode '11'
-        try to.bits.write(bits: 1, 1)       // header
-        try to.bits.write(bit: bit)         // value
-        try to.bits.write(uint: n, bits: k) // length
+        try to.write(bits: 1, 1)       // header
+        try to.write(bit: bit)         // value
+        try to.write(uint: n, bits: k) // length
     } else if k < n { // long mode '10'
-        try to.bits.write(bits: 1, 0)       // header
-        try to.bits.write(uint: n, bits: k) // length
-        try to.bits.write(bits: src)        // the string itself
+        try to.write(bits: 1, 0)       // header
+        try to.write(uint: n, bits: k) // length
+        try to.write(bits: src)        // the string itself
     } else { // short mode '0'
-        try to.bits.write(bit: 0)     // header
+        try to.write(bit: 0)     // header
         try to.store(Unary(n))        // unary length prefix: 1{n}0
-        try to.bits.write(bits: src)  // the string itself
+        try to.write(bits: src)  // the string itself
     }
 }
 

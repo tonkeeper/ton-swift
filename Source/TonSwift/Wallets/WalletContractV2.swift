@@ -28,7 +28,7 @@ public final class WalletContractV2: WalletContract {
         
         let cell = try Cell.fromBoc(src: Data(base64Encoded: bocString)!)[0]
         let data = try Builder().storeUint(UInt64(0), bits: 32) // Seqno
-        try data.bits.write(data: publicKey)
+        try data.write(data: publicKey)
         
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
@@ -41,7 +41,7 @@ public final class WalletContractV2: WalletContract {
         let signingMessage = try Builder().storeUint(args.seqno, bits: 32)
         if args.seqno == 0 {
             for _ in 0..<32 {
-                try signingMessage.bits.write(bit: 1)
+                try signingMessage.write(bit: 1)
             }
         } else {
             let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
@@ -56,7 +56,7 @@ public final class WalletContractV2: WalletContract {
         let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
         
         let body = Builder()
-        try body.bits.write(data: signature)
+        try body.write(data: signature)
         try body.store(signingMessage)
         
         return try body.endCell()

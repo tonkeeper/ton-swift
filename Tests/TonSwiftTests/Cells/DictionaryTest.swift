@@ -114,7 +114,7 @@ final class DictionaryTest: XCTestCase {
     // Helpers
     
     func storeBits(builder: Builder, src: String) throws -> Builder {
-        try builder.bits.write(binaryString: src)
+        try builder.write(binaryString: src)
         return builder
     }
     
@@ -131,7 +131,7 @@ final class DictionaryTest: XCTestCase {
     
     private func builderFrom(_ src: String) throws -> Builder {
         let b = Builder()
-        try b.bits.write(binaryString: src)
+        try b.write(binaryString: src)
         return b
     }
     

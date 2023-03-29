@@ -11,9 +11,9 @@ public struct Unary: Readable, Writable {
     
     public func writeTo(builder: Builder) throws {
         for _ in 0..<value {
-            try builder.bits.write(bit: true)
+            try builder.write(bit: true)
         }
-        try builder.bits.write(bit: false)
+        try builder.write(bit: false)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -29,7 +29,7 @@ extension Bool: Codeable, StaticSize {
     public static var bitWidth: Int = 1
         
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(bit: self)
+        try builder.write(bit: self)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -48,7 +48,7 @@ public struct UInt256: Hashable, Codeable, StaticSize {
     }
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(uint: value, bits: Self.bitWidth)
+        try builder.write(uint: value, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -62,7 +62,7 @@ extension UInt8: Codeable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(uint: self, bits: Self.bitWidth)
+        try builder.write(uint: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -74,7 +74,7 @@ extension UInt16: Codeable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(uint: self, bits: Self.bitWidth)
+        try builder.write(uint: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -86,7 +86,7 @@ extension UInt32: Codeable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(uint: self, bits: Self.bitWidth)
+        try builder.write(uint: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -98,7 +98,7 @@ extension UInt64: Codeable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(uint: self, bits: Self.bitWidth)
+        try builder.write(uint: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -112,7 +112,7 @@ extension Int8: Codeable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(int: self, bits: Self.bitWidth)
+        try builder.write(int: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -124,7 +124,7 @@ extension Int16: Codeable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(int: self, bits: Self.bitWidth)
+        try builder.write(int: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -136,7 +136,7 @@ extension Int32: Codeable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(int: self, bits: Self.bitWidth)
+        try builder.write(int: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
@@ -148,7 +148,7 @@ extension Int64: Codeable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func writeTo(builder: Builder) throws {
-        try builder.bits.write(int: self, bits: Self.bitWidth)
+        try builder.write(int: self, bits: Self.bitWidth)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
