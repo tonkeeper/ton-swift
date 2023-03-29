@@ -14,17 +14,17 @@ final class SliceTest: XCTestCase {
             
             let bits = try builder.build()
             let slice = try Cell(bits: bits).beginParse()
-            XCTAssertEqual(try slice.bits.preloadUint(bits: 48), a)
-            XCTAssertEqual(try slice.bits.loadUint(bits: 48), a)
-            XCTAssertEqual(try slice.bits.preloadUint(bits: 48), b)
-            XCTAssertEqual(try slice.bits.loadUint(bits: 48), b)
+            XCTAssertEqual(try slice.preloadUint(bits: 48), a)
+            XCTAssertEqual(try slice.loadUint(bits: 48), a)
+            XCTAssertEqual(try slice.preloadUint(bits: 48), b)
+            XCTAssertEqual(try slice.loadUint(bits: 48), b)
 
             let bits2 = try builder.build()
             let slice2 = Slice(bits: bits2)
-            XCTAssertEqual(try slice2.bits.preloadUint(bits: 48), a)
-            XCTAssertEqual(try slice2.bits.loadUint(bits: 48), a)
-            XCTAssertEqual(try slice2.bits.preloadUint(bits: 48), b)
-            XCTAssertEqual(try slice2.bits.loadUint(bits: 48), b)
+            XCTAssertEqual(try slice2.preloadUint(bits: 48), a)
+            XCTAssertEqual(try slice2.loadUint(bits: 48), a)
+            XCTAssertEqual(try slice2.preloadUint(bits: 48), b)
+            XCTAssertEqual(try slice2.loadUint(bits: 48), b)
 
             // TODO: - create tests for int, varUint, varInt, coins, address
         }

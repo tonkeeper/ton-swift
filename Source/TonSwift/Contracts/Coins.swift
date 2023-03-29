@@ -28,7 +28,7 @@ extension Coins: Codeable {
         try builder.storeVarUint(value: self.amount, bits: 4)
     }
     public static func readFrom(slice: Slice) throws -> Coins {
-        return Coins(try slice.bits.loadVarUintBig(bits: 4))
+        return Coins(try slice.loadVarUintBig(bits: 4))
     }
 }
 
@@ -45,7 +45,7 @@ extension Slice {
     
     /// Load optionals Coins value.
     public func loadMaybeCoins() throws -> Coins? {
-        if try bits.loadBit() {
+        if try loadBit() {
             return try loadCoins()
         }
         return nil

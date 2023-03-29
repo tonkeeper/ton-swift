@@ -66,7 +66,7 @@ public class BytesCoder: TypeCoder {
         try builder.bits.write(data: src)
     }
     public func parse(src: Slice) throws -> T {
-        return try src.bits.loadBytes(self.size)
+        return try src.loadBytes(self.size)
     }
 }
 

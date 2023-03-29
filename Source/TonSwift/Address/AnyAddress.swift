@@ -79,10 +79,10 @@ extension AnyAddress: Codeable {
     }
     
     static func readFrom(slice: Slice) throws -> AnyAddress {
-        let type = try slice.bits.preloadUint(bits: 2)
+        let type = try slice.preloadUint(bits: 2)
         switch type {
         case 0:
-            try slice.bits.skip(2);
+            try slice.skip(2);
             return .none;
         case 1:
             return .externalAddr(try slice.loadType());

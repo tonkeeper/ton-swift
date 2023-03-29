@@ -90,20 +90,20 @@ extension Address: Codeable, StaticSize {
     
     public static func readFrom(slice: Slice) throws -> Address {
         return try slice.tryLoad { s in
-            let type = try s.bits.loadUint(bits: 2)
+            let type = try s.loadUint(bits: 2)
             if type != 2 {
                 throw TonError.custom("Unsupported address type: expecting internal address `addr_std$10`")
             }
             
             // No Anycast supported
-            let anycastPrefix = try s.bits.loadUint(bits: 1);
+            let anycastPrefix = try s.loadUint(bits: 1);
             if anycastPrefix != 0 {
                 throw TonError.custom("Invalid address: anycast not supported")
             }
 
             // Read address
-            let wc = Int8(try s.bits.loadInt(bits: 8))
-            let hash = try s.bits.loadBytes(32)
+            let wc = Int8(try s.loadInt(bits: 8))
+            let hash = try s.loadBytes(32)
 
             return Address(workchain: wc, hash: hash)
         }

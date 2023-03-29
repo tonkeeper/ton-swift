@@ -149,7 +149,7 @@ public class TupleReader {
             throw TonError.custom("Not a buffer")
         }
         
-        return try s.bits.loadBytes(s.remainingBits / 8)
+        return try s.loadBytes(s.remainingBits / 8)
     }
     
     public func readBufferOpt() throws -> Data? {
@@ -166,7 +166,7 @@ public class TupleReader {
             throw TonError.custom("Not a buffer")
         }
         
-        return try s.bits.loadBytes(s.remainingBits / 8)
+        return try s.loadBytes(s.remainingBits / 8)
     }
     
     public func readString() throws -> String {

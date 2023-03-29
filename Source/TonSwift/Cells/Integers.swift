@@ -18,7 +18,7 @@ public struct Unary: Readable, Writable {
     
     public static func readFrom(slice: Slice) throws -> Self {
         var v: Int = 0
-        while try slice.bits.loadBit() {
+        while try slice.loadBit() {
             v += 1
         }
         return Unary(v)
@@ -33,7 +33,7 @@ extension Bool: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return try slice.bits.loadBit()
+        return try slice.loadBit()
     }
 }
 
@@ -52,7 +52,7 @@ public struct UInt256: Hashable, Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(biguint: try slice.bits.loadUintBig(bits: Self.bitWidth))
+        return Self(biguint: try slice.loadUintBig(bits: Self.bitWidth))
     }
 }
 
@@ -66,7 +66,7 @@ extension UInt8: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadUint(bits: Self.bitWidth))
+        return Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -78,7 +78,7 @@ extension UInt16: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadUint(bits: Self.bitWidth))
+        return Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -90,7 +90,7 @@ extension UInt32: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadUint(bits: Self.bitWidth))
+        return Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -102,7 +102,7 @@ extension UInt64: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadUint(bits: Self.bitWidth))
+        return Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -116,7 +116,7 @@ extension Int8: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+        return Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -128,7 +128,7 @@ extension Int16: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+        return Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -140,7 +140,7 @@ extension Int32: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+        return Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -152,7 +152,7 @@ extension Int64: Codeable, StaticSize {
     }
     
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(try slice.bits.loadInt(bits: Self.bitWidth))
+        return Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -169,7 +169,7 @@ public struct VarUInt248: Hashable, Codeable {
         try builder.storeVarUint(value: value, bits: 5)
     }
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.bits.loadVarUintBig(bits: 5))
+        return Self(value: try slice.loadVarUintBig(bits: 5))
     }
 }
 
@@ -180,7 +180,7 @@ public struct VarUInt120: Hashable, Codeable {
         try builder.storeVarUint(value: value, bits: 4)
     }
     public static func readFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.bits.loadVarUintBig(bits: 4))
+        return Self(value: try slice.loadVarUintBig(bits: 4))
     }
 }
 
@@ -198,7 +198,7 @@ public struct IntCoder: TypeCoder {
     }
     
     public func parse(src: Slice) throws -> T {
-        return try src.bits.loadIntBig(bits: bits)
+        return try src.loadIntBig(bits: bits)
     }
 }
 
@@ -216,7 +216,7 @@ public struct UIntCoder: TypeCoder {
     }
     
     public func parse(src: Slice) throws -> T {
-        return try src.bits.loadUintBig(bits: bits)
+        return try src.loadUintBig(bits: bits)
     }
 }
 
@@ -242,6 +242,6 @@ public struct VarUIntCoder: TypeCoder {
     }
     
     public func parse(src: Slice) throws -> T {
-        return try src.bits.loadVarUintBig(bits: prefixbits)
+        return try src.loadVarUintBig(bits: prefixbits)
     }
 }

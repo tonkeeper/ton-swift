@@ -219,7 +219,7 @@ public class Builder {
     public func storeSlice(src: Slice) throws -> Self {
         let c = src.clone()
         if c.remainingBits > 0 {
-            try bits.write(bits: c.bits.loadBits(c.remainingBits))
+            try bits.write(bits: c.loadBits(c.remainingBits))
         }
         while c.remainingRefs > 0 {
             try storeRef(cell: c.loadRef())

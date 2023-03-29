@@ -17,8 +17,8 @@ public struct MessageRelaxed: Readable, Writable {
         let info = try CommonMessageInfoRelaxed.readFrom(slice: slice)
             
         var stateInit: StateInit? = nil
-        if try slice.bits.loadBit() {
-            if !(try slice.bits.loadBit()) {
+        if try slice.loadBit() {
+            if !(try slice.loadBit()) {
                 stateInit = try StateInit.readFrom(slice: slice)
             } else {
                 stateInit = try StateInit.readFrom(slice: try slice.loadRef().beginParse())
@@ -26,7 +26,7 @@ public struct MessageRelaxed: Readable, Writable {
         }
         
         var body: Cell
-        if try slice.bits.loadBit() {
+        if try slice.loadBit() {
             body = try slice.loadRef()
         } else {
             body = try slice.loadRemainder()

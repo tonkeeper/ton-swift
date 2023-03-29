@@ -47,7 +47,7 @@ public struct StateInit: Writable, Readable {
     
     static public func readFrom(slice: Slice) throws -> StateInit {
         let splitDepth: UInt32? = try slice.loadMaybe { s in
-            UInt32(try s.bits.loadUint(bits: 5))
+            UInt32(try s.loadUint(bits: 5))
         };
 
         let special: TickTock? = try slice.loadMaybe { s in
@@ -77,8 +77,8 @@ struct TickTock: Writable, Readable {
     
     static func readFrom(slice: Slice) throws -> TickTock {
         return TickTock(
-            tick: try slice.bits.loadBit(),
-            tock: try slice.bits.loadBit()
+            tick: try slice.loadBit(),
+            tock: try slice.loadBit()
         )
     }
 }
@@ -98,7 +98,7 @@ extension SimpleLibrary: Codeable {
     }
     public static func readFrom(slice: Slice) throws -> SimpleLibrary {
         return Self(
-            public: try slice.bits.loadBit(),
+            public: try slice.loadBit(),
             root: try slice.loadRef()
         )
     }

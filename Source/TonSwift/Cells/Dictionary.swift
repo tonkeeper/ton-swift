@@ -119,20 +119,20 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         var pfxlen: Int = 0
         
         // short mode: $0
-        if try slice.bits.loadBit() == false {
+        if try slice.loadBit() == false {
             // Read
             pfxlen = try Unary.readFrom(slice: slice).value
-            try prefix.write(bits: try slice.bits.loadBits(pfxlen))
+            try prefix.write(bits: try slice.loadBits(pfxlen))
         } else {
             // long mode: $10
-            if try slice.bits.loadBit() == false {
-                pfxlen = Int(try slice.bits.loadUint(bits: k))
-                try prefix.write(bits: try slice.bits.loadBits(pfxlen))
+            if try slice.loadBit() == false {
+                pfxlen = Int(try slice.loadUint(bits: k))
+                try prefix.write(bits: try slice.loadBits(pfxlen))
             // same mode: $11
             } else {
                 // Same label detected
-                let bit = try slice.bits.loadBit()
-                pfxlen = Int(try slice.bits.loadUint(bits: k))
+                let bit = try slice.loadBit()
+                pfxlen = Int(try slice.loadUint(bits: k))
                 for _ in 0..<pfxlen {
                     try prefix.write(bit: bit)
                 }

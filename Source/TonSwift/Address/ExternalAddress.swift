@@ -30,13 +30,13 @@ extension ExternalAddress: Codeable {
     
     public static func readFrom(slice: Slice) throws -> ExternalAddress {
         return try slice.tryLoad { s in
-            let type = try s.bits.loadUint(bits: 2)
+            let type = try s.loadUint(bits: 2)
             if type != 1 {
                 throw TonError.custom("Invalid ExternalAddress")
             }
             
-            let bits = Int(try s.bits.loadUint(bits: 9))
-            let data = try s.bits.loadBits(bits)
+            let bits = Int(try s.loadUint(bits: 9))
+            let data = try s.loadBits(bits)
             
             return ExternalAddress(value: data)
         }

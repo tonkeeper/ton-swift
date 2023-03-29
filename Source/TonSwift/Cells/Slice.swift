@@ -8,14 +8,7 @@ public class Slice {
     private var bitstring: BitString
     private var offset: Int
     private var refs: [Cell]
-    
-    // tmp stub for refactoring
-    public var bits: Slice {
-        get {
-            return self
-        }
-    }
-    
+        
     init(cell: Cell) {
         bitstring = cell.bits
         offset = 0
@@ -66,7 +59,7 @@ public class Slice {
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
-        if try bits.loadBit() {
+        if try loadBit() {
             return try closure(self)
         } else {
             return nil
@@ -103,7 +96,7 @@ public class Slice {
     
     /// Loads an optional cell reference.
     public func loadMaybeRef() throws -> Cell? {
-        if try bits.loadBit() {
+        if try loadBit() {
             return try loadRef()
         } else {
             return nil
@@ -112,7 +105,7 @@ public class Slice {
     
     /// Preloads an optional cell reference.
     public func preloadMaybeRef() throws -> Cell? {
-        if try bits.preloadBit() {
+        if try preloadBit() {
             return try preloadRef()
         } else {
             return nil

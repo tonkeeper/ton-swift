@@ -16,8 +16,8 @@ public struct Message: Readable, Writable {
         let info = try CommonMessageInfo.readFrom(slice: slice)
         
         var stateInit: StateInit? = nil
-        if try slice.bits.loadBit() {
-            if !(try slice.bits.loadBit()) {
+        if try slice.loadBit() {
+            if !(try slice.loadBit()) {
                 stateInit = try StateInit.readFrom(slice: slice)
             } else {
                 stateInit = try StateInit.readFrom(slice: try slice.loadRef().beginParse())
@@ -25,7 +25,7 @@ public struct Message: Readable, Writable {
         }
         
         var body: Cell
-        if try slice.bits.loadBit() {
+        if try slice.loadBit() {
             body = try slice.loadRef()
         } else {
             body = try slice.loadRemainder()

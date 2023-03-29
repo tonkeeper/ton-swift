@@ -28,7 +28,7 @@ extension Slice {
         if self.remainingBits == 0 {
             res = Data()
         } else {
-            res = try self.bits.loadBytes(self.remainingBits / 8)
+            res = try self.loadBytes(self.remainingBits / 8)
         }
 
         // Read tail

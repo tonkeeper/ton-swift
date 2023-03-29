@@ -48,17 +48,17 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
     
     public static func readFrom(slice: Slice) throws -> CommonMessageInfoRelaxed {
         // Internal message
-        if !(try slice.bits.loadBit()) {
-            let ihrDisabled = try slice.bits.loadBit()
-            let bounce = try slice.bits.loadBit()
-            let bounced = try slice.bits.loadBit()
+        if !(try slice.loadBit()) {
+            let ihrDisabled = try slice.loadBit()
+            let bounce = try slice.loadBit()
+            let bounced = try slice.loadBit()
             let src: AnyAddress = try slice.loadType()
             let dest: Address = try slice.loadType()
             let value: CurrencyCollection = try slice.loadType()
             let ihrFee = try slice.loadCoins()
             let forwardFee = try slice.loadCoins()
-            let createdLt = try slice.bits.loadUint(bits: 64)
-            let createdAt = UInt32(try slice.bits.loadUint(bits: 32))
+            let createdLt = try slice.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.loadUint(bits: 32))
             
             return CommonMessageInfoRelaxed.internalInfo(
                 info: .init(
@@ -77,14 +77,14 @@ public enum CommonMessageInfoRelaxed: Readable, Writable {
         }
         
         // External In message
-        if !(try slice.bits.loadBit()) {
+        if !(try slice.loadBit()) {
             throw TonError.custom("External In message is not possible for CommonMessageInfoRelaxed")
         } else {
             // External Out mesage
             let src: AnyAddress = try slice.loadType()
             let dest: AnyAddress = try slice.loadType()
-            let createdLt = try slice.bits.loadUint(bits: 64)
-            let createdAt = UInt32(try slice.bits.loadUint(bits: 32))
+            let createdLt = try slice.loadUint(bits: 64)
+            let createdAt = UInt32(try slice.loadUint(bits: 32))
             
             return CommonMessageInfoRelaxed.externalOutInfo(
                 info: .init(
