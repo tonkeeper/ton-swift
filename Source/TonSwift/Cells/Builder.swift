@@ -10,7 +10,7 @@ public class Builder {
     
     
     
-    // MARK: Initializers
+    // MARK: - Initializers
     
         
     /// Initialize the Builder with a given capacity.
@@ -35,7 +35,7 @@ public class Builder {
     }
     
     
-    // MARK: Finalization
+    // MARK: - Finalization
     
     
     /// Clones slice at its current state.
@@ -70,7 +70,7 @@ public class Builder {
     
     
     
-    // MARK: Metrics
+    // MARK: - Metrics
 
     
     /// Returns whether the written bits are byte-aligned
@@ -122,7 +122,7 @@ public class Builder {
     }
     
     
-    // MARK: Storing generic types
+    // MARK: - Storing Generic Types
     
     
     /// Stores an object
@@ -147,7 +147,7 @@ public class Builder {
     
     
     
-    // MARK: Storing refs
+    // MARK: - Storing Refs
     
     
     /**
@@ -234,7 +234,7 @@ public class Builder {
     
     
     
-    // MARK: storing
+    // MARK: - Storing Dictionaries
     
     
     @discardableResult
@@ -248,6 +248,11 @@ public class Builder {
         try dict.writeRootTo(builder: self)
         return self
     }
+    
+    
+    
+    
+    // MARK: - Storing Bits
     
 
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
@@ -321,6 +326,14 @@ public class Builder {
         }
         return self
     }
+    
+    
+    
+    
+    
+    
+    // MARK: - Storing Integers
+    
     
     /**
      Write uint value

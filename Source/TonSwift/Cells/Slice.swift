@@ -9,10 +9,9 @@ public class Slice {
     private var offset: Int
     private var refs: [Cell]
     
+
     
-    
-    
-    // MARK: Initializers
+    // MARK: - Initializers
         
     init(cell: Cell) {
         bitstring = cell.bits
@@ -44,7 +43,7 @@ public class Slice {
     
     
     
-    // MARK: Metrics
+    // MARK: - Metrics
     
         
     /// Remaining unread refs in this slice.
@@ -60,7 +59,7 @@ public class Slice {
     
     
     
-    // MARK: Slice Lifecycle
+    // MARK: - Slice Lifecycle
     
     
     /// Checks if the cell is fully processed without unread bits or refs.
@@ -103,7 +102,7 @@ public class Slice {
     
     
     
-    // MARK: Loading generic types
+    // MARK: - Loading generic types
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
@@ -138,7 +137,7 @@ public class Slice {
     
     
     
-    // MARK: Loading Refs
+    // MARK: - Loading Refs
     
     /// Loads a cell reference.
     public func loadRef() throws -> Cell {
@@ -176,7 +175,7 @@ public class Slice {
     
     
     
-    // MARK: Loading Dictionaries
+    // MARK: - Loading Dictionaries
     
     
     /// Reads a dictionary from the slice.
@@ -192,7 +191,7 @@ public class Slice {
     
     
     
-    // MARK: Loading Bits
+    // MARK: - Loading Bits
     
     
     /// Advances cursor by the specified numbe rof bits.
@@ -287,7 +286,7 @@ public class Slice {
     
     
     
-    // MARK: Loading Integers
+    // MARK: - Loading Integers
     
     
     /**
