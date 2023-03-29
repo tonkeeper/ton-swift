@@ -34,11 +34,11 @@ final class DictionaryTest: XCTestCase {
         // should parse and serialize dict from example
         
         let root = try builderFrom("11001000")
-            .storeRef(cell: try builderFrom("011000")
-                .storeRef(cell: try builderFrom("1010011010000000010101001"))
-                .storeRef(cell: try builderFrom("1010000010000000100100001"))
+            .store(ref: try builderFrom("011000")
+                .store(ref: try builderFrom("1010011010000000010101001"))
+                .store(ref: try builderFrom("1010000010000000100100001"))
             )
-            .storeRef(cell: try builderFrom("1011111011111101111100100001"))
+            .store(ref: try builderFrom("1011111011111101111100100001"))
             .endCell()
         
         let dict: [UInt16: UInt16] = try root.beginParse().loadDictRoot();
@@ -77,11 +77,11 @@ final class DictionaryTest: XCTestCase {
     func testParseDict() throws {
         // should parse the one from documentation
         let root = try storeBits(builder: Builder(), src: "11001000")
-            .storeRef(cell: try storeBits(builder: Builder(), src: "011000")
-                .storeRef(cell: try storeBits(builder: Builder(), src: "1010011010000000010101001"))
-                .storeRef(cell: try storeBits(builder: Builder(), src: "1010000010000000100100001"))
+            .store(ref: try storeBits(builder: Builder(), src: "011000")
+                .store(ref: try storeBits(builder: Builder(), src: "1010011010000000010101001"))
+                .store(ref: try storeBits(builder: Builder(), src: "1010000010000000100100001"))
             )
-            .storeRef(cell: try storeBits(builder: Builder(), src: "1011111011111101111100100001"))
+            .store(ref: try storeBits(builder: Builder(), src: "1011111011111101111100100001"))
             .endCell()
         
         

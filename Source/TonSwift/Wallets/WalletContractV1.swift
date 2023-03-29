@@ -41,7 +41,7 @@ public final class WalletContractV1: WalletContract {
         
         if let message = args.messages.first {
             try signingMessage.write(uint: UInt64(args.sendMode.rawValue), bits: 8)
-            try signingMessage.storeRef(cell: try Builder().store(message))
+            try signingMessage.store(ref:try Builder().store(message))
         }
         
         let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)

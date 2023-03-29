@@ -83,7 +83,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
             try builder.write(bit: 1)
             let subcell = Builder()
             try storeRoot(map: map, builder: subcell)
-            try builder.storeRef(cell: try subcell.endCell())
+            try builder.store(ref: try subcell.endCell())
         }
     }
     
@@ -311,8 +311,8 @@ func writeNode<T, V>(src: Node<T>, keyLength: Int, valueCoder: V, to builder: Bu
         try writeEdge(src: left, keyLength: keyLength - 1, valueCoder: valueCoder, to: leftCell)
         try writeEdge(src: right, keyLength: keyLength - 1, valueCoder: valueCoder, to: rightCell)
         
-        try builder.storeRef(cell: leftCell)
-        try builder.storeRef(cell: rightCell)
+        try builder.store(ref: leftCell)
+        try builder.store(ref: rightCell)
         
     case .leaf(let value):
         try valueCoder.storeValue(value, to: builder)

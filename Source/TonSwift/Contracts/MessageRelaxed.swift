@@ -48,7 +48,7 @@ public struct MessageRelaxed: CellCodable {
                 try builder.store(initCell)
             } else {
                 try builder.write(bit: 1)
-                try builder.storeRef(cell: initCell)
+                try builder.store(ref:initCell)
             }
         } else {
             try builder.write(bit: 0)
@@ -59,7 +59,7 @@ public struct MessageRelaxed: CellCodable {
             try builder.store(body.asBuilder())
         } else {
             try builder.write(bit: 1)
-            try builder.storeRef(cell: body)
+            try builder.store(ref: body)
         }
     }
     

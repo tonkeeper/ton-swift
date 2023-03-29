@@ -156,7 +156,7 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeRef(cell: Cell) throws -> Self {
+    public func store(ref cell: Cell) throws -> Self {
         if refs.count >= 4 {
             throw TonError.custom("Too many references")
         }
@@ -164,14 +164,8 @@ public class Builder {
         return self
     }
     @discardableResult
-    public func storeRef(cell: Builder) throws -> Self {
-        if refs.count >= 4 {
-            throw TonError.custom("Too many references")
-        }
-        
-        refs.append(try cell.endCell())
-        
-        return self
+    public func store(ref builder: Builder) throws -> Self {
+        return try store(ref: try builder.endCell())
     }
     
     /**
@@ -180,10 +174,10 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeMaybeRef(cell: Cell?) throws -> Self {
+    public func storeMaybeRef(_ cell: Cell?) throws -> Self {
         if let cell = cell {
             try write(bit: true)
-            try storeRef(cell: cell)
+            try store(ref: cell)
         } else {
             try write(bit: false)
         }
@@ -191,10 +185,10 @@ public class Builder {
         return self
     }
     @discardableResult
-    public func storeMaybeRef(cell: Builder?) throws -> Self {
-        if let cell = cell {
+    public func storeMaybeRef(_ builder: Builder?) throws -> Self {
+        if let builder = builder {
             try write(bit: true)
-            try storeRef(cell: cell)
+            try store(ref: builder)
         } else {
             try write(bit: false)
         }
@@ -213,7 +207,7 @@ public class Builder {
             try write(bits: c.loadBits(c.remainingBits))
         }
         while c.remainingRefs > 0 {
-            try storeRef(cell: c.loadRef())
+            try store(ref: c.loadRef())
         }
         
         return self

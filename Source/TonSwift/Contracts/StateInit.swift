@@ -40,8 +40,8 @@ public struct StateInit: CellCodable {
             try builder.write(bit: false)
         }
         
-        try builder.storeMaybeRef(cell: self.code)
-        try builder.storeMaybeRef(cell: self.data)
+        try builder.storeMaybeRef(self.code)
+        try builder.storeMaybeRef(self.data)
         try builder.store(self.libraries)
     }
     
@@ -94,7 +94,7 @@ public struct SimpleLibrary: Hashable {
 extension SimpleLibrary: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.write(bit: self.public)
-        try builder.storeRef(cell: self.root)
+        try builder.store(ref: self.root)
     }
     public static func readFrom(slice: Slice) throws -> SimpleLibrary {
         return Self(

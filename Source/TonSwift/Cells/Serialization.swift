@@ -65,7 +65,7 @@ public class BytesCoder: TypeCoder {
 // Cell is encoded as a separate ref
 extension Cell: CellCodable {
     public func writeTo(builder: Builder) throws {
-        try builder.storeRef(cell: self)
+        try builder.store(ref: self)
     }
     
     public static func readFrom(slice: Slice) throws -> Self {

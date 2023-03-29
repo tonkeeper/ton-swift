@@ -51,7 +51,7 @@ extension Builder {
                 let t = src.subdata(in: bytes..<src.endIndex)
                 try self.write(data: a)
                 let cell = try (try Builder().writeSnakeData(t)).endCell();
-                try self.storeRef(cell: cell)
+                try self.store(ref:cell)
             } else {
                 try self.write(data: src)
             }
