@@ -206,7 +206,7 @@ fileprivate struct BasicCell: Hashable {
     
     /// Parse the exotic cell
     static func exotic(bits: BitString, refs: [Cell]) throws -> Self {
-        let reader = BitReader(bits: bits)
+        let reader = Slice(bits: bits)
         let typeInt = try reader.preloadUint(bits: 8)
         
         let type: CellType;
