@@ -22,7 +22,7 @@ import Foundation
                      created_at:uint32 = CommonMsgInfoRelaxed;
  */
 
-public struct CommonMessageInfoRelaxedInternal {
+public struct CommonMsgInfoRelaxedInternal {
     let ihrDisabled: Bool
     let bounce: Bool
     let bounced: Bool
@@ -35,18 +35,18 @@ public struct CommonMessageInfoRelaxedInternal {
     let createdAt: UInt32
 }
 
-public struct CommonMessageInfoRelaxedExternalOut {
+public struct CommonMsgInfoRelaxedExternalOut {
     let src: AnyAddress
     let dest: ExternalAddress?
     let createdLt: UInt64
     let createdAt: UInt32
 }
 
-public enum CommonMessageInfoRelaxed: CellCodable {
-    case internalInfo(info: CommonMessageInfoRelaxedInternal)
-    case externalOutInfo(info: CommonMessageInfoRelaxedExternalOut)
+public enum CommonMsgInfoRelaxed: CellCodable {
+    case internalInfo(info: CommonMsgInfoRelaxedInternal)
+    case externalOutInfo(info: CommonMsgInfoRelaxedExternalOut)
     
-    public static func loadFrom(slice: Slice) throws -> CommonMessageInfoRelaxed {
+    public static func loadFrom(slice: Slice) throws -> CommonMsgInfoRelaxed {
         // Internal message
         if !(try slice.loadBit()) {
             let ihrDisabled = try slice.loadBit()
@@ -60,7 +60,7 @@ public enum CommonMessageInfoRelaxed: CellCodable {
             let createdLt = try slice.loadUint(bits: 64)
             let createdAt = UInt32(try slice.loadUint(bits: 32))
             
-            return CommonMessageInfoRelaxed.internalInfo(
+            return CommonMsgInfoRelaxed.internalInfo(
                 info: .init(
                     ihrDisabled: ihrDisabled,
                     bounce: bounce,
@@ -86,7 +86,7 @@ public enum CommonMessageInfoRelaxed: CellCodable {
             let createdLt = try slice.loadUint(bits: 64)
             let createdAt = UInt32(try slice.loadUint(bits: 32))
             
-            return CommonMessageInfoRelaxed.externalOutInfo(
+            return CommonMsgInfoRelaxed.externalOutInfo(
                 info: .init(
                     src: src,
                     dest: try dest.asExternal(),
@@ -107,8 +107,8 @@ public enum CommonMessageInfoRelaxed: CellCodable {
             try builder.store(info.src)
             try builder.store(AnyAddress(info.dest))
             try builder.store(info.value)
-            try builder.storeCoins(info.ihrFee)
-            try builder.storeCoins(info.forwardFee)
+            try builder.store(coins: info.ihrFee)
+            try builder.store(coins: info.forwardFee)
             try builder.store(uint: info.createdLt, bits: 64)
             try builder.store(uint: UInt64(info.createdAt), bits: 32)
             

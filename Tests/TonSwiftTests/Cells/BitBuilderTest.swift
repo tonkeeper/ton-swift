@@ -193,7 +193,7 @@ final class BitBuilderTest: XCTestCase {
         
         for c in cases {
             let bits = try Builder()
-                .storeCoins(Coins(BigUInt(c[0])!))
+                .store(coins: Coins(BigUInt(c[0])!))
                 .bitstring()
             XCTAssertEqual(bits.toString(), c[1])
         }

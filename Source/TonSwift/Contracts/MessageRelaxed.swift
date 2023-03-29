@@ -9,12 +9,12 @@ import BigInt
  */
 
 public struct MessageRelaxed: CellCodable {
-    public let info: CommonMessageInfoRelaxed
+    public let info: CommonMsgInfoRelaxed
     public let stateInit: StateInit?
     public let body: Cell
     
     public static func loadFrom(slice: Slice) throws -> MessageRelaxed {
-        let info = try CommonMessageInfoRelaxed.loadFrom(slice: slice)
+        let info = try CommonMsgInfoRelaxed.loadFrom(slice: slice)
             
         var stateInit: StateInit? = nil
         if try slice.loadBit() {
@@ -67,7 +67,7 @@ public struct MessageRelaxed: CellCodable {
         return MessageRelaxed(
             info: .internalInfo(
                 info:
-                    CommonMessageInfoRelaxedInternal(
+                    CommonMsgInfoRelaxedInternal(
                         ihrDisabled: true,
                         bounce: bounce,
                         bounced: false,

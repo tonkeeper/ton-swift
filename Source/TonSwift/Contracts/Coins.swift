@@ -56,7 +56,7 @@ extension Builder {
     
     /// Write coins amount in varuint format
     @discardableResult
-    func storeCoins(_ coins: Coins) throws -> Self {
+    func store(coins: Coins) throws -> Self {
         return try store(varuint: coins.amount, prefixSize: 4)
     }
     
@@ -66,10 +66,10 @@ extension Builder {
      * @returns this builder
      */
     @discardableResult
-    public func storeMaybeCoins(_ coins: Coins?) throws -> Self {
+    public func storeMaybe(coins: Coins?) throws -> Self {
         if let coins {
             try store(bit: true)
-            try storeCoins(coins)
+            try store(coins: coins)
         } else {
             try store(bit: false)
         }

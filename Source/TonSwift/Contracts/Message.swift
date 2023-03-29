@@ -8,12 +8,12 @@ import Foundation
  */
 
 public struct Message: CellCodable {
-    public let info: CommonMessageInfo
+    public let info: CommonMsgInfo
     public let stateInit: StateInit?
     public let body: Cell
     
     public static func loadFrom(slice: Slice) throws -> Message {
-        let info = try CommonMessageInfo.loadFrom(slice: slice)
+        let info = try CommonMsgInfo.loadFrom(slice: slice)
         
         var stateInit: StateInit? = nil
         if try slice.loadBit() {
@@ -65,7 +65,7 @@ public struct Message: CellCodable {
     public static func external(to: Address, stateInit: StateInit?, body: Cell = .empty) -> Message {
         return Message(
             info: .externalInInfo(
-                info: CommonMessageInfoExternalIn(
+                info: CommonMsgInfoExternalIn(
                     src: nil,
                     dest: to,
                     importFee: Coins(0)
