@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 
 /// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
-public struct Unary: CellLoadable, CellStorable {
+public struct Unary: CellCodable {
     public let value: Int
     
     init(_ v: Int) {

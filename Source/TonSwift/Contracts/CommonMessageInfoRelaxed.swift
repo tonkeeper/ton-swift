@@ -42,7 +42,7 @@ public struct CommonMessageInfoRelaxedExternalOut {
     let createdAt: UInt32
 }
 
-public enum CommonMessageInfoRelaxed: CellLoadable, CellStorable {
+public enum CommonMessageInfoRelaxed: CellCodable {
     case internalInfo(info: CommonMessageInfoRelaxedInternal)
     case externalOutInfo(info: CommonMessageInfoRelaxedExternalOut)
     

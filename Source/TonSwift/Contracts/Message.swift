@@ -7,7 +7,7 @@ import Foundation
                     body:(Either X ^X) = Message X;
  */
 
-public struct Message: CellLoadable, CellStorable {
+public struct Message: CellCodable {
     public let info: CommonMessageInfo
     public let stateInit: StateInit?
     public let body: Cell

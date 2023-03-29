@@ -1,17 +1,9 @@
 import Foundation
 
-/// Types implement the `Writeable` protocol to become writeable to Cells via Builder.
-public protocol CellStorable {
-    func writeTo(builder: Builder) throws
-}
-
-/// Types implement the `Readable` protocol to become readable from Slices
-public protocol CellLoadable {
-    static func readFrom(slice: Slice) throws -> Self
-}
-
 /// Types implementing both reading and writing
-public protocol CellCodable: CellLoadable, CellStorable {
+public protocol CellCodable {
+    func writeTo(builder: Builder) throws
+    static func readFrom(slice: Slice) throws -> Self
 }
 
 /// Types implement KnownSize protocol when they have statically-known size in bits

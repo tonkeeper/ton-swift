@@ -2,7 +2,7 @@ import Foundation
 
 /// Type of a standard dictionary where keys have a statically known length.
 /// To work with dynamically known key lengths, use `DictionaryCoder` to load and store dictionaries.
-public protocol CodeableDictionary: CellCodable {
+public protocol CellCodableDictionary: CellCodable {
     associatedtype Key: CellCodable & StaticSize
     associatedtype Value: CellCodable
     
@@ -10,22 +10,16 @@ public protocol CodeableDictionary: CellCodable {
     static func readRootFrom(slice: Slice) throws -> Self
 }
 
-extension Dictionary: CellLoadable where Key: CellCodable & StaticSize, Value: CellCodable {
+extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: CellCodable {
     public static func readFrom(slice: Slice) throws -> Self {
         return try DictionaryCoder.default().load(slice)
     }
-}
-
-extension Dictionary: CellStorable where Key: CellCodable & StaticSize, Value: CellCodable {
     public func writeTo(builder: Builder) throws {
         try DictionaryCoder.default().store(map: self, builder: builder)
     }
 }
 
-extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: CellCodable {
-}
-
-extension Dictionary: CodeableDictionary where Key: CellCodable & StaticSize, Value: CellCodable {
+extension Dictionary: CellCodableDictionary where Key: CellCodable & StaticSize, Value: CellCodable {
     
     public func writeRootTo(builder: Builder) throws {
         try DictionaryCoder.default().storeRoot(map: self, builder: builder)

@@ -48,12 +48,12 @@ public class Slice {
     }
 
     /// Loads type T that implements interface Readable
-    public func loadType<T: CellLoadable>() throws -> T {
+    public func loadType<T: CellCodable>() throws -> T {
         return try T.readFrom(slice: self)
     }
     
     /// Preloads type T that implements interface Readable
-    public func preloadType<T: CellLoadable>() throws -> T {
+    public func preloadType<T: CellCodable>() throws -> T {
         return try T.readFrom(slice: self.clone())
     }
     
@@ -113,12 +113,12 @@ public class Slice {
     }
     
     /// Reads a dictionary from the slice.
-    public func loadDict<T>() throws -> T where T: CodeableDictionary {
+    public func loadDict<T>() throws -> T where T: CellCodableDictionary {
         return try T.readFrom(slice: self)
     }
 
     /// Reads the non-empty dictionary root directly from this slice.
-    public func loadDictRoot<T>() throws -> T where T: CodeableDictionary {
+    public func loadDictRoot<T>() throws -> T where T: CellCodableDictionary {
         return try T.readRootFrom(slice: self)
     }
 
