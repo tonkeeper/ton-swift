@@ -127,14 +127,14 @@ public class Builder {
     
     /// Stores an object
     @discardableResult
-    public func store(_ object: Writable) throws -> Self  {
+    public func store(_ object: CellStorable) throws -> Self  {
         try object.writeTo(builder: self)
         return self
     }
     
     /// Stores an optional object with a single-bit prefix (`Maybe T`)
     @discardableResult
-    public func storeMaybe(_ object: Writable?) throws -> Self {
+    public func storeMaybe(_ object: CellStorable?) throws -> Self {
         if let object = object {
             try write(bit: true)
             try store(object)

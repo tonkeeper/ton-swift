@@ -48,12 +48,12 @@ public class Slice {
     }
 
     /// Loads type T that implements interface Readable
-    public func loadType<T: Readable>() throws -> T {
+    public func loadType<T: CellLoadable>() throws -> T {
         return try T.readFrom(slice: self)
     }
     
     /// Preloads type T that implements interface Readable
-    public func preloadType<T: Readable>() throws -> T {
+    public func preloadType<T: CellLoadable>() throws -> T {
         return try T.readFrom(slice: self.clone())
     }
     

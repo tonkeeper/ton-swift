@@ -77,7 +77,7 @@ extension Address: Equatable {
 ///             workchain_id:int32
 ///             address:(bits addr_len)            = MsgAddressInt;
 /// ```
-extension Address: Codeable, StaticSize {
+extension Address: CellCodable, StaticSize {
     
     public static var bitWidth: Int = 267
     

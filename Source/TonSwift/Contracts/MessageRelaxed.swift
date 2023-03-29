@@ -8,7 +8,7 @@ import BigInt
                     body:(Either X ^X) = MessageRelaxed X;
  */
 
-public struct MessageRelaxed: Readable, Writable {
+public struct MessageRelaxed: CellLoadable, CellStorable {
     public let info: CommonMessageInfoRelaxed
     public let stateInit: StateInit?
     public let body: Cell

@@ -63,7 +63,7 @@ enum AnyAddress {
     }
 }
 
-extension AnyAddress: Codeable {
+extension AnyAddress: CellCodable {
     func writeTo(builder: Builder) throws {
         switch self {
         case .none:

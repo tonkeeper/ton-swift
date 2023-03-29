@@ -23,7 +23,7 @@ extension Coins: RawRepresentable {
     }
 }
 
-extension Coins: Codeable {
+extension Coins: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.writeVarUint(value: self.amount, bits: 4)
     }

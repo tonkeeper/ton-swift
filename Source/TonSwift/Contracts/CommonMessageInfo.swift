@@ -48,7 +48,7 @@ public struct CommonMessageInfoExternalOut {
     let createdAt: UInt32
 }
 
-public enum CommonMessageInfo: Readable, Writable {
+public enum CommonMessageInfo: CellLoadable, CellStorable {
     case internalInfo(info: CommonMessageInfoInternal)
     case externalOutInfo(info: CommonMessageInfoExternalOut)
     case externalInInfo(info: CommonMessageInfoExternalIn)

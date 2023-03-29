@@ -2,7 +2,7 @@ import Foundation
 import BigInt
 
 /// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
-public struct Unary: Readable, Writable {
+public struct Unary: CellLoadable, CellStorable {
     public let value: Int
     
     init(_ v: Int) {
@@ -25,7 +25,7 @@ public struct Unary: Readable, Writable {
     }
 }
 
-extension Bool: Codeable, StaticSize {
+extension Bool: CellCodable, StaticSize {
     public static var bitWidth: Int = 1
         
     public func writeTo(builder: Builder) throws {
@@ -38,7 +38,7 @@ extension Bool: Codeable, StaticSize {
 }
 
 /// 256-bit unsigned integer
-public struct UInt256: Hashable, Codeable, StaticSize {
+public struct UInt256: Hashable, CellCodable, StaticSize {
     public var value: BigUInt
     
     public static var bitWidth: Int = 256
@@ -58,7 +58,7 @@ public struct UInt256: Hashable, Codeable, StaticSize {
 
 // Unsigned short integers
 
-extension UInt8: Codeable, StaticSize {
+extension UInt8: CellCodable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func writeTo(builder: Builder) throws {
@@ -70,7 +70,7 @@ extension UInt8: Codeable, StaticSize {
     }
 }
 
-extension UInt16: Codeable, StaticSize {
+extension UInt16: CellCodable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func writeTo(builder: Builder) throws {
@@ -82,7 +82,7 @@ extension UInt16: Codeable, StaticSize {
     }
 }
 
-extension UInt32: Codeable, StaticSize {
+extension UInt32: CellCodable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func writeTo(builder: Builder) throws {
@@ -94,7 +94,7 @@ extension UInt32: Codeable, StaticSize {
     }
 }
 
-extension UInt64: Codeable, StaticSize {
+extension UInt64: CellCodable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func writeTo(builder: Builder) throws {
@@ -108,7 +108,7 @@ extension UInt64: Codeable, StaticSize {
 
 // Signed short integers
 
-extension Int8: Codeable, StaticSize {
+extension Int8: CellCodable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func writeTo(builder: Builder) throws {
@@ -120,7 +120,7 @@ extension Int8: Codeable, StaticSize {
     }
 }
 
-extension Int16: Codeable, StaticSize {
+extension Int16: CellCodable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func writeTo(builder: Builder) throws {
@@ -132,7 +132,7 @@ extension Int16: Codeable, StaticSize {
     }
 }
 
-extension Int32: Codeable, StaticSize {
+extension Int32: CellCodable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func writeTo(builder: Builder) throws {
@@ -144,7 +144,7 @@ extension Int32: Codeable, StaticSize {
     }
 }
 
-extension Int64: Codeable, StaticSize {
+extension Int64: CellCodable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func writeTo(builder: Builder) throws {
@@ -163,7 +163,7 @@ extension Int64: Codeable, StaticSize {
 //
 
 /// Up-to-31-byte (248-bit) unsigned integer (5-bit length prefix)
-public struct VarUInt248: Hashable, Codeable {
+public struct VarUInt248: Hashable, CellCodable {
     public var value: BigUInt
     public func writeTo(builder: Builder) throws {
         try builder.writeVarUint(value: value, bits: 5)
@@ -174,7 +174,7 @@ public struct VarUInt248: Hashable, Codeable {
 }
 
 /// Up-to-15-byte (120-bit) unsigned integer (4-bit length prefix)
-public struct VarUInt120: Hashable, Codeable {
+public struct VarUInt120: Hashable, CellCodable {
     public var value: BigUInt
     public func writeTo(builder: Builder) throws {
         try builder.writeVarUint(value: value, bits: 4)

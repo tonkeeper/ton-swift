@@ -6,7 +6,7 @@ import BigInt
 //  code:(Maybe ^Cell) data:(Maybe ^Cell)
 //  library:(HashmapE 256 SimpleLib) = StateInit;
 
-public struct StateInit: Writable, Readable {
+public struct StateInit: CellStorable, CellLoadable {
     var splitDepth: UInt32?
     var special: TickTock?
     var code: Cell?
@@ -66,7 +66,7 @@ public struct StateInit: Writable, Readable {
 // Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L139
 // tick_tock$_ tick:Bool tock:Bool = TickTock;
 
-struct TickTock: Writable, Readable {
+struct TickTock: CellStorable, CellLoadable {
     var tick: Bool
     var tock: Bool
     
@@ -91,7 +91,7 @@ public struct SimpleLibrary: Hashable {
     var root: Cell
 }
 
-extension SimpleLibrary: Codeable {
+extension SimpleLibrary: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.write(bit: self.public)
         try builder.storeRef(cell: self.root)

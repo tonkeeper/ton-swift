@@ -13,7 +13,7 @@ typealias ExtraCurrencyCollection = [UInt32: VarUInt248]
 /// ```
 /// currencies$_ grams:Grams other:ExtraCurrencyCollection = CurrencyCollection;
 /// ```
-struct CurrencyCollection: Codeable {
+struct CurrencyCollection: CellCodable {
     let coins: Coins
     let other: ExtraCurrencyCollection
     

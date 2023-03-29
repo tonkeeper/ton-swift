@@ -1,17 +1,17 @@
 import Foundation
 
 /// Types implement the `Writeable` protocol to become writeable to Cells via Builder.
-public protocol Writable {
+public protocol CellStorable {
     func writeTo(builder: Builder) throws
 }
 
 /// Types implement the `Readable` protocol to become readable from Slices
-public protocol Readable {
+public protocol CellLoadable {
     static func readFrom(slice: Slice) throws -> Self
 }
 
 /// Types implementing both reading and writing
-public protocol Codeable: Readable, Writable {
+public protocol CellCodable: CellLoadable, CellStorable {
 }
 
 /// Types implement KnownSize protocol when they have statically-known size in bits
@@ -28,13 +28,13 @@ public protocol TypeCoder {
     func parse(src: Slice) throws -> T
 }
 
-extension Codeable {
+extension CellCodable {
     static func defaultCoder() -> some TypeCoder {
         DefaultCoder<Self>()
     }
 }
 
-public class DefaultCoder<X: Codeable>: TypeCoder {
+public class DefaultCoder<X: CellCodable>: TypeCoder {
     public typealias T = X
     public func serialize(src: T, builder: Builder) throws {
         try src.writeTo(builder: builder)
@@ -71,7 +71,7 @@ public class BytesCoder: TypeCoder {
 }
 
 // Cell is encoded as a separate ref
-extension Cell: Codeable {
+extension Cell: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.storeRef(cell: self)
     }
@@ -82,7 +82,7 @@ extension Cell: Codeable {
 }
 
 // Slice is encoded inline
-extension Slice: Codeable {
+extension Slice: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.storeSlice(src: self)
     }
@@ -93,7 +93,7 @@ extension Slice: Codeable {
 }
 
 // Builder is encoded inline
-extension Builder: Codeable {
+extension Builder: CellCodable {
     public func writeTo(builder: Builder) throws {
         try builder.storeSlice(src: endCell().beginParse())
     }
