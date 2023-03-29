@@ -117,6 +117,14 @@ public struct Cell: Hashable {
         return _hashes[min(_hashes.count - 1, level)]
     }
     
+    /// Returns the lowest-order hash that represents an actual tree of cells, possibly pruned.
+    /// This is the hash of the data being transmitted.
+    /// For the hash of the underlying contents see  `hash(level:)` method.
+    public func representationHash() -> Data {
+        return _hashes[0]
+    }
+    
+    
     /**
      Get cell depth
     - parameter level: level
