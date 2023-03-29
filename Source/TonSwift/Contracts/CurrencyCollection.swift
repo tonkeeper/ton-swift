@@ -22,13 +22,13 @@ struct CurrencyCollection: CellCodable {
         self.other = other
     }
     
-    static func readFrom(slice: Slice) throws -> CurrencyCollection {
+    static func loadFrom(slice: Slice) throws -> CurrencyCollection {
         let coins = try slice.loadCoins()
         let other: ExtraCurrencyCollection = try slice.loadType()
         return CurrencyCollection(coins: coins, other: other)
     }
     
-    func writeTo(builder: Builder) throws {
+    func storeTo(builder: Builder) throws {
         try builder.storeCoins(coins)
         try builder.store(other)
     }

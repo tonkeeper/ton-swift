@@ -13,15 +13,15 @@ public struct MessageRelaxed: CellCodable {
     public let stateInit: StateInit?
     public let body: Cell
     
-    public static func readFrom(slice: Slice) throws -> MessageRelaxed {
-        let info = try CommonMessageInfoRelaxed.readFrom(slice: slice)
+    public static func loadFrom(slice: Slice) throws -> MessageRelaxed {
+        let info = try CommonMessageInfoRelaxed.loadFrom(slice: slice)
             
         var stateInit: StateInit? = nil
         if try slice.loadBit() {
             if !(try slice.loadBit()) {
-                stateInit = try StateInit.readFrom(slice: slice)
+                stateInit = try StateInit.loadFrom(slice: slice)
             } else {
-                stateInit = try StateInit.readFrom(slice: try slice.loadRef().beginParse())
+                stateInit = try StateInit.loadFrom(slice: try slice.loadRef().beginParse())
             }
         }
         
@@ -35,7 +35,7 @@ public struct MessageRelaxed: CellCodable {
         return MessageRelaxed(info: info, stateInit: stateInit, body: body)
     }
     
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.store(info)
         
         if let stateInit {

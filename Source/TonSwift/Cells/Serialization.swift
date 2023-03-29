@@ -2,8 +2,8 @@ import Foundation
 
 /// Types implementing both reading and writing
 public protocol CellCodable {
-    func writeTo(builder: Builder) throws
-    static func readFrom(slice: Slice) throws -> Self
+    func storeTo(builder: Builder) throws
+    static func loadFrom(slice: Slice) throws -> Self
 }
 
 /// Types implement KnownSize protocol when they have statically-known size in bits
@@ -29,10 +29,10 @@ extension CellCodable {
 public class DefaultCoder<X: CellCodable>: TypeCoder {
     public typealias T = X
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try src.writeTo(builder: builder)
+        try src.storeTo(builder: builder)
     }
     public func loadValue(from src: Slice) throws -> T {
-        return try T.readFrom(slice: src)
+        return try T.loadFrom(slice: src)
     }
 }
 
@@ -64,33 +64,33 @@ public class BytesCoder: TypeCoder {
 
 // Cell is encoded as a separate ref
 extension Cell: CellCodable {
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.store(ref: self)
     }
     
-    public static func readFrom(slice: Slice) throws -> Self {
+    public static func loadFrom(slice: Slice) throws -> Self {
         return try slice.loadRef()
     }
 }
 
 // Slice is encoded inline
 extension Slice: CellCodable {
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.storeSlice(src: self)
     }
     
-    public static func readFrom(slice: Slice) throws -> Self {
+    public static func loadFrom(slice: Slice) throws -> Self {
         return slice.clone() as! Self
     }
 }
 
 // Builder is encoded inline
 extension Builder: CellCodable {
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.storeSlice(src: endCell().beginParse())
     }
     
-    public static func readFrom(slice: Slice) throws -> Self {
+    public static func loadFrom(slice: Slice) throws -> Self {
         return try slice.clone().asBuilder() as! Self
     }
 }

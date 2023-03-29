@@ -22,13 +22,13 @@ public struct ExternalAddress {
 }
 
 extension ExternalAddress: CellCodable {
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.write(uint: 1, bits: 2)
         try builder.write(uint: self.value.length, bits: 9)
         try builder.write(bits: self.value)
     }
     
-    public static func readFrom(slice: Slice) throws -> ExternalAddress {
+    public static func loadFrom(slice: Slice) throws -> ExternalAddress {
         return try slice.tryLoad { s in
             let type = try s.loadUint(bits: 2)
             if type != 1 {

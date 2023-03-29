@@ -11,10 +11,10 @@ public protocol CellCodableDictionary: CellCodable {
 }
 
 extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: CellCodable {
-    public static func readFrom(slice: Slice) throws -> Self {
+    public static func loadFrom(slice: Slice) throws -> Self {
         return try DictionaryCoder.default().load(slice)
     }
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try DictionaryCoder.default().store(map: self, builder: builder)
     }
 }
@@ -115,7 +115,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         // short mode: $0
         if try slice.loadBit() == false {
             // Read
-            pfxlen = try Unary.readFrom(slice: slice).value
+            pfxlen = try Unary.loadFrom(slice: slice).value
             try prefix.write(bits: try slice.loadBits(pfxlen))
         } else {
             // long mode: $10

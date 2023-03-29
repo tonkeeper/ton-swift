@@ -106,12 +106,12 @@ public class Slice {
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
-        return try T.readFrom(slice: self)
+        return try T.loadFrom(slice: self)
     }
     
     /// Preloads type T that implements interface Readable
     public func preloadType<T: CellCodable>() throws -> T {
-        return try T.readFrom(slice: self.clone())
+        return try T.loadFrom(slice: self.clone())
     }
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
@@ -180,7 +180,7 @@ public class Slice {
     
     /// Reads a dictionary from the slice.
     public func loadDict<T>() throws -> T where T: CellCodableDictionary {
-        return try T.readFrom(slice: self)
+        return try T.loadFrom(slice: self)
     }
 
     /// Reads the non-empty dictionary root directly from this slice.

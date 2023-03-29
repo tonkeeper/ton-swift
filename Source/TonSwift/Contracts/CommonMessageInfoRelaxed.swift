@@ -46,7 +46,7 @@ public enum CommonMessageInfoRelaxed: CellCodable {
     case internalInfo(info: CommonMessageInfoRelaxedInternal)
     case externalOutInfo(info: CommonMessageInfoRelaxedExternalOut)
     
-    public static func readFrom(slice: Slice) throws -> CommonMessageInfoRelaxed {
+    public static func loadFrom(slice: Slice) throws -> CommonMessageInfoRelaxed {
         // Internal message
         if !(try slice.loadBit()) {
             let ihrDisabled = try slice.loadBit()
@@ -97,7 +97,7 @@ public enum CommonMessageInfoRelaxed: CellCodable {
         }
     }
     
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
             try builder.write(bit: false)

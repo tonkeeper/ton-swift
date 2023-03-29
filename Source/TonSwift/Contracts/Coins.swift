@@ -24,10 +24,10 @@ extension Coins: RawRepresentable {
 }
 
 extension Coins: CellCodable {
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         try builder.writeVarUint(value: self.amount, bits: 4)
     }
-    public static func readFrom(slice: Slice) throws -> Coins {
+    public static func loadFrom(slice: Slice) throws -> Coins {
         return Coins(try slice.loadVarUintBig(bits: 4))
     }
 }

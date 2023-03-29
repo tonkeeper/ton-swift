@@ -64,21 +64,21 @@ enum AnyAddress {
 }
 
 extension AnyAddress: CellCodable {
-    func writeTo(builder: Builder) throws {
+    func storeTo(builder: Builder) throws {
         switch self {
         case .none:
             try builder.write(uint: UInt64(0), bits: 2)
             break
         case .internalAddr(let addr):
-            try addr.writeTo(builder: builder)
+            try addr.storeTo(builder: builder)
             break
         case .externalAddr(let addr):
-            try addr.writeTo(builder: builder)
+            try addr.storeTo(builder: builder)
             break
         }
     }
     
-    static func readFrom(slice: Slice) throws -> AnyAddress {
+    static func loadFrom(slice: Slice) throws -> AnyAddress {
         let type = try slice.preloadUint(bits: 2)
         switch type {
         case 0:

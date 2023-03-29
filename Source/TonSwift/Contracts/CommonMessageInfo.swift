@@ -53,7 +53,7 @@ public enum CommonMessageInfo: CellCodable {
     case externalOutInfo(info: CommonMessageInfoExternalOut)
     case externalInInfo(info: CommonMessageInfoExternalIn)
     
-    public static func readFrom(slice: Slice) throws -> CommonMessageInfo {
+    public static func loadFrom(slice: Slice) throws -> CommonMessageInfo {
         // Internal message
         if !(try slice.loadBit()) {
             let ihrDisabled = try slice.loadBit()
@@ -114,7 +114,7 @@ public enum CommonMessageInfo: CellCodable {
         }
     }
     
-    public func writeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
             try builder.write(bit: false)

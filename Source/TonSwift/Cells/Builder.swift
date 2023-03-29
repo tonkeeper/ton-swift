@@ -128,7 +128,7 @@ public class Builder {
     /// Stores an object
     @discardableResult
     public func store(_ object: CellCodable) throws -> Self  {
-        try object.writeTo(builder: self)
+        try object.storeTo(builder: self)
         return self
     }
     
@@ -233,7 +233,7 @@ public class Builder {
     
     @discardableResult
     public func storeDict(_ dict: any CellCodableDictionary) throws -> Self {
-        try dict.writeTo(builder: self)
+        try dict.storeTo(builder: self)
         return self
     }
     

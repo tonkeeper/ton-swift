@@ -81,14 +81,14 @@ extension Address: CellCodable, StaticSize {
     
     public static var bitWidth: Int = 267
     
-    public func writeTo(builder b: Builder) throws {
+    public func storeTo(builder b: Builder) throws {
         try b.write(uint: 2, bits: 2) // $10
         try b.write(uint: 0, bits: 1)
         try b.write(int: self.workchain, bits: 8)
         try b.write(data: self.hash)
     }
     
-    public static func readFrom(slice: Slice) throws -> Address {
+    public static func loadFrom(slice: Slice) throws -> Address {
         return try slice.tryLoad { s in
             let type = try s.loadUint(bits: 2)
             if type != 2 {
