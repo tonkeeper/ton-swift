@@ -186,7 +186,7 @@ public struct Cell: Hashable {
     - returns builder
     */
     public func asBuilder() throws -> Builder {
-        return try Builder().storeSlice(src: asSlice())
+        return try Builder().store(slice: asSlice())
     }
 }
 

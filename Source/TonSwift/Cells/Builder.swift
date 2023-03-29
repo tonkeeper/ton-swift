@@ -201,8 +201,8 @@ public class Builder {
      - parameter src: source slice
      */
     @discardableResult
-    public func storeSlice(src: Slice) throws -> Self {
-        let c = src.clone()
+    public func store(slice: Slice) throws -> Self {
+        let c = slice.clone()
         if c.remainingBits > 0 {
             try store(bits: c.loadBits(c.remainingBits))
         }
@@ -217,10 +217,10 @@ public class Builder {
      Store slice in this builder if not null
      - parameter src: source slice
      */
-    public func storeMaybeSlice(src: Slice?) throws {
-        if let src = src {
+    public func storeMaybe(slice: Slice?) throws {
+        if let slice = slice {
             try store(bit: true)
-            try storeSlice(src: src)
+            try store(slice: slice)
         } else {
             try store(bit: false)
         }
@@ -232,13 +232,13 @@ public class Builder {
     
     
     @discardableResult
-    public func storeDict(_ dict: any CellCodableDictionary) throws -> Self {
+    public func store(dict: any CellCodableDictionary) throws -> Self {
         try dict.storeTo(builder: self)
         return self
     }
     
     @discardableResult
-    public func storeDictRoot(_ dict: any CellCodableDictionary) throws -> Self {
+    public func store(dictRoot dict: any CellCodableDictionary) throws -> Self {
         try dict.writeRootTo(builder: self)
         return self
     }

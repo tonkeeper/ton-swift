@@ -76,7 +76,7 @@ extension Cell: CellCodable {
 // Slice is encoded inline
 extension Slice: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.storeSlice(src: self)
+        try builder.store(slice: self)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -87,7 +87,7 @@ extension Slice: CellCodable {
 // Builder is encoded inline
 extension Builder: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.storeSlice(src: endCell().beginParse())
+        try builder.store(slice: endCell().beginParse())
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {

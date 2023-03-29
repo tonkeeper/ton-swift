@@ -84,7 +84,7 @@ public class Slice {
     /// Converts slice to a Builder filled with remaining data in this slice.
     public func asBuilder() throws -> Builder {
         let builder = Builder()
-        try builder.storeSlice(src: self)
+        try builder.store(slice: self)
         return builder
     }
     

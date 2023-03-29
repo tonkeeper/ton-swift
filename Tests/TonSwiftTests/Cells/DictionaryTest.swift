@@ -22,7 +22,7 @@ final class DictionaryTest: XCTestCase {
         
         // Test serialization
         let builder = Builder()
-        try! builder.storeDictRoot(map)
+        try! builder.store(dictRoot: map)
         let root = try builder.endCell()
         XCTAssertEqual(root.hash().hexString(), "c8c0ca7071eabf18a71adcbb398d1d2164b1378b9ae70c00510049fb865aec6a")
         XCTAssertEqual(root.hash().first, 200)
@@ -52,10 +52,10 @@ final class DictionaryTest: XCTestCase {
         fromEmpty[239] = 57121
         
         let packed = try Builder()
-            .storeDictRoot(dict)
+            .store(dictRoot: dict)
             .endCell()
         let packed2 = try Builder()
-            .storeDictRoot(fromEmpty)
+            .store(dictRoot: fromEmpty)
             .endCell()
         
         XCTAssertEqual(packed, root)
