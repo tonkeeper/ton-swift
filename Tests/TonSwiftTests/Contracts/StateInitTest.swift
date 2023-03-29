@@ -8,8 +8,8 @@ final class StateInitTest: XCTestCase {
         
         // Serialize
         let boc = try Builder()
-            .store(StateInit(code: try Builder().storeUint(UInt64(1), bits: 8).endCell(),
-                                     data: try Builder().storeUint(UInt64(2), bits: 8).endCell()))
+            .store(StateInit(code: try Builder().write(uint: 1, bits: 8).endCell(),
+                                     data: try Builder().write(uint: 2, bits: 8).endCell()))
             .endCell()
             .toBoc(idx: false, crc32: true)
         

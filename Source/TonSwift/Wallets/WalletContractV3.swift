@@ -35,8 +35,8 @@ public final class WalletContractV3: WalletContract {
         
         let cell = try Cell.fromBoc(src: Data(base64Encoded: bocString)!)[0]
         let data = try Builder()
-            .storeUint(UInt64(0), bits: 32) // Seqno
-            .storeUint(self.walletId, bits: 32)
+            .write(uint: UInt64(0), bits: 32) // Seqno
+            .write(uint: self.walletId, bits: 32)
         try data.write(data: publicKey)
         
         self.stateInit = StateInit(code: cell, data: try data.endCell())
@@ -47,18 +47,18 @@ public final class WalletContractV3: WalletContract {
             throw TonError.custom("Maximum number of messages in a single transfer is 4")
         }
         
-        let signingMessage = try Builder().storeUint(args.seqno, bits: 32)
+        let signingMessage = try Builder().write(uint: args.seqno, bits: 32)
         if args.seqno == 0 {
             for _ in 0..<32 {
                 try signingMessage.write(bit: 1)
             }
         } else {
             let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
-            try signingMessage.storeUint(args.timeout ?? defaultTimeout, bits: 32)
+            try signingMessage.write(uint: args.timeout ?? defaultTimeout, bits: 32)
         }
         
         for message in args.messages {
-            try signingMessage.storeUint(UInt64(args.sendMode.rawValue), bits: 8)
+            try signingMessage.write(uint: UInt64(args.sendMode.rawValue), bits: 8)
             try signingMessage.storeRef(cell: try Builder().store(message))
         }
         

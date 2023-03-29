@@ -166,7 +166,7 @@ extension Int64: Codeable, StaticSize {
 public struct VarUInt248: Hashable, Codeable {
     public var value: BigUInt
     public func writeTo(builder: Builder) throws {
-        try builder.storeVarUint(value: value, bits: 5)
+        try builder.writeVarUint(value: value, bits: 5)
     }
     public static func readFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.loadVarUintBig(bits: 5))
@@ -177,7 +177,7 @@ public struct VarUInt248: Hashable, Codeable {
 public struct VarUInt120: Hashable, Codeable {
     public var value: BigUInt
     public func writeTo(builder: Builder) throws {
-        try builder.storeVarUint(value: value, bits: 4)
+        try builder.writeVarUint(value: value, bits: 4)
     }
     public static func readFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.loadVarUintBig(bits: 4))
@@ -194,7 +194,7 @@ public struct IntCoder: TypeCoder {
     }
     
     public func serialize(src: T, builder: Builder) throws {
-        try builder.storeInt(src, bits: bits)
+        try builder.write(int: src, bits: bits)
     }
     
     public func parse(src: Slice) throws -> T {
@@ -212,7 +212,7 @@ public struct UIntCoder: TypeCoder {
     }
     
     public func serialize(src: T, builder: Builder) throws {
-        try builder.storeUint(src, bits: bits)
+        try builder.write(uint: src, bits: bits)
     }
     
     public func parse(src: Slice) throws -> T {
@@ -238,7 +238,7 @@ public struct VarUIntCoder: TypeCoder {
     }
     
     public func serialize(src: T, builder: Builder) throws {
-        try builder.storeVarUint(value: src, bits: prefixbits)
+        try builder.writeVarUint(value: src, bits: prefixbits)
     }
     
     public func parse(src: Slice) throws -> T {

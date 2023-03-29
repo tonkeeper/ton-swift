@@ -67,7 +67,8 @@ final class BitBuilderTest: XCTestCase {
         ]
         
         for c in cases {
-            let bits = try Builder().write(uint: c.0, bits: c.1).bitstring()
+            let b = try Builder().write(uint: c.0, bits: c.1)
+            let bits = b.bitstring()
             XCTAssertEqual(bits.toString(), c.2)
         }
     }
@@ -129,7 +130,7 @@ final class BitBuilderTest: XCTestCase {
         
         for c in cases {
             let builder = Builder()
-            try builder.writeInt(c.0, bits: c.1)
+            try builder.write(int: c.0, bits: c.1)
             let bits = builder.bitstring()
             XCTAssertEqual(bits.toString(), c.2)
         }
@@ -192,7 +193,7 @@ final class BitBuilderTest: XCTestCase {
         
         for c in cases {
             let bits = try Builder()
-                .writeCoins(coins: Coins(BigUInt(c[0])!))
+                .storeCoins(Coins(BigUInt(c[0])!))
                 .bitstring()
             XCTAssertEqual(bits.toString(), c[1])
         }

@@ -38,7 +38,7 @@ final class SerializationTest: XCTestCase {
         XCTAssertEqual(try deserializeBoc(src: Data(base64Encoded: "te6ccsEBAQEAAgAAAAC1U5ck")!)[0], cell)
         
         // should serialize single cell with a number of byte-aligned bits
-        cell = try Builder().storeUint(UInt64(123456789), bits: 32).endCell()
+        cell = try Builder().write(uint: UInt64(123456789), bits: 32).endCell()
         XCTAssertEqual(try cell.toString(), "x{075BCD15}")
         XCTAssertEqual(cell.hash().base64EncodedString(), "keNT38owvINaYYHwYjE1R8HYk0c1NSMH72u+/aMJ+1c=")
         XCTAssertEqual(try serializeBoc(root: cell, idx: false, crc32: false).base64EncodedString(), "te6ccgEBAQEABgAACAdbzRU=")
@@ -51,7 +51,7 @@ final class SerializationTest: XCTestCase {
         XCTAssertEqual(try deserializeBoc(src: Data(base64Encoded: "te6ccsEBAQEABgAAAAgHW80Vyf0TAA==")!)[0], cell)
         
         // should serialize single cell with a number of non-aligned bits
-        cell = try Builder().storeUint(UInt64(123456789), bits: 34).endCell()
+        cell = try Builder().write(uint: UInt64(123456789), bits: 34).endCell()
         XCTAssertEqual(try cell.toString(), "x{01D6F3456_}")
         XCTAssertEqual(cell.hash().base64EncodedString(), "Rk+nt8kkAyN9S1v4H0zwFbGs2INwpMHvESvPQbrI6d0=")
         XCTAssertEqual(try serializeBoc(root: cell, idx: false, crc32: false).base64EncodedString(), "te6ccgEBAQEABwAACQHW80Vg")
@@ -65,10 +65,10 @@ final class SerializationTest: XCTestCase {
 
         // should serialize single cell with a single reference
         var refCell = try Builder()
-            .storeUint(UInt64(123456789), bits: 32)
+            .write(uint: UInt64(123456789), bits: 32)
             .endCell()
         cell = try Builder()
-            .storeUint(UInt64(987654321), bits: 32)
+            .write(uint: UInt64(987654321), bits: 32)
             .storeRef(cell: refCell)
             .endCell()
         XCTAssertEqual(try cell.toString(), "x{3ADE68B1}\n x{075BCD15}")
@@ -84,10 +84,10 @@ final class SerializationTest: XCTestCase {
         
         // should serialize single cell with multiple references
         refCell = try Builder()
-            .storeUint(UInt64(123456789), bits: 32)
+            .write(uint: UInt64(123456789), bits: 32)
             .endCell()
         cell = try Builder()
-            .storeUint(UInt64(987654321), bits: 32)
+            .write(uint: UInt64(987654321), bits: 32)
             .storeRef(cell: refCell)
             .storeRef(cell: refCell)
             .storeRef(cell: refCell)

@@ -119,10 +119,7 @@ final class DictionaryTest: XCTestCase {
     }
     
     func int2bits(_ i: Int, bits: Int = 16) -> BitString {
-        return try! Builder()
-            .storeInt(i, bits: bits)
-            .endCell()
-            .bits
+        return try! Builder().write(int: i, bits: bits).bitstring()
     }
     
     func b(_ s: String) -> BitString {

@@ -28,7 +28,7 @@ public struct StateInit: Writable, Readable {
     public func writeTo(builder: Builder) throws {
         if let splitDepth = self.splitDepth {
             try builder.write(bit: true)
-            try builder.storeUint(UInt64(splitDepth), bits: 5)
+            try builder.write(uint: UInt64(splitDepth), bits: 5)
         } else {
             try builder.write(bit: false)
         }

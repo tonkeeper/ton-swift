@@ -29,7 +29,7 @@ struct CurrencyCollection: Codeable {
     }
     
     func writeTo(builder: Builder) throws {
-        try builder.storeCoins(coins: coins)
+        try builder.storeCoins(coins)
         try builder.store(other)
     }
 }

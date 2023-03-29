@@ -84,7 +84,7 @@ extension Address: Codeable, StaticSize {
     public func writeTo(builder b: Builder) throws {
         try b.write(uint: 2, bits: 2) // $10
         try b.write(uint: 0, bits: 1)
-        try b.writeInt(Int(self.workchain), bits: 8)
+        try b.write(int: self.workchain, bits: 8)
         try b.write(data: self.hash)
     }
     

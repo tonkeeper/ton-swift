@@ -23,8 +23,8 @@ public struct ExternalAddress {
 
 extension ExternalAddress: Codeable {
     public func writeTo(builder: Builder) throws {
-        try builder.storeUint(UInt64(1), bits: 2)
-        try builder.storeUint(UInt64(self.value.length), bits: 9)
+        try builder.write(uint: 1, bits: 2)
+        try builder.write(uint: self.value.length, bits: 9)
         try builder.write(bits: self.value)
     }
     

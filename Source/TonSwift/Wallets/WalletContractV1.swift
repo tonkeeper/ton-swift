@@ -30,17 +30,17 @@ public final class WalletContractV1: WalletContract {
         }
         
         let cell = try Cell.fromBoc(src: Data(base64Encoded: bocString)!)[0]
-        let data = try Builder().storeUint(UInt64(0), bits: 32) // Seqno
+        let data = try Builder().write(uint: UInt64(0), bits: 32) // Seqno
         try data.write(data: publicKey)
         
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
     
     public func createTransfer(args: WalletTransferData) throws -> Cell {
-        let signingMessage = try Builder().storeUint(args.seqno, bits: 32)
+        let signingMessage = try Builder().write(uint: args.seqno, bits: 32)
         
         if let message = args.messages.first {
-            try signingMessage.storeUint(UInt64(args.sendMode.rawValue), bits: 8)
+            try signingMessage.write(uint: UInt64(args.sendMode.rawValue), bits: 8)
             try signingMessage.storeRef(cell: try Builder().store(message))
         }
         

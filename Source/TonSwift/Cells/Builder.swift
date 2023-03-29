@@ -7,6 +7,11 @@ public class Builder {
     private var _length: Int
     
     public private(set) var refs: [Cell]
+    
+    
+    
+    // MARK: Initializers
+    
         
     /// Initialize the Builder with a given capacity.
     /// Note: Builder can be used to construct larger bitstrings, not only 1023-bit Cells. E.g. to build a BoC.
@@ -29,11 +34,44 @@ public class Builder {
         self.refs = refs
     }
     
+    
+    // MARK: Finalization
+    
+    
     /// Clones slice at its current state.
     public func clone() -> Builder {
         return Builder(capacity: capacity, buffer: _buffer, length: _length, refs: refs)
     }
     
+    /// Completes cell
+    public func endCell() throws -> Cell {
+        let bits = BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+        return try Cell(bits: bits, refs: refs)
+    }
+    
+    /// Same as `endCell`
+    public func asCell() throws -> Cell {
+        return try endCell()
+    }
+
+    /// Converts builder into BitString
+    public func bitstring() -> BitString {
+        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+    }
+    
+    /// Converts to data if the bitstring contains a whole number of bytes.
+    /// If the bitstring is not byte-aligned, returns error.
+    public func alignedBitstring() throws -> Data {
+        if !aligned {
+            throw TonError.custom("Builder buffer is not byte-aligned")
+        }
+        return _buffer.subdata(in: 0..._length / 8)
+    }
+    
+    
+    
+    // MARK: Metrics
+
     
     /// Returns whether the written bits are byte-aligned
     public var aligned: Bool {
@@ -83,94 +121,34 @@ public class Builder {
         }
     }
     
-    /**
-     Store int value
-     - parameter value: value as bigint or number
-     - parameter bits: number of bits to write
-     - returns this builder
-     */
+    
+    // MARK: Storing generic types
+    
+    
+    /// Stores an object
     @discardableResult
-    public func storeInt(_ value: Int, bits: Int) throws -> Self {
-        try self.writeInt(value, bits: bits)
-        return self
-    }
-    @discardableResult
-    public func storeInt(_ value: BigUInt, bits: Int) throws -> Self {
-        try self.writeInt(value, bits: bits)
-        return self
-    }
-    @discardableResult
-    public func storeInt(_ value: BigInt, bits: Int) throws -> Self {
-        try self.writeInt(value, bits: bits)
+    public func store(_ object: Writable) throws -> Self  {
+        try object.writeTo(builder: self)
         return self
     }
     
-    /**
-     Store uint value
-     - parameter value: value as bigint or number
-     - parameter bits: number of bits to write
-     - returns this builder
-     */
+    /// Stores an optional object with a single-bit prefix (`Maybe T`)
     @discardableResult
-    public func storeUint(_ value: UInt64, bits: Int) throws -> Self {
-        try self.write(uint: value, bits: bits)
-        return self
-    }
-    @discardableResult
-    public func storeUint(_ value: BigUInt, bits: Int) throws -> Self {
-        try self.write(uint: value, bits: bits)
-        return self
-    }
-    @discardableResult
-    public func storeUint(_ value: BigInt, bits: Int) throws -> Self {
-        try self.write(uint: value, bits: bits)
-        return self
-    }
-    
-    /**
-     Store varuint value
-     - parameter value: value as bigint or number
-     - parameter bits: number of bits to write to header
-     - returns this builder
-     */
-    @discardableResult
-    public func storeVarUint(value: UInt64, bits: Int) throws -> Self {
-        try self.writeVarUint(value: value, bits: bits)
-        return self
-    }
-    @discardableResult
-    public func storeVarUint(value: BigUInt, bits: Int) throws -> Self {
-        try self.writeVarUint(value: value, bits: bits)
-        return self
-    }
-    
-    /**
-     * Store coins value
-     * @param amount amount of coins
-     * @returns this builder
-     */
-    @discardableResult
-    public func storeCoins(coins: Coins) throws -> Self {
-        try self.writeCoins(coins: coins)
-        return self
-    }
-    
-    /**
-     * Store maybe coins value
-     * @param amount amount of coins, null or undefined
-     * @returns this builder
-     */
-    @discardableResult
-    public func storeMaybeCoins(coins: Coins?) throws -> Self {
-        if let coins {
+    public func storeMaybe(_ object: Writable?) throws -> Self {
+        if let object = object {
             try write(bit: true)
-            try storeCoins(coins: coins)
+            try store(object)
         } else {
             try write(bit: false)
         }
         
         return self
     }
+    
+    
+    
+    // MARK: Storing refs
+    
     
     /**
      Store reference
@@ -182,9 +160,7 @@ public class Builder {
         if refs.count >= 4 {
             throw TonError.custom("Too many references")
         }
-        
         refs.append(cell)
-        
         return self
     }
     @discardableResult
@@ -256,33 +232,10 @@ public class Builder {
         }
     }
     
-    /**
-     Store writer or builder
-     - parameter writer: writer or builder to store
-     - returns this builder
-     */
-    @discardableResult
-    public func store(_ object: Writable) throws -> Self  {
-        try object.writeTo(builder: self)
-        return self
-    }
     
-    /**
-     Store writer or builder if not null
-     - parameter writer: writer or builder to store
-     - returns this builder
-     */
-    @discardableResult
-    public func storeMaybe(_ object: Writable?) throws -> Self {
-        if let object = object {
-            try write(bit: true)
-            try store(object)
-        } else {
-            try write(bit: false)
-        }
-        
-        return self
-    }
+    
+    // MARK: storing
+    
     
     @discardableResult
     public func storeDict(_ dict: any CodeableDictionary) throws -> Self {
@@ -294,21 +247,6 @@ public class Builder {
     public func storeDictRoot(_ dict: any CodeableDictionary) throws -> Self {
         try dict.writeRootTo(builder: self)
         return self
-    }
-    
-    /// Completes cell
-    /// TODO: make this non-fallible
-    public func endCell() throws -> Cell {
-        let bits = BitString(data: _buffer, unchecked:(offset: 0, length: _length))
-        return try Cell(bits: bits, refs: refs)
-    }
-    
-    /**
-     Convert to cell
-     - returns cell
-     */
-    public func asCell() throws -> Cell {
-        return try endCell()
     }
     
 
@@ -390,12 +328,12 @@ public class Builder {
     - parameter bits: number of bits to write
     */
     @discardableResult
-    public func write<T>(uint value: T, bits: Int) throws  -> Self where T: BinaryInteger {
-        return try write(biguint: BigInt(value), bits: bits)
+    public func write<T>(uint value: T, bits: Int) throws -> Self where T: BinaryInteger {
+        return try write(biguint: BigUInt(value), bits: bits)
     }
     
     @discardableResult
-    public func write(biguint value: BigInt, bits: Int) throws -> Self {
+    public func write(biguint value: BigUInt, bits: Int) throws -> Self {
         try checkCapacity(bits)
         
         // Special cases when our buffer is aligned
@@ -469,26 +407,7 @@ public class Builder {
     func write(int value: any BinaryInteger, bits: Int) throws -> Self {
         return try write(bigint: BigInt(value), bits: bits)
     }
-    
-    /**
-     DEPRECATED API
-     Write int value
-    - parameter value: value as bigint or number
-    - parameter bits: number of bits to write
-    */
-    func writeInt(_ value: Any, bits: Int) throws {
-        if let value = value as? BigInt {
-            try write(bigint: value, bits: bits)
-        } else if let value = value as? Int {
-            try write(bigint: BigInt(value), bits: bits)
-        } else if let value = value as? any BinaryInteger {
-            try write(bigint: BigInt(value), bits: bits)
-        } else {
-            throw TonError.custom("Invalid value. Got \(value)")
-        }
         
-    }
-    
     @discardableResult
     func write(bigint value: BigInt, bits: Int) throws -> Self {
         var v = value
@@ -528,15 +447,7 @@ public class Builder {
         try write(uint: v, bits: bits - 1)
         return self
     }
-    
-    /**
-     Write coins in var uint format
-     - parameter amount: amount to write
-    */
-    @discardableResult
-    func writeCoins(coins: Coins) throws -> Self {
-        return try writeVarUint(value: coins.amount, bits: 4)
-    }
+
         
     /**
      Wrtie var uint value, used for serializing coins
@@ -578,19 +489,6 @@ public class Builder {
         return self
     }
     
-    /// Converts builder into BitString
-    public func bitstring() -> BitString {
-        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
-    }
-    
-    /// Converts to data if the bitstring contains a whole number of bytes.
-    /// If the bitstring is not byte-aligned, returns error.
-    public func alignedBitstring() throws -> Data {
-        if !aligned {
-            throw TonError.custom("Builder buffer is not byte-aligned")
-        }
-        return _buffer.subdata(in: 0..._length / 8)
-    }
 
     private func checkCapacity(_ bits: Int) throws {
         if availableBits < bits || bits < 0 {
