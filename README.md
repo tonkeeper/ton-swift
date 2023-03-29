@@ -9,16 +9,16 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] TON mnemonic and key pairs
 - [x] Bitstrings
 - [x] Cells
+- [x] Hashmap (aka “dictionary”)
 - [x] Contract
 - [x] StateInit
 - [x] CommonMsgInfo
 - [x] Send Flags
-- [x] Snake data
+- [x] Text encoding (aka “snake data”)
 - [x] Signatures
-- [x] Wallet V3R1, V3R2
-- [x] Wallet V4R1, V4R2
+- [x] Standard wallets
 - [ ] Data signatures [TEP/PR104](https://github.com/ton-blockchain/TEPs/pull/104)
-- [ ] Subscription V1
+- [ ] Subscriptions V1
 - [ ] Jettons
 - [ ] NFT
 - [ ] TON.DNS
