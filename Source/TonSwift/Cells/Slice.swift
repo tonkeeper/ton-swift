@@ -8,6 +8,11 @@ public class Slice {
     private var bitstring: BitString
     private var offset: Int
     private var refs: [Cell]
+    
+    
+    
+    
+    // MARK: Initializers
         
     init(cell: Cell) {
         bitstring = cell.bits
@@ -36,6 +41,11 @@ public class Slice {
         self.offset = offset
         self.refs = refs
     }
+    
+    
+    
+    // MARK: Metrics
+    
         
     /// Remaining unread refs in this slice.
     public var remainingRefs: Int {
@@ -46,6 +56,54 @@ public class Slice {
     public var remainingBits: Int {
         return bitstring.length - offset
     }
+    
+    
+    
+    
+    // MARK: Slice Lifecycle
+    
+    
+    /// Checks if the cell is fully processed without unread bits or refs.
+    public func endParse() throws {
+        if remainingBits > 0 || remainingRefs > 0 {
+            throw TonError.custom("Slice is not empty")
+        }
+    }
+
+    /// Converts the remaining data in the slice to a Cell.
+    /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
+    public func loadRemainder() throws -> Cell {
+        return try asBuilder().endCell()
+    }
+    
+    /// Converts the remaining data in the slice to a Cell.
+    /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
+    public func asCell() throws -> Cell {
+        return try asBuilder().endCell()
+    }
+    
+    /// Converts slice to a Builder filled with remaining data in this slice.
+    public func asBuilder() throws -> Builder {
+        let builder = Builder()
+        try builder.storeSlice(src: self)
+        return builder
+    }
+    
+    /// Clones slice at its current state.
+    public func clone() -> Slice {
+        return Slice(bitstring: bitstring, offset: offset, refs: refs)
+    }
+    
+    /// Returns string representation of the slice as a cell.
+    public func toString() throws -> String {
+        return try loadRemainder().toString()
+    }
+    
+    
+    
+    
+    
+    // MARK: Loading generic types
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
@@ -77,7 +135,11 @@ public class Slice {
         self.refs = tmpslice.refs;
         return result;
     }
-        
+    
+    
+    
+    // MARK: Loading Refs
+    
     /// Loads a cell reference.
     public func loadRef() throws -> Cell {
         if refs.isEmpty {
@@ -112,6 +174,11 @@ public class Slice {
         }
     }
     
+    
+    
+    // MARK: Loading Dictionaries
+    
+    
     /// Reads a dictionary from the slice.
     public func loadDict<T>() throws -> T where T: CellCodableDictionary {
         return try T.readFrom(slice: self)
@@ -122,41 +189,10 @@ public class Slice {
         return try T.readRootFrom(slice: self)
     }
 
-    /// Checks if the cell is fully processed without unread bits or refs.
-    public func endParse() throws {
-        if remainingBits > 0 || remainingRefs > 0 {
-            throw TonError.custom("Slice is not empty")
-        }
-    }
     
-    /// Converts the remaining data in the slice to a Cell.
-    /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
-    public func loadRemainder() throws -> Cell {
-        return try asBuilder().endCell()
-    }
     
-    /// Converts the remaining data in the slice to a Cell.
-    /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
-    public func asCell() throws -> Cell {
-        return try asBuilder().endCell()
-    }
     
-    /// Converts slice to a Builder filled with remaining data in this slice.
-    public func asBuilder() throws -> Builder {
-        let builder = Builder()
-        try builder.storeSlice(src: self)
-        return builder
-    }
-    
-    /// Clones slice at its current state.
-    public func clone() -> Slice {
-        return Slice(bitstring: bitstring, offset: offset, refs: refs)
-    }
-    
-    /// Returns string representation of the slice as a cell.
-    public func toString() throws -> String {
-        return try loadRemainder().toString()
-    }
+    // MARK: Loading Bits
     
     
     /// Advances cursor by the specified numbe rof bits.
@@ -177,6 +213,15 @@ public class Slice {
     /// Load a single bit as a boolean value.
     public func loadBoolean() throws -> Bool {
         return try loadBit()
+    }
+    
+    /// Loads an optional boolean.
+    public func loadMaybeBoolean() throws -> Bool? {
+        if try loadBit() {
+            return try loadBoolean()
+        } else {
+            return nil
+        }
     }
 
     /// Preload a single bit without advancing the cursor.
@@ -209,6 +254,42 @@ public class Slice {
         return try _preloadBuffer(bytes: bytes, offset: offset)
     }
 
+    
+
+    /**
+     Load bit string that was padded to make it byte alligned. Used in BOC serialization
+    - parameter bytes: number of bytes to read
+    */
+    func loadPaddedBits(bits: Int) throws -> BitString {
+        // Check that number of bits is byte alligned
+        guard bits % 8 == 0 else {
+            throw TonError.custom("Invalid number of bits")
+        }
+        
+        // Skip padding
+        var length = bits
+        while true {
+            if try bitstring.at(offset + length - 1) {
+                length -= 1
+                break
+            } else {
+                length -= 1
+            }
+        }
+        
+        // Read substring
+        let substring = try bitstring.substring(offset: offset, length: length)
+        offset += bits
+        
+        return substring
+    }
+
+    
+    
+    
+    // MARK: Loading Integers
+    
+    
     /**
      Load uint value
     - parameter bits: uint bits
@@ -272,33 +353,6 @@ public class Slice {
         return try _preloadBigUint(bits: bits, offset: offset)
     }
     
-    /**
-     Load bit string that was padded to make it byte alligned. Used in BOC serialization
-    - parameter bytes: number of bytes to read
-    */
-    func loadPaddedBits(bits: Int) throws -> BitString {
-        // Check that number of bits is byte alligned
-        guard bits % 8 == 0 else {
-            throw TonError.custom("Invalid number of bits")
-        }
-        
-        // Skip padding
-        var length = bits
-        while true {
-            if try bitstring.at(offset + length - 1) {
-                length -= 1
-                break
-            } else {
-                length -= 1
-            }
-        }
-        
-        // Read substring
-        let substring = try bitstring.substring(offset: offset, length: length)
-        offset += bits
-        
-        return substring
-    }
     
     /**
      Load varuint value
@@ -344,15 +398,6 @@ public class Slice {
         return BigUInt(try _preloadUint(bits: size * 8, offset: offset + bits))
     }
     
-    
-    /// Loads an optional boolean.
-    public func loadMaybeBoolean() throws -> Bool? {
-        if try loadBit() {
-            return try loadBoolean()
-        } else {
-            return nil
-        }
-    }
 
     /**
      Load maybe uint
@@ -380,6 +425,7 @@ public class Slice {
         }
     }
 
+    
     
     // MARK: - Private methods
     
