@@ -25,10 +25,10 @@ extension Coins: RawRepresentable {
 
 extension Coins: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.store(varuint: self.amount, prefixSize: 4)
+        try builder.store(varuint: self.amount, limit: 16)
     }
     public static func loadFrom(slice: Slice) throws -> Coins {
-        return Coins(try slice.loadVarUintBig(bits: 4))
+        return Coins(try slice.loadVarUintBig(limit: 16))
     }
 }
 
@@ -57,7 +57,7 @@ extension Builder {
     /// Write coins amount in varuint format
     @discardableResult
     func store(coins: Coins) throws -> Self {
-        return try store(varuint: coins.amount, prefixSize: 4)
+        return try store(varuint: coins.amount, limit: 16)
     }
     
     /**

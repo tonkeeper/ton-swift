@@ -166,10 +166,10 @@ extension Int64: CellCodable, StaticSize {
 public struct VarUInt248: Hashable, CellCodable {
     public var value: BigUInt
     public func storeTo(builder: Builder) throws {
-        try builder.store(varuint: value, prefixSize: 5)
+        try builder.store(varuint: value, limit: 32)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.loadVarUintBig(bits: 5))
+        return Self(value: try slice.loadVarUintBig(limit: 32))
     }
 }
 
@@ -177,10 +177,10 @@ public struct VarUInt248: Hashable, CellCodable {
 public struct VarUInt120: Hashable, CellCodable {
     public var value: BigUInt
     public func storeTo(builder: Builder) throws {
-        try builder.store(varuint: value, prefixSize: 4)
+        try builder.store(varuint: value, limit: 16)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.loadVarUintBig(bits: 4))
+        return Self(value: try slice.loadVarUintBig(limit: 16))
     }
 }
 
@@ -220,28 +220,27 @@ public struct UIntCoder: TypeCoder {
     }
 }
 
-/// Encodes variable-length integers using `p`-long length prefix for size in _bytes_.
-/// Therefore, `VarUIntCoder(5)` can fit `2^5` = `32` byte-long integers, therefore representing 256-bit integers.
+/// Encodes variable-length integers using `limit` bound on integer size in _bytes_.
+/// Therefore, `VarUIntCoder(32)` can represent 248-bit integers (lengths 0...31 bytes).
 /// TL-B:
 /// ```
 /// var_uint$_ {n:#} len:(#< n) value:(uint (len * 8)) = VarUInteger n;
 /// var_int$_  {n:#} len:(#< n) value:(int (len * 8))  = VarInteger n;
 /// ```
-/// TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
 public struct VarUIntCoder: TypeCoder {
     public typealias T = BigUInt
     
-    public let prefixbits: Int
+    public let limit: Int
     
-    public init(prefixbits: Int) {
-        self.prefixbits = prefixbits
+    public init(limit: Int) {
+        self.limit = limit
     }
     
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try builder.store(varuint: src, prefixSize: prefixbits)
+        try builder.store(varuint: src, limit: limit)
     }
     
     public func loadValue(from src: Slice) throws -> T {
-        return try src.loadVarUintBig(bits: prefixbits)
+        return try src.loadVarUintBig(limit: limit)
     }
 }

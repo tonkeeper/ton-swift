@@ -59,7 +59,7 @@ public class Slice {
     
     
     
-    // MARK: - Slice Lifecycle
+    // MARK: - Finalization
     
     
     /// Checks if the cell is fully processed without unread bits or refs.
@@ -102,7 +102,7 @@ public class Slice {
     
     
     
-    // MARK: - Loading generic types
+    // MARK: - Loading Generic Types
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
@@ -242,7 +242,7 @@ public class Slice {
 
     /// Loads whole number of bytes and returns standard `Data` object.
     public func loadBytes(_ bytes: Int) throws -> Data {
-        let buf = try _preloadBuffer(bytes: bytes, offset: offset)
+        let buf = try _preloadBuffer(bytes: bytes)
         offset += bytes * 8
         
         return buf
@@ -250,7 +250,7 @@ public class Slice {
 
     /// Preloads whole number of bytes and returns standard `Data` object without advancing the cursor.
     public func preloadBytes(_ bytes: Int) throws -> Data {
-        return try _preloadBuffer(bytes: bytes, offset: offset)
+        return try _preloadBuffer(bytes: bytes)
     }
 
     
@@ -352,52 +352,6 @@ public class Slice {
         return try _preloadBigUint(bits: bits, offset: offset)
     }
     
-    
-    /**
-     Load varuint value
-    - parameter bits: number of bits to read the size
-    - returns read value as bigint
-     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
-    */
-    func loadVarUint(bits: Int) throws -> UInt64 {
-        let size = Int(try loadUint(bits: bits))
-        return try loadUint(bits: size * 8)
-    }
-
-    /**
-     Load varuint value
-    - parameter bits: number of bits to read the size
-    - returns read value as bigint
-     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
-    */
-    func loadVarUintBig(bits: Int) throws -> BigUInt {
-        let size = Int(try loadUint(bits: bits))
-        return BigUInt(try loadUintBig(bits: size * 8))
-    }
-
-    /**
-     Preload varuint value
-    - parameter bits: number of bits to read the size
-    - returns read value as bigint
-     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
-    */
-    func preloadVarUint(bits: Int) throws -> UInt64 {
-        let size = Int(try _preloadUint(bits: bits, offset: offset))
-        return try _preloadUint(bits: size * 8, offset: offset + bits)
-    }
-
-    /**
-     Preload varuint value
-    - parameter bits: number of bits to read the size
-    - returns read value as bigint
-     TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify bounds when reading the result.
-    */
-    func preloadVarUintBig(bits: Int) throws -> BigUInt {
-        let size = Int(try _preloadUint(bits: bits, offset: offset))
-        return BigUInt(try _preloadUint(bits: size * 8, offset: offset + bits))
-    }
-    
-
     /**
      Load maybe uint
     - parameter bits number of bits to read
@@ -424,6 +378,41 @@ public class Slice {
         }
     }
 
+    
+    
+    
+    
+    // MARK: - Loading Variable-Length Integers
+    
+    
+    /// Loads VarUInteger with a given `limit` in bytes.
+    /// The integer must be at most `limit-1` bytes long.
+    /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes) and uses 4 bits to encode length prefix 0...15.
+    func loadVarUint(limit: Int) throws -> UInt64 {
+        if limit > 9 {
+            throw TonError.custom("VarUInteger \(limit) cannot store UInt64 (it occupies 8 bytes, so the largest type is VarUInteger 9)")
+        }
+        return try UInt64(self.loadVarUintBig(limit: limit))
+    }
+
+    /// Loads VarUInteger with a given `limit` in bytes.
+    /// The integer must be at most `limit-1` bytes long.
+    /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes) and uses 4 bits to encode length prefix 0...15.
+    func loadVarUintBig(limit: Int) throws -> BigUInt {
+        let bytesize = limit - 1
+        let prefixbits = bitsForInt(bytesize)
+        let size = Int(try loadUint(bits: prefixbits))
+        if size > bytesize {
+            throw TonError.varUIntOutOfBounds(limit: limit, actualBits: size*8)
+        }
+        return try loadUintBig(bits: size * 8)
+    }
+
+    
+
+    
+    
+    
     
     
     // MARK: - Private methods
@@ -498,7 +487,7 @@ public class Slice {
         return res
     }
 
-    private func _preloadBuffer(bytes: Int, offset: Int) throws -> Data {
+    private func _preloadBuffer(bytes: Int) throws -> Data {
         if let fastBuffer = try bitstring.subbuffer(offset: offset, length: bytes * 8) {
             return fastBuffer
         }
