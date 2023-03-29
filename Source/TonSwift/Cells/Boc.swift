@@ -88,7 +88,7 @@ func getBitsDescriptor(bits: BitString) -> UInt8 {
     return UInt8(ceil(Double(len) / 8) + floor(Double(len) / 8))
 }
 
-func readCell(reader: BitReader, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt64]) {
+func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt64]) {
     let d1 = try reader.loadUint(bits: 8)
     let refsCount = d1 % 8
     let exotic = d1 & 8 != 0

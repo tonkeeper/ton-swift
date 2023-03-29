@@ -1,8 +1,6 @@
 import Foundation
 import BigInt
 
-typealias BitReader = Slice
-
 /// `Slice` is a class that allows to read cell data (bits and refs), consuming it along the way.
 /// Once you have done reading and want to make sure all the data is consumed, call `endParse()`.
 public class Slice {

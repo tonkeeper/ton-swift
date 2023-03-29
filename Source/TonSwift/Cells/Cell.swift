@@ -400,7 +400,7 @@ public struct ExoticPruned {
 }
 
 func exoticPruned(bits: BitString, refs: [Cell]) throws -> ExoticPruned {
-    let reader = BitReader(bits: bits)
+    let reader = Slice(bits: bits)
 
     let type = try reader.loadUint(bits: 8)
     if type != 1 {
@@ -482,7 +482,7 @@ func resolveMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (type: CellTyp
 
 @discardableResult
 func exoticMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (proofDepth1: UInt32, proofDepth2: UInt32, proofHash1: Data, proofHash2: Data) {
-    let reader = BitReader(bits: bits)
+    let reader = Slice(bits: bits)
 
     // type + hash + hash + depth + depth
     let size = 8 + (2 * (256 + 16))
@@ -526,7 +526,7 @@ func exoticMerkleUpdate(bits: BitString, refs: [Cell]) throws -> (proofDepth1: U
 
 @discardableResult
 func exoticMerkleProof(bits: BitString, refs: [Cell]) throws -> (proofDepth: UInt32, proofHash: Data) {
-    let reader = BitReader(bits: bits)
+    let reader = Slice(bits: bits)
 
     // type + hash + depth
     let size = 8 + 256 + 16
