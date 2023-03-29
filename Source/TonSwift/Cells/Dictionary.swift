@@ -12,22 +12,13 @@ public protocol CodeableDictionary: Codeable {
 
 extension Dictionary: Readable where Key: Codeable & StaticSize, Value: Codeable {
     public static func readFrom(slice: Slice) throws -> Self {
-        let coder = DictionaryCoder(
-            keyLength: Key.bitWidth,
-            DefaultCoder<Key>(),
-            DefaultCoder<Value>()
-        )
-        return try coder.load(slice: slice)
+        return try DictionaryCoder.default().load(slice)
     }
 }
 
 extension Dictionary: Writable where Key: Codeable & StaticSize, Value: Codeable {
     public func writeTo(builder: Builder) throws {
-        try DictionaryCoder(
-            keyLength: Key.bitWidth,
-            DefaultCoder<Key>(),
-            DefaultCoder<Value>()
-        ).store(map: self, builder: builder)
+        try DictionaryCoder.default().store(map: self, builder: builder)
     }
 }
 
@@ -37,24 +28,13 @@ extension Dictionary: Codeable where Key: Codeable & StaticSize, Value: Codeable
 extension Dictionary: CodeableDictionary where Key: Codeable & StaticSize, Value: Codeable {
     
     public func writeRootTo(builder: Builder) throws {
-        try DictionaryCoder(
-            keyLength: Key.bitWidth,
-            DefaultCoder<Key>(),
-            DefaultCoder<Value>()
-        ).storeRoot(map: self, builder: builder)
+        try DictionaryCoder.default().storeRoot(map: self, builder: builder)
     }
     
     public static func readRootFrom(slice: Slice) throws -> Self {
-        let coder = DictionaryCoder(
-            keyLength: Key.bitWidth,
-            DefaultCoder<Key>(),
-            DefaultCoder<Value>()
-        )
-        return try coder.loadRoot(slice: slice)
+        return try DictionaryCoder.default().loadRoot(slice)
     }
 }
-
-
 
 /// Coder for the dictionaries that stores the coding rules for keys and values.
 /// Use this explicit API when working with dynamically-sized dictionary keys.
@@ -69,29 +49,34 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         self.keyCoder = keyCoder
         self.valueCoder = valueCoder
     }
-        
+
+    static func `default`<KT,VT>() -> DictionaryCoder<K,V>
+        where KT: Codeable & StaticSize & Hashable,
+              VT: Codeable,
+              K == DefaultCoder<KT>,
+              V == DefaultCoder<VT> {
+        return DictionaryCoder(
+            keyLength: KT.bitWidth,
+            DefaultCoder<KT>(),
+            DefaultCoder<VT>()
+       )
+    }
+    
     /// Loads dictionary from slice
-    public func load(slice: Slice) throws -> [K.T:V.T] {
+    public func load(_ slice: Slice) throws -> [K.T:V.T] {
         let cell = try slice.loadMaybeRef()
         if let cell, !cell.isExotic {
-            return try loadRoot(slice: cell.beginParse())
+            return try loadRoot(cell.beginParse())
         } else {
+            // TODO: review this decision to return empty dicts from exotic cells
+            // Steve Korshakov says the reason for this is that
+            // pruned branches should yield empty dicts somewhere down the line.
             return [:]
         }
     }
     
-    /// Loads dictionary from a cell
-    public func load(cell: Cell) throws -> [K.T:V.T] {
-        // TODO: maybe it would be better to add type "AnyCell" and keep "Cell" for non-exotic cell and avoid these decisions here.
-        // Steve Korshakov says the reason for this is that pruned branches should yield empty dicts somewhere down the line.
-        if cell.isExotic {
-            return [:]
-        }
-        return try load(slice: try cell.beginParse())
-    }
-
     /// Loads root of the dictionary directly from a slice
-    public func loadRoot(slice: Slice) throws -> [K.T:V.T] {
+    public func loadRoot(_ slice: Slice) throws -> [K.T:V.T] {
         var map = [K.T: V.T]()
         try doParse(prefix: BitBuilder(), slice: slice, n: keyLength, result: &map)
         return map
@@ -178,6 +163,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         }
     }
 }
+
 
 
 enum Node<T> {
