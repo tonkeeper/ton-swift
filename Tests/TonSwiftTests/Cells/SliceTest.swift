@@ -12,14 +12,14 @@ final class SliceTest: XCTestCase {
             try builder.write(uint: a, bits: 48)
             try builder.write(uint: b, bits: 48)
             
-            let bits = try builder.bitstring()
+            let bits = builder.bitstring()
             let slice = try Cell(bits: bits).beginParse()
             XCTAssertEqual(try slice.preloadUint(bits: 48), a)
             XCTAssertEqual(try slice.loadUint(bits: 48), a)
             XCTAssertEqual(try slice.preloadUint(bits: 48), b)
             XCTAssertEqual(try slice.loadUint(bits: 48), b)
 
-            let bits2 = try builder.bitstring()
+            let bits2 = builder.bitstring()
             let slice2 = Slice(bits: bits2)
             XCTAssertEqual(try slice2.preloadUint(bits: 48), a)
             XCTAssertEqual(try slice2.loadUint(bits: 48), a)

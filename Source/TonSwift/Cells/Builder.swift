@@ -45,12 +45,6 @@ public class Builder {
         return _length
     }
     
-    /// Number of bits written
-    public var length: Int {
-        return _length
-    }
-    
-    
     /// Number of references added to this cell
     public var refsCount: Int {
         return refs.count
