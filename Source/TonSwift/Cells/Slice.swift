@@ -72,17 +72,17 @@ public class Slice {
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
     public func loadRemainder() throws -> Cell {
-        return try asBuilder().endCell()
+        return try toBuilder().endCell()
     }
     
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
-    public func asCell() throws -> Cell {
-        return try asBuilder().endCell()
+    public func toCell() throws -> Cell {
+        return try toBuilder().endCell()
     }
     
     /// Converts slice to a Builder filled with remaining data in this slice.
-    public func asBuilder() throws -> Builder {
+    public func toBuilder() throws -> Builder {
         let builder = Builder()
         try builder.store(slice: self)
         return builder

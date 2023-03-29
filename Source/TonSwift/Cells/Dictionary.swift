@@ -223,16 +223,6 @@ func buildEdge<T>(_ src: [BitString: T]) throws -> Edge<T> {
     return Edge(label: label, node: try buildNode(removePrefixMap(src, label.length)))
 }
 
-/// Returns minimum number of bits needed to encode values up to this one.
-/// This is the same as TL-B notation `#<= n`. To quote the TVM paper:
-///
-/// Parametrized type `#<= p` with `p : #` (this notation means “p of type #”, i.e., a natural number)
-/// denotes the subtype of the natural numbers type #, consisting of integers 0 . . . p;
-/// it is serialized into ⌈log2(p + 1)⌉ bits as an unsigned big-endian integer.
-func bitsForInt(_ n: Int) -> Int {
-    return Int(ceil(log2(Double(n + 1))))
-}
-
 
 /// Deterministically produces optimal label type for a given label.
 /// This implementation is equivalent to the C++ reference implementation, and resolves the ties in the same way.

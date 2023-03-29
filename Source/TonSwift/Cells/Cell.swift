@@ -126,10 +126,8 @@ public struct Cell: Hashable {
         return _depths[min(_depths.count - 1, level)]
     }
     
-    /**
-     Beging cell parsing
-    - returns a new slice
-    */
+    /// Convert cell to slice so it can be parsed.
+    /// Same as `toSlice`.
     public func beginParse(allowExotic: Bool = false) throws -> Slice {
         if isExotic && !allowExotic {
             throw TonError.custom("Exotic cells cannot be parsed");
@@ -138,6 +136,16 @@ public struct Cell: Hashable {
         return Slice(cell: self)
     }
     
+    /// Convert cell to slice so it can be parsed.
+    /// Same as `beginParse`.
+    public func toSlice() throws -> Slice {
+        return try beginParse()
+    }
+
+    /// Convert cell to a builder that has this cell pre-stored. Finalizing this builder yields the same cell.
+    public func toBuilder() throws -> Builder {
+        return try Builder().store(slice: toSlice())
+    }
     /**
      Serializes cell to BOC
     - parameter opts: options
@@ -173,21 +181,7 @@ public struct Cell: Hashable {
         return s
     }
     
-    /**
-     Covnert cell to slice
-    - returns slice
-    */
-    public func asSlice() throws -> Slice {
-        return try beginParse()
-    }
 
-    /**
-     Convert cell to a builder that has this cell stored
-    - returns builder
-    */
-    public func asBuilder() throws -> Builder {
-        return try Builder().store(slice: asSlice())
-    }
 }
 
 // MARK: - Equatable
@@ -623,4 +617,14 @@ func countSetBits(_ n: UInt32) -> UInt32 {
     n = (n & 0x33333333) + ((n >> 2) & 0x33333333)
     
     return (n + (n >> 4) & 0xF0F0F0F) * 0x1010101 >> 24
+}
+
+/// Returns minimum number of bits needed to encode values up to this one.
+/// This is the same as TL-B notation `#<= n`. To quote the TVM paper:
+///
+/// Parametrized type `#<= p` with `p : #` (this notation means “p of type #”, i.e., a natural number)
+/// denotes the subtype of the natural numbers type #, consisting of integers 0 . . . p;
+/// it is serialized into ⌈log2(p + 1)⌉ bits as an unsigned big-endian integer.
+public func bitsForInt(_ n: Int) -> Int {
+    return Int(ceil(log2(Double(n + 1))))
 }

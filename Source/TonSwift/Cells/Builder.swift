@@ -457,6 +457,7 @@ public class Builder {
 
         
     /**
+     DEPRECATED
      Wrtie var uint value, used for serializing coins
     - parameter value: value to write as bigint or number
     - parameter bits: header bits to write size
@@ -466,16 +467,57 @@ public class Builder {
     func store(varuint: UInt64, prefixSize: Int) throws -> Self {
         return try store(varuint: BigUInt(varuint), prefixSize: prefixSize)
     }
+    /// DEPRECATED
     @discardableResult
     func store(varuint: BigUInt, prefixSize: Int) throws -> Self {
         let v = BigUInt(varuint)
         if prefixSize < 0 {
             throw TonError.custom("Invalid bit length. Got \(prefixSize)")
         }
-        if v < 0 {
-            throw TonError.custom("Value is negative. Got \(varuint)")
+
+        // Corner case for zero
+        if v == 0 {
+            // Write zero size
+            try store(uint: 0, bits: prefixSize)
+            return self
         }
 
+        // Calculate size
+        let sizeBytes = Int(ceil(Double(v.bitWidth) / 8.0))
+        let sizeBits = sizeBytes * 8
+
+        // Write size
+        try store(uint: sizeBytes, bits: prefixSize)
+
+        // Write number
+        try store(uint: v, bits: sizeBits)
+        
+        return self
+    }
+    
+    /// Stores VarUInteger with a given `limit` in bytes.
+    /// The integer must be at most `limit-1` bytes long.
+    /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes).
+    @discardableResult
+    func store(varuint v: UInt64, limit: Int) throws -> Self {
+        return try store(varuint: BigUInt(v), limit: limit)
+    }
+    
+    /// Stores VarUInteger with a given `limit` in bytes.
+    /// The integer must be at most `limit-1` bytes long.
+    /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes).
+    @discardableResult
+    func store(varuint v: BigUInt, limit: Int) throws -> Self {
+        let bytesize = limit - 1
+        if bytesize < 0 {
+            throw TonError.custom("Invalid limit. Got \(limit) < 1")
+        }
+        if v.bitWidth > bytesize * 8 {
+            throw TonError.custom("Number is out of bounds: it must be up to \(bytesize*8) bits long, but received \(v.bitWidth) bits")
+        }
+        
+        let prefixSize = bitsForInt(bytesize)
+        
         // Corner case for zero
         if v == 0 {
             // Write zero size

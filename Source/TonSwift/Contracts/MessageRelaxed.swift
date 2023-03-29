@@ -56,7 +56,7 @@ public struct MessageRelaxed: CellCodable {
         
         if let space = builder.fit(body.metrics), space.bitsCount >= 1 {
             try builder.store(bit: 0)
-            try builder.store(body.asBuilder())
+            try builder.store(body.toBuilder())
         } else {
             try builder.store(bit: 1)
             try builder.store(ref: body)

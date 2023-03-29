@@ -91,6 +91,6 @@ extension Builder: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try slice.clone().asBuilder() as! Self
+        return try slice.clone().toBuilder() as! Self
     }
 }
