@@ -27,21 +27,21 @@ public struct StateInit: CellCodable {
     
     public func storeTo(builder: Builder) throws {
         if let splitDepth = self.splitDepth {
-            try builder.write(bit: true)
-            try builder.write(uint: UInt64(splitDepth), bits: 5)
+            try builder.store(bit: true)
+            try builder.store(uint: UInt64(splitDepth), bits: 5)
         } else {
-            try builder.write(bit: false)
+            try builder.store(bit: false)
         }
         
         if let ticktock = self.special {
-            try builder.write(bit: true)
+            try builder.store(bit: true)
             try builder.store(ticktock)
         } else {
-            try builder.write(bit: false)
+            try builder.store(bit: false)
         }
         
-        try builder.storeMaybeRef(self.code)
-        try builder.storeMaybeRef(self.data)
+        try builder.storeMaybe(ref: self.code)
+        try builder.storeMaybe(ref: self.data)
         try builder.store(self.libraries)
     }
     
@@ -71,8 +71,8 @@ struct TickTock: CellCodable {
     var tock: Bool
     
     func storeTo(builder: Builder) throws {
-        try builder.write(bit: self.tick)
-        try builder.write(bit: self.tock)
+        try builder.store(bit: self.tick)
+        try builder.store(bit: self.tock)
     }
     
     static func loadFrom(slice: Slice) throws -> TickTock {
@@ -93,7 +93,7 @@ public struct SimpleLibrary: Hashable {
 
 extension SimpleLibrary: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.write(bit: self.public)
+        try builder.store(bit: self.public)
         try builder.store(ref: self.root)
     }
     public static func loadFrom(slice: Slice) throws -> SimpleLibrary {

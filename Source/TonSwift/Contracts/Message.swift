@@ -38,26 +38,26 @@ public struct Message: CellCodable {
         try builder.store(info)
         
         if let stateInit {
-            try builder.write(bit: 1)
+            try builder.store(bit: 1)
             let initCell = try Builder().store(stateInit)
             
             // check if we fit the cell inline with 2 bits for the stateinit and the body
             if let space = builder.fit(initCell.metrics), space.bitsCount >= 2 {
-                try builder.write(bit: 0)
+                try builder.store(bit: 0)
                 try builder.store(initCell)
             } else {
-                try builder.write(bit: 1)
+                try builder.store(bit: 1)
                 try builder.store(ref:initCell)
             }
         } else {
-            try builder.write(bit:0)
+            try builder.store(bit:0)
         }
         
         if let space = builder.fit(body.metrics), space.bitsCount >= 1 {
-            try builder.write(bit: 0)
+            try builder.store(bit: 0)
             try builder.store(body.asBuilder())
         } else {
-            try builder.write(bit: 1)
+            try builder.store(bit: 1)
             try builder.store(ref:body)
         }
     }

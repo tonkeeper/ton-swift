@@ -55,7 +55,7 @@ public class BytesCoder: TypeCoder {
     }
     
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try builder.write(data: src)
+        try builder.store(data: src)
     }
     public func loadValue(from src: Slice) throws -> T {
         return try src.loadBytes(self.size)

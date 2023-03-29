@@ -78,9 +78,9 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
     
     func store(map: [K.T: V.T], builder: Builder) throws {
         if map.count == 0 {
-            try builder.write(bit: 0)
+            try builder.store(bit: 0)
         } else {
-            try builder.write(bit: 1)
+            try builder.store(bit: 1)
             let subcell = Builder()
             try storeRoot(map: map, builder: subcell)
             try builder.store(ref: try subcell.endCell())
@@ -116,19 +116,19 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         if try slice.loadBit() == false {
             // Read
             pfxlen = try Unary.loadFrom(slice: slice).value
-            try prefix.write(bits: try slice.loadBits(pfxlen))
+            try prefix.store(bits: try slice.loadBits(pfxlen))
         } else {
             // long mode: $10
             if try slice.loadBit() == false {
                 pfxlen = Int(try slice.loadUint(bits: k))
-                try prefix.write(bits: try slice.loadBits(pfxlen))
+                try prefix.store(bits: try slice.loadBits(pfxlen))
             // same mode: $11
             } else {
                 // Same label detected
                 let bit = try slice.loadBit()
                 pfxlen = Int(try slice.loadUint(bits: k))
                 for _ in 0..<pfxlen {
-                    try prefix.write(bit: bit)
+                    try prefix.store(bit: bit)
                 }
             }
         }
@@ -146,12 +146,12 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
             // Note: left and right branches implicitly contain prefixes '0' and '1'
             if !left.isExotic {
                 let prefixleft = prefix.clone()
-                try prefixleft.write(bit: 0)
+                try prefixleft.store(bit: 0)
                 try doParse(prefix: prefixleft, slice: left.beginParse(), n: n - pfxlen - 1, result: &result)
             }
             if !right.isExotic {
                 let prefixright = prefix.clone()
-                try prefixright.write(bit: 1)
+                try prefixright.store(bit: 1)
                 try doParse(prefix: prefixright, slice: right.beginParse(), n: n - pfxlen - 1, result: &result)
             }
         }
@@ -288,17 +288,17 @@ func writeLabel(src: BitString, keyLength: Int, to: Builder) throws {
     // long mode '10' requires 2+k+n bits (used only for n<=1)
     // same mode '11' requires 3+k bits (for n>=2, k<2n-1)
     if let bit = src.repeatsSameBit(), n > 1 && k < 2 * n - 1 { // same mode '11'
-        try to.write(bits: 1, 1)       // header
-        try to.write(bit: bit)         // value
-        try to.write(uint: n, bits: k) // length
+        try to.store(bits: 1, 1)       // header
+        try to.store(bit: bit)         // value
+        try to.store(uint: n, bits: k) // length
     } else if k < n { // long mode '10'
-        try to.write(bits: 1, 0)       // header
-        try to.write(uint: n, bits: k) // length
-        try to.write(bits: src)        // the string itself
+        try to.store(bits: 1, 0)       // header
+        try to.store(uint: n, bits: k) // length
+        try to.store(bits: src)        // the string itself
     } else { // short mode '0'
-        try to.write(bit: 0)     // header
+        try to.store(bit: 0)     // header
         try to.store(Unary(n))        // unary length prefix: 1{n}0
-        try to.write(bits: src)  // the string itself
+        try to.store(bits: src)  // the string itself
     }
 }
 

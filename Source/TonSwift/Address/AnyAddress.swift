@@ -67,7 +67,7 @@ extension AnyAddress: CellCodable {
     func storeTo(builder: Builder) throws {
         switch self {
         case .none:
-            try builder.write(uint: UInt64(0), bits: 2)
+            try builder.store(uint: UInt64(0), bits: 2)
             break
         case .internalAddr(let addr):
             try addr.storeTo(builder: builder)

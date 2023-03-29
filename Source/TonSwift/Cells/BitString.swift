@@ -56,7 +56,7 @@ public struct BitString: Hashable {
     
     /// Constructs BitString from a binary string of 1s and 0s.
     public init(binaryString: String) throws {
-        let cell = try Builder().write(binaryString: binaryString).endCell()
+        let cell = try Builder().store(binaryString: binaryString).endCell()
         self = cell.bits
     }
     
@@ -196,23 +196,23 @@ public struct BitString: Hashable {
     public func padLeft(_ n: Int = 0) -> BitString {
         let b = Builder(capacity: max(n, self.length))
         for _ in self.length..<n {
-            try! b.write(bit: 0)
+            try! b.store(bit: 0)
         }
-        try! b.write(bits: self)
+        try! b.store(bits: self)
         return try! b.endCell().bits
     }
     
     /// Pads bitstring with `10*` bits.
     public func bitsToPaddedBuffer() -> Data {
         let builder = Builder(capacity: (self.length + 7) / 8 * 8)
-        try! builder.write(bits: self)
+        try! builder.store(bits: self)
 
         let padding = (self.length + 7) / 8 * 8 - self.length
         for i in 0..<padding {
             if i == 0 {
-                try! builder.write(bit: true)
+                try! builder.store(bit: true)
             } else {
-                try! builder.write(bit: false)
+                try! builder.store(bit: false)
             }
         }
         

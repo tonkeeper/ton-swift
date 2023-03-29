@@ -117,29 +117,29 @@ public enum CommonMessageInfo: CellCodable {
     public func storeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
-            try builder.write(bit: false)
-            try builder.write(bit: info.ihrDisabled)
-            try builder.write(bit: info.bounce)
-            try builder.write(bit: info.bounced)
+            try builder.store(bit: false)
+            try builder.store(bit: info.ihrDisabled)
+            try builder.store(bit: info.bounce)
+            try builder.store(bit: info.bounced)
             try builder.store(AnyAddress(info.src))
             try builder.store(AnyAddress(info.dest))
             try builder.store(info.value)
             try builder.storeCoins(info.ihrFee)
             try builder.storeCoins(info.forwardFee)
-            try builder.write(uint: info.createdLt, bits: 64)
-            try builder.write(uint: UInt64(info.createdAt), bits: 32)
+            try builder.store(uint: info.createdLt, bits: 64)
+            try builder.store(uint: UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
-            try builder.write(bit: true)
-            try builder.write(bit: true)
+            try builder.store(bit: true)
+            try builder.store(bit: true)
             try builder.store(AnyAddress(info.src))
             try builder.store(AnyAddress(info.dest))
-            try builder.write(uint: info.createdLt, bits: 64)
-            try builder.write(uint: UInt64(info.createdAt), bits: 32)
+            try builder.store(uint: info.createdLt, bits: 64)
+            try builder.store(uint: UInt64(info.createdAt), bits: 32)
             
         case .externalInInfo(let info):
-            try builder.write(bit: true)
-            try builder.write(bit: false)
+            try builder.store(bit: true)
+            try builder.store(bit: false)
             try builder.store(AnyAddress(info.src))
             try builder.store(AnyAddress(info.dest))
             try builder.storeCoins(info.importFee)

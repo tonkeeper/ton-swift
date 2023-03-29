@@ -82,10 +82,10 @@ extension Address: CellCodable, StaticSize {
     public static var bitWidth: Int = 267
     
     public func storeTo(builder b: Builder) throws {
-        try b.write(uint: 2, bits: 2) // $10
-        try b.write(uint: 0, bits: 1)
-        try b.write(int: self.workchain, bits: 8)
-        try b.write(data: self.hash)
+        try b.store(uint: 2, bits: 2) // $10
+        try b.store(uint: 0, bits: 1)
+        try b.store(int: self.workchain, bits: 8)
+        try b.store(data: self.hash)
     }
     
     public static func loadFrom(slice: Slice) throws -> Address {

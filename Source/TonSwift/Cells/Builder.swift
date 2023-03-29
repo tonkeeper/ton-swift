@@ -24,7 +24,7 @@ public class Builder {
     
     public convenience init(_ bits: BitString) throws {
         self.init()
-        try self.write(bits: bits)
+        try self.store(bits: bits)
     }
     
     private init(capacity: Int, buffer: Data, length: Int, refs: [Cell]) {
@@ -136,10 +136,10 @@ public class Builder {
     @discardableResult
     public func storeMaybe(_ object: CellCodable?) throws -> Self {
         if let object = object {
-            try write(bit: true)
+            try store(bit: true)
             try store(object)
         } else {
-            try write(bit: false)
+            try store(bit: false)
         }
         
         return self
@@ -174,23 +174,23 @@ public class Builder {
      - returns this builder
      */
     @discardableResult
-    public func storeMaybeRef(_ cell: Cell?) throws -> Self {
+    public func storeMaybe(ref cell: Cell?) throws -> Self {
         if let cell = cell {
-            try write(bit: true)
+            try store(bit: true)
             try store(ref: cell)
         } else {
-            try write(bit: false)
+            try store(bit: false)
         }
         
         return self
     }
     @discardableResult
-    public func storeMaybeRef(_ builder: Builder?) throws -> Self {
+    public func storeMaybe(ref builder: Builder?) throws -> Self {
         if let builder = builder {
-            try write(bit: true)
+            try store(bit: true)
             try store(ref: builder)
         } else {
-            try write(bit: false)
+            try store(bit: false)
         }
         
         return self
@@ -204,7 +204,7 @@ public class Builder {
     public func storeSlice(src: Slice) throws -> Self {
         let c = src.clone()
         if c.remainingBits > 0 {
-            try write(bits: c.loadBits(c.remainingBits))
+            try store(bits: c.loadBits(c.remainingBits))
         }
         while c.remainingRefs > 0 {
             try store(ref: c.loadRef())
@@ -219,10 +219,10 @@ public class Builder {
      */
     public func storeMaybeSlice(src: Slice?) throws {
         if let src = src {
-            try write(bit: true)
+            try store(bit: true)
             try storeSlice(src: src)
         } else {
-            try write(bit: false)
+            try store(bit: false)
         }
     }
     
@@ -251,7 +251,7 @@ public class Builder {
 
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     @discardableResult
-    public func write(bit: Int) throws -> Self {
+    public func store(bit: Int) throws -> Self {
         try checkCapacity(1)
         
         if bit > 0 {
@@ -264,22 +264,22 @@ public class Builder {
     
     /// Writes bit as a boolean (true => 1, false => 0)
     @discardableResult
-    public func write(bit: Bool) throws -> Self {
-        return try write(bit: bit ? 1 : 0)
+    public func store(bit: Bool) throws -> Self {
+        return try store(bit: bit ? 1 : 0)
     }
     
     /// Writes bits from a bitstring
     @discardableResult
-    public func write(bits: BitString) throws -> Self {
+    public func store(bits: BitString) throws -> Self {
         for i in 0..<bits.length {
-            try write(bit: bits.at(i))
+            try store(bit: bits.at(i))
         }
         return self
     }
 
     /// Writes bits from a literal sequence of numbers
     @discardableResult
-    public func write(bits: Int...) throws -> Self {
+    public func store(bits: Int...) throws -> Self {
         try checkCapacity(bits.count)
         for bit in bits {
             if bit > 0 {
@@ -292,19 +292,19 @@ public class Builder {
 
     /// Writes bits from a textual string of binary digits
     @discardableResult
-    public func write(binaryString: String) throws -> Self {
+    public func store(binaryString: String) throws -> Self {
         for s in binaryString {
             if s != "0" && s != "1" {
                 throw TonError.custom("Bitstring must contain only 0s and 1s. Invalid character: \(s)")
             }
-            try write(bit: s == "1" ? 1 : 0)
+            try store(bit: s == "1" ? 1 : 0)
         }
         return self
     }
 
     /// Writes bytes from the src data.
     @discardableResult
-    func write(data: Data) throws -> Self {
+    func store(data: Data) throws -> Self {
         try checkCapacity(data.count*8)
         
         // Special case for aligned offsets
@@ -315,7 +315,7 @@ public class Builder {
             _length += data.count * 8
         } else {
             for i in 0..<data.count {
-                try write(uint: data[i], bits: 8)
+                try store(uint: data[i], bits: 8)
             }
         }
         return self
@@ -335,12 +335,12 @@ public class Builder {
     - parameter bits: number of bits to write
     */
     @discardableResult
-    public func write<T>(uint value: T, bits: Int) throws -> Self where T: BinaryInteger {
-        return try write(biguint: BigUInt(value), bits: bits)
+    public func store<T>(uint value: T, bits: Int) throws -> Self where T: BinaryInteger {
+        return try store(biguint: BigUInt(value), bits: bits)
     }
     
     @discardableResult
-    public func write(biguint value: BigUInt, bits: Int) throws -> Self {
+    public func store(biguint value: BigUInt, bits: Int) throws -> Self {
         try checkCapacity(bits)
         
         // Special cases when our buffer is aligned
@@ -401,9 +401,9 @@ public class Builder {
         for i in 0..<bits {
             let off = bits - i - 1
             if (off < b.count) {
-                try write(bit: b[off])
+                try store(bit: b[off])
             } else {
-                try write(bit: false)
+                try store(bit: false)
             }
         }
         return self
@@ -411,12 +411,12 @@ public class Builder {
     
     
     @discardableResult
-    func write(int value: any BinaryInteger, bits: Int) throws -> Self {
-        return try write(bigint: BigInt(value), bits: bits)
+    func store(int value: any BinaryInteger, bits: Int) throws -> Self {
+        return try store(bigint: BigInt(value), bits: bits)
     }
         
     @discardableResult
-    func write(bigint value: BigInt, bits: Int) throws -> Self {
+    func store(bigint value: BigInt, bits: Int) throws -> Self {
         var v = value
         if bits < 0 {
             throw TonError.custom("Invalid bit length. Got \(bits)")
@@ -434,7 +434,7 @@ public class Builder {
             if v != -1 && v != 0 {
                 throw TonError.custom("Value is not zero or -1 for \(bits) bits. Got \(v)")
             } else {
-                try write(bit: v == -1)
+                try store(bit: v == -1)
                 return self
             }
         }
@@ -445,13 +445,13 @@ public class Builder {
         }
         
         if v < 0 {
-            try write(bit: true)
+            try store(bit: true)
             v = (1 << (bits - 1)) + v
         } else {
-            try write(bit: false)
+            try store(bit: false)
         }
         
-        try write(uint: v, bits: bits - 1)
+        try store(uint: v, bits: bits - 1)
         return self
     }
 
@@ -463,23 +463,23 @@ public class Builder {
      TODO: replace with TL-B compatible definition where we specify upper bound in bytes and verify actual bounds of the incoming number
     */
     @discardableResult
-    func writeVarUint(value: UInt64, bits: Int) throws -> Self {
-        return try writeVarUint(value: BigUInt(value), bits: bits)
+    func store(varuint: UInt64, prefixSize: Int) throws -> Self {
+        return try store(varuint: BigUInt(varuint), prefixSize: prefixSize)
     }
     @discardableResult
-    func writeVarUint(value: BigUInt, bits: Int) throws -> Self {
-        let v = BigUInt(value)
-        if bits < 0 {
-            throw TonError.custom("Invalid bit length. Got \(bits)")
+    func store(varuint: BigUInt, prefixSize: Int) throws -> Self {
+        let v = BigUInt(varuint)
+        if prefixSize < 0 {
+            throw TonError.custom("Invalid bit length. Got \(prefixSize)")
         }
         if v < 0 {
-            throw TonError.custom("Value is negative. Got \(value)")
+            throw TonError.custom("Value is negative. Got \(varuint)")
         }
 
         // Corner case for zero
         if v == 0 {
             // Write zero size
-            try write(uint: 0, bits: bits)
+            try store(uint: 0, bits: prefixSize)
             return self
         }
 
@@ -488,10 +488,10 @@ public class Builder {
         let sizeBits = sizeBytes * 8
 
         // Write size
-        try write(uint: sizeBytes, bits: bits)
+        try store(uint: sizeBytes, bits: prefixSize)
 
         // Write number
-        try write(uint: v, bits: sizeBits)
+        try store(uint: v, bits: sizeBits)
         
         return self
     }

@@ -9,8 +9,8 @@ final class BuilderTest: XCTestCase {
             let a = UInt64.random(in: 0..<10000000)
             let b = UInt64.random(in: 0..<10000000)
             let builder = Builder()
-            try builder.write(uint: a, bits: 48)
-            try builder.write(uint: b, bits: 48)
+            try builder.store(uint: a, bits: 48)
+            try builder.store(uint: b, bits: 48)
             
             let bits = builder.bitstring()
             let reader = Slice(bits: bits)

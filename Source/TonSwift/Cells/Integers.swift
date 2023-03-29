@@ -11,9 +11,9 @@ public struct Unary: CellCodable {
     
     public func storeTo(builder: Builder) throws {
         for _ in 0..<value {
-            try builder.write(bit: true)
+            try builder.store(bit: true)
         }
-        try builder.write(bit: false)
+        try builder.store(bit: false)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -29,7 +29,7 @@ extension Bool: CellCodable, StaticSize {
     public static var bitWidth: Int = 1
         
     public func storeTo(builder: Builder) throws {
-        try builder.write(bit: self)
+        try builder.store(bit: self)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -48,7 +48,7 @@ public struct UInt256: Hashable, CellCodable, StaticSize {
     }
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(uint: value, bits: Self.bitWidth)
+        try builder.store(uint: value, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -62,7 +62,7 @@ extension UInt8: CellCodable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(uint: self, bits: Self.bitWidth)
+        try builder.store(uint: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -74,7 +74,7 @@ extension UInt16: CellCodable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(uint: self, bits: Self.bitWidth)
+        try builder.store(uint: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -86,7 +86,7 @@ extension UInt32: CellCodable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(uint: self, bits: Self.bitWidth)
+        try builder.store(uint: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -98,7 +98,7 @@ extension UInt64: CellCodable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(uint: self, bits: Self.bitWidth)
+        try builder.store(uint: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -112,7 +112,7 @@ extension Int8: CellCodable, StaticSize {
     public static var bitWidth: Int = 8
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(int: self, bits: Self.bitWidth)
+        try builder.store(int: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -124,7 +124,7 @@ extension Int16: CellCodable, StaticSize {
     public static var bitWidth: Int = 16
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(int: self, bits: Self.bitWidth)
+        try builder.store(int: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -136,7 +136,7 @@ extension Int32: CellCodable, StaticSize {
     public static var bitWidth: Int = 32
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(int: self, bits: Self.bitWidth)
+        try builder.store(int: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -148,7 +148,7 @@ extension Int64: CellCodable, StaticSize {
     public static var bitWidth: Int = 64
     
     public func storeTo(builder: Builder) throws {
-        try builder.write(int: self, bits: Self.bitWidth)
+        try builder.store(int: self, bits: Self.bitWidth)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
@@ -166,7 +166,7 @@ extension Int64: CellCodable, StaticSize {
 public struct VarUInt248: Hashable, CellCodable {
     public var value: BigUInt
     public func storeTo(builder: Builder) throws {
-        try builder.writeVarUint(value: value, bits: 5)
+        try builder.store(varuint: value, prefixSize: 5)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.loadVarUintBig(bits: 5))
@@ -177,7 +177,7 @@ public struct VarUInt248: Hashable, CellCodable {
 public struct VarUInt120: Hashable, CellCodable {
     public var value: BigUInt
     public func storeTo(builder: Builder) throws {
-        try builder.writeVarUint(value: value, bits: 4)
+        try builder.store(varuint: value, prefixSize: 4)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
         return Self(value: try slice.loadVarUintBig(bits: 4))
@@ -194,7 +194,7 @@ public struct IntCoder: TypeCoder {
     }
     
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try builder.write(int: src, bits: bits)
+        try builder.store(int: src, bits: bits)
     }
     
     public func loadValue(from src: Slice) throws -> T {
@@ -212,7 +212,7 @@ public struct UIntCoder: TypeCoder {
     }
     
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try builder.write(uint: src, bits: bits)
+        try builder.store(uint: src, bits: bits)
     }
     
     public func loadValue(from src: Slice) throws -> T {
@@ -238,7 +238,7 @@ public struct VarUIntCoder: TypeCoder {
     }
     
     public func storeValue(_ src: T, to builder: Builder) throws {
-        try builder.writeVarUint(value: src, bits: prefixbits)
+        try builder.store(varuint: src, prefixSize: prefixbits)
     }
     
     public func loadValue(from src: Slice) throws -> T {

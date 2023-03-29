@@ -157,12 +157,12 @@ func writeCellToBuilder(cell: Cell, refs: [UInt64], sizeBytes: Int, to: Builder)
     let d1 = getRefsDescriptor(refs: cell.refs, level: cell.level, type: cell.type)
     let d2 = getBitsDescriptor(bits: cell.bits)
     
-    try to.write(uint: d1, bits: 8)
-    try to.write(uint: d2, bits: 8)
-    try to.write(data: cell.bits.bitsToPaddedBuffer())
+    try to.store(uint: d1, bits: 8)
+    try to.store(uint: d2, bits: 8)
+    try to.store(data: cell.bits.bitsToPaddedBuffer())
     
     for r in refs {
-        try to.write(uint: r, bits: sizeBytes * 8)
+        try to.store(uint: r, bits: sizeBytes * 8)
     }
     
     return to
@@ -202,22 +202,22 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
 
     // Serialize
     var builder = Builder(capacity: totalSize)
-    try builder.write(uint: 0xb5ee9c72, bits: 32) // Magic
-    try builder.write(bit: hasIdx) // Has index
-    try builder.write(bit: hasCrc32c) // Has crc32c
-    try builder.write(bit: hasCacheBits) // Has cache bits
-    try builder.write(uint: flags, bits: 2) // Flags
-    try builder.write(uint: sizeBytes, bits: 3) // Size bytes
-    try builder.write(uint: offsetBytes, bits: 8) // Offset bytes
-    try builder.write(uint: cellsNum, bits: sizeBytes * 8) // Cells num
-    try builder.write(uint: 1, bits: sizeBytes * 8) // Roots num
-    try builder.write(uint: 0, bits: sizeBytes * 8) // Absent num
-    try builder.write(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
-    try builder.write(uint: 0, bits: sizeBytes * 8) // Root id == 0
+    try builder.store(uint: 0xb5ee9c72, bits: 32) // Magic
+    try builder.store(bit: hasIdx) // Has index
+    try builder.store(bit: hasCrc32c) // Has crc32c
+    try builder.store(bit: hasCacheBits) // Has cache bits
+    try builder.store(uint: flags, bits: 2) // Flags
+    try builder.store(uint: sizeBytes, bits: 3) // Size bytes
+    try builder.store(uint: offsetBytes, bits: 8) // Offset bytes
+    try builder.store(uint: cellsNum, bits: sizeBytes * 8) // Cells num
+    try builder.store(uint: 1, bits: sizeBytes * 8) // Roots num
+    try builder.store(uint: 0, bits: sizeBytes * 8) // Absent num
+    try builder.store(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
+    try builder.store(uint: 0, bits: sizeBytes * 8) // Root id == 0
 
     if hasIdx {
         for i in 0 ..< cellsNum {
-            try builder.write(uint: index[i], bits: offsetBytes * 8)
+            try builder.store(uint: index[i], bits: offsetBytes * 8)
         }
     }
 
@@ -232,7 +232,7 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
 
     if hasCrc32c {
         let crc32 = (try builder.alignedBitstring()).crc32c()
-        try builder.write(data: crc32)
+        try builder.store(data: crc32)
     }
 
     let res = try builder.alignedBitstring()

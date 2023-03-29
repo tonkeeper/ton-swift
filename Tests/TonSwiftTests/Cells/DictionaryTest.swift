@@ -114,12 +114,12 @@ final class DictionaryTest: XCTestCase {
     // Helpers
     
     func storeBits(builder: Builder, src: String) throws -> Builder {
-        try builder.write(binaryString: src)
+        try builder.store(binaryString: src)
         return builder
     }
     
     func int2bits(_ i: Int, bits: Int = 16) -> BitString {
-        return try! Builder().write(int: i, bits: bits).bitstring()
+        return try! Builder().store(int: i, bits: bits).bitstring()
     }
     
     func b(_ s: String) -> BitString {
@@ -128,7 +128,7 @@ final class DictionaryTest: XCTestCase {
     
     private func builderFrom(_ src: String) throws -> Builder {
         let b = Builder()
-        try b.write(binaryString: src)
+        try b.store(binaryString: src)
         return b
     }
     
