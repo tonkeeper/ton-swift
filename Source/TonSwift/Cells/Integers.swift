@@ -193,11 +193,11 @@ public struct IntCoder: TypeCoder {
         self.bits = bits
     }
     
-    public func serialize(src: T, builder: Builder) throws {
+    public func storeValue(_ src: T, to builder: Builder) throws {
         try builder.write(int: src, bits: bits)
     }
     
-    public func parse(src: Slice) throws -> T {
+    public func loadValue(from src: Slice) throws -> T {
         return try src.loadIntBig(bits: bits)
     }
 }
@@ -211,11 +211,11 @@ public struct UIntCoder: TypeCoder {
         self.bits = bits
     }
     
-    public func serialize(src: T, builder: Builder) throws {
+    public func storeValue(_ src: T, to builder: Builder) throws {
         try builder.write(uint: src, bits: bits)
     }
     
-    public func parse(src: Slice) throws -> T {
+    public func loadValue(from src: Slice) throws -> T {
         return try src.loadUintBig(bits: bits)
     }
 }
@@ -237,11 +237,11 @@ public struct VarUIntCoder: TypeCoder {
         self.prefixbits = prefixbits
     }
     
-    public func serialize(src: T, builder: Builder) throws {
+    public func storeValue(_ src: T, to builder: Builder) throws {
         try builder.writeVarUint(value: src, bits: prefixbits)
     }
     
-    public func parse(src: Slice) throws -> T {
+    public func loadValue(from src: Slice) throws -> T {
         return try src.loadVarUintBig(bits: prefixbits)
     }
 }

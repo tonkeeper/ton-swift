@@ -96,7 +96,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         var paddedMap: [BitString: V.T] = [:]
         for (k, v) in map {
             let b = Builder()
-            try keyCoder.serialize(src: k, builder: b)
+            try keyCoder.storeValue(k, to: b)
             let keybits = b.bitstring()
             let paddedKey = keybits.padLeft(keyLength)
             paddedMap[paddedKey] = v
@@ -137,8 +137,8 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         // parse the value and store it in the dictionary.
         if n - pfxlen == 0 {
             let fullkey = prefix.bitstring()
-            let parsedKey = try keyCoder.parse(src: Cell(bits: fullkey).beginParse())
-            result[parsedKey] = try valueCoder.parse(src: slice)
+            let parsedKey = try keyCoder.loadValue(from: Cell(bits: fullkey).beginParse())
+            result[parsedKey] = try valueCoder.loadValue(from: slice)
         } else {
             // We have to drill down the tree
             let left = try slice.loadRef()
@@ -315,7 +315,7 @@ func writeNode<T, V>(src: Node<T>, keyLength: Int, valueCoder: V, to builder: Bu
         try builder.storeRef(cell: rightCell)
         
     case .leaf(let value):
-        try valueCoder.serialize(src: value, builder: builder)
+        try valueCoder.storeValue(value, to: builder)
     }
 }
 

@@ -16,8 +16,8 @@ public protocol StaticSize {
 /// This protocol allows implement dependent types because the exact instance would have runtime parameter such as bitlength for the values of this type.
 public protocol TypeCoder {
     associatedtype T
-    func serialize(src: T, builder: Builder) throws
-    func parse(src: Slice) throws -> T
+    func storeValue(_ src: T, to builder: Builder) throws
+    func loadValue(from src: Slice) throws -> T
 }
 
 extension CellCodable {
@@ -28,10 +28,10 @@ extension CellCodable {
 
 public class DefaultCoder<X: CellCodable>: TypeCoder {
     public typealias T = X
-    public func serialize(src: T, builder: Builder) throws {
+    public func storeValue(_ src: T, to builder: Builder) throws {
         try src.writeTo(builder: builder)
     }
-    public func parse(src: Slice) throws -> T {
+    public func loadValue(from src: Slice) throws -> T {
         return try T.readFrom(slice: src)
     }
 }
@@ -40,7 +40,7 @@ public extension TypeCoder {
     /// Serializes type to Cell
     func serializeToCell(_ src: T) throws -> Cell {
         let b = Builder()
-        try serialize(src: src, builder: b)
+        try storeValue(src, to: b)
         return try b.endCell()
     }
 }
@@ -54,10 +54,10 @@ public class BytesCoder: TypeCoder {
         self.size = size
     }
     
-    public func serialize(src: T, builder: Builder) throws {
+    public func storeValue(_ src: T, to builder: Builder) throws {
         try builder.write(data: src)
     }
-    public func parse(src: Slice) throws -> T {
+    public func loadValue(from src: Slice) throws -> T {
         return try src.loadBytes(self.size)
     }
 }
