@@ -47,7 +47,7 @@ public final class WalletContractV3: WalletContract {
             throw TonError.custom("Maximum number of messages in a single transfer is 4")
         }
         
-        let signingMessage = try Builder().store(uint: args.seqno, bits: 32)
+        let signingMessage = try Builder().store(uint: walletId, bits: 32)
         if args.seqno == 0 {
             for _ in 0..<32 {
                 try signingMessage.store(bit: 1)
@@ -57,6 +57,7 @@ public final class WalletContractV3: WalletContract {
             try signingMessage.store(uint: args.timeout ?? defaultTimeout, bits: 32)
         }
         
+        try signingMessage.store(uint: args.seqno, bits: 32)
         for message in args.messages {
             try signingMessage.store(uint: UInt64(args.sendMode.rawValue), bits: 8)
             try signingMessage.store(ref: try Builder().store(message))
