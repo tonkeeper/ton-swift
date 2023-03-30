@@ -52,7 +52,7 @@ final class WalletContractV2Test: XCTestCase {
                     textPayload: "Hello, world!"
                 )
             ],
-            sendMode: .walletDefault(),
+            sendMode: SendMode(payMsgFees: true),
             timeout: 1680176383
         )
     }
