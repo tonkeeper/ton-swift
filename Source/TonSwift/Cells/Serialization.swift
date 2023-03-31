@@ -94,3 +94,13 @@ extension Builder: CellCodable {
         return try slice.clone().toBuilder() as! Self
     }
 }
+
+/// Empty struct to store empty leafs in the dictionaries to form sets.
+public struct Empty: CellCodable {
+    public static func loadFrom(slice: Slice) throws -> Self {
+        return Empty()
+    }
+    public func storeTo(builder: Builder) throws {
+        // store nothing
+    }
+}

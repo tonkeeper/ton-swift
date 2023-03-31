@@ -239,7 +239,7 @@ public class Builder {
     
     @discardableResult
     public func store(dictRoot dict: any CellCodableDictionary) throws -> Self {
-        try dict.writeRootTo(builder: self)
+        try dict.storeRootTo(builder: self)
         return self
     }
     

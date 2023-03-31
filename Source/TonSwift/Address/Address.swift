@@ -109,3 +109,27 @@ extension Address: CellCodable, StaticSize {
         }
     }
 }
+
+/// The most compact address encoding that's often used within smart contracts: workchain + hash.
+public struct CompactAddress: Hashable, CellCodable, StaticSize {
+    public static var bitWidth: Int = 8 + 256
+    public let inner: Address
+    
+    init(_ inner: Address) {
+        self.inner = inner
+    }
+    
+    public func storeTo(builder b: Builder) throws {
+        try b.store(int: inner.workchain, bits: 8)
+        try b.store(data: inner.hash)
+    }
+    
+    public static func loadFrom(slice: Slice) throws -> CompactAddress {
+        return try slice.tryLoad { s in
+            let wc = Int8(try s.loadInt(bits: 8))
+            let hash = try s.loadBytes(32)
+            return CompactAddress(Address(workchain: wc, hash: hash))
+        }
+    }
+}
+

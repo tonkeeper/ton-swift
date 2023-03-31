@@ -185,7 +185,7 @@ public class Slice {
 
     /// Reads the non-empty dictionary root directly from this slice.
     public func loadDictRoot<T>() throws -> T where T: CellCodableDictionary {
-        return try T.readRootFrom(slice: self)
+        return try T.loadRootFrom(slice: self)
     }
 
     

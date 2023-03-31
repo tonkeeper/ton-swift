@@ -3,11 +3,8 @@ import Foundation
 /// Type of a standard dictionary where keys have a statically known length.
 /// To work with dynamically known key lengths, use `DictionaryCoder` to load and store dictionaries.
 public protocol CellCodableDictionary: CellCodable {
-    associatedtype Key: CellCodable & StaticSize
-    associatedtype Value: CellCodable
-    
-    func writeRootTo(builder: Builder) throws
-    static func readRootFrom(slice: Slice) throws -> Self
+    func storeRootTo(builder: Builder) throws
+    static func loadRootFrom(slice: Slice) throws -> Self
 }
 
 extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: CellCodable {
@@ -21,14 +18,38 @@ extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: Ce
 
 extension Dictionary: CellCodableDictionary where Key: CellCodable & StaticSize, Value: CellCodable {
     
-    public func writeRootTo(builder: Builder) throws {
+    public func storeRootTo(builder: Builder) throws {
         try DictionaryCoder.default().storeRoot(map: self, builder: builder)
     }
     
-    public static func readRootFrom(slice: Slice) throws -> Self {
+    public static func loadRootFrom(slice: Slice) throws -> Self {
         return try DictionaryCoder.default().loadRoot(slice)
     }
 }
+
+extension Set: CellCodable where Element: CellCodable & StaticSize {
+    public static func loadFrom(slice: Slice) throws -> Self {
+        let dict: [Element: Empty] = try DictionaryCoder.default().load(slice)
+        return Set(dict.keys)
+    }
+    public func storeTo(builder: Builder) throws {
+        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: self.map { k in (k, Empty()) })
+        try DictionaryCoder.default().store(map: dict, builder: builder)
+    }
+}
+
+extension Set: CellCodableDictionary where Element: CellCodable & StaticSize {
+    public static func loadRootFrom(slice: Slice) throws -> Self {
+        let dict: [Element: Empty] = try DictionaryCoder.default().loadRoot(slice)
+        return Set(dict.keys)
+    }
+    public func storeRootTo(builder: Builder) throws {
+        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: self.map { k in (k, Empty()) })
+        try DictionaryCoder.default().storeRoot(map: dict, builder: builder)
+    }
+}
+
+
 
 /// Coder for the dictionaries that stores the coding rules for keys and values.
 /// Use this explicit API when working with dynamically-sized dictionary keys.
