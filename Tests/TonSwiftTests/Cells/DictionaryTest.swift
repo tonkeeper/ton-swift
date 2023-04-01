@@ -118,12 +118,12 @@ final class DictionaryTest: XCTestCase {
         return builder
     }
     
-    func int2bits(_ i: Int, bits: Int = 16) -> BitString {
+    func int2bits(_ i: Int, bits: Int = 16) -> Bitstring {
         return try! Builder().store(int: i, bits: bits).bitstring()
     }
     
-    func b(_ s: String) -> BitString {
-        return try! BitString(binaryString: s)
+    func b(_ s: String) -> Bitstring {
+        return try! Bitstring(binaryString: s)
     }
     
     private func builderFrom(_ src: String) throws -> Builder {

@@ -22,7 +22,7 @@ public class Builder {
         self.refs = []
     }
     
-    public convenience init(_ bits: BitString) throws {
+    public convenience init(_ bits: Bitstring) throws {
         self.init()
         try self.store(bits: bits)
     }
@@ -45,7 +45,7 @@ public class Builder {
     
     /// Completes cell
     public func endCell() throws -> Cell {
-        let bits = BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+        let bits = Bitstring(data: _buffer, unchecked:(offset: 0, length: _length))
         return try Cell(bits: bits, refs: refs)
     }
     
@@ -55,8 +55,8 @@ public class Builder {
     }
 
     /// Converts builder into BitString
-    public func bitstring() -> BitString {
-        return BitString(data: _buffer, unchecked:(offset: 0, length: _length))
+    public func bitstring() -> Bitstring {
+        return Bitstring(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
     /// Converts to data if the bitstring contains a whole number of bytes.
@@ -270,7 +270,7 @@ public class Builder {
     
     /// Writes bits from a bitstring
     @discardableResult
-    public func store(bits: BitString) throws -> Self {
+    public func store(bits: Bitstring) throws -> Self {
         for i in 0..<bits.length {
             try store(bit: bits.at(i))
         }

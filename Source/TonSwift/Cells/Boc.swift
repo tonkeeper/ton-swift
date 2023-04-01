@@ -83,12 +83,12 @@ func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
     return UInt8(refs.count) + typeFactor * 8 + UInt8(level) * 32
 }
 
-func getBitsDescriptor(bits: BitString) -> UInt8 {
+func getBitsDescriptor(bits: Bitstring) -> UInt8 {
     let len = bits.length
     return UInt8(ceil(Double(len) / 8) + floor(Double(len) / 8))
 }
 
-func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: BitString, refs: [UInt64]) {
+func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: Bitstring, refs: [UInt64]) {
     let d1 = try reader.loadUint(bits: 8)
     let refsCount = d1 % 8
     let exotic = d1 & 8 != 0
@@ -97,7 +97,7 @@ func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: BitS
     let dataBytesize = Int(ceil(Double(d2) / 2.0))
     let paddingAdded = d2 % 2 != 0
     
-    var bits = BitString.empty
+    var bits = Bitstring.empty
     if dataBytesize > 0 {
         if paddingAdded {
             bits = try reader.loadPaddedBits(bits: dataBytesize * 8)
@@ -122,7 +122,7 @@ func deserializeBoc(src: Data) throws -> [Cell] {
     let boc = try Boc(data: src)
     let reader = Slice(data: boc.cellData)
     
-    var cells: [(bits: BitString, refs: [UInt64], exotic: Bool, result: Cell?)] = []
+    var cells: [(bits: Bitstring, refs: [UInt64], exotic: Bool, result: Cell?)] = []
     for _ in 0..<boc.cells {
         let cell = try readCell(reader: reader, sizeBytes: boc.size)
         cells.append((cell.bits, cell.refs, cell.exotic, nil))

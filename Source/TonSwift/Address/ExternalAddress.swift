@@ -5,9 +5,9 @@ import Foundation
 /// addr_extern$01 len:(## 9) external_address:(bits len) = MsgAddressExt;
 /// ```
 public struct ExternalAddress {
-    private(set) var value: BitString
+    private(set) var value: Bitstring
 
-    public init(value: BitString) {
+    public init(value: Bitstring) {
         self.value = value
     }
 
@@ -16,7 +16,7 @@ public struct ExternalAddress {
     }
     
     public static func mock(seed: String) throws -> Self {
-        let value = BitString(data: Data(seed.utf8).sha256())
+        let value = Bitstring(data: Data(seed.utf8).sha256())
         return ExternalAddress(value: value)
     }
 }

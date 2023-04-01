@@ -1,8 +1,8 @@
 import Foundation
 
-public struct BitString: Hashable {
+public struct Bitstring: Hashable {
     
-    public static let empty = BitString(data: .init(), unchecked: (offset: 0, length: 0))
+    public static let empty = Bitstring(data: .init(), unchecked: (offset: 0, length: 0))
     
     private let _offset: Int
     private let _length: Int
@@ -111,15 +111,15 @@ public struct BitString: Hashable {
      - parameter length: length of the bitstring in bits
      - returns substring of bitstring
      */
-    public func substring(offset: Int, length: Int) throws -> BitString {
+    public func substring(offset: Int, length: Int) throws -> Bitstring {
         // Corner case of empty string
         if length == 0 && offset == _length {
-            return BitString.empty
+            return Bitstring.empty
         }
         
         try checkOffset(offset: offset, length: length)
         
-        return BitString(data: _data, unchecked:(offset: _offset + offset, length: length))
+        return Bitstring(data: _data, unchecked:(offset: _offset + offset, length: length))
     }
     
     /// Returns a byte-aligned substring given the `offset` and `length` in bits (same as in `substring` method).
@@ -148,7 +148,7 @@ public struct BitString: Hashable {
     }
     
     /// Drops first `n` bits from the bitstring.
-    public func dropFirst(_ n: Int) throws -> BitString {
+    public func dropFirst(_ n: Int) throws -> Bitstring {
         return try substring(offset: n, length: self.length - n)
     }
     
@@ -193,7 +193,7 @@ public struct BitString: Hashable {
         }
     }
     
-    public func padLeft(_ n: Int = 0) -> BitString {
+    public func padLeft(_ n: Int = 0) -> Bitstring {
         let b = Builder(capacity: max(n, self.length))
         for _ in self.length..<n {
             try! b.store(bit: 0)
@@ -221,7 +221,7 @@ public struct BitString: Hashable {
 }
 
 /// Bitstring implements lexicographic comparison.
-extension BitString: Comparable {
+extension Bitstring: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         for i in 0..<min(lhs.length, rhs.length) {
             let l = lhs.at(unchecked: i)
@@ -233,7 +233,7 @@ extension BitString: Comparable {
     }
 }
 
-extension BitString: Equatable {
+extension Bitstring: Equatable {
     
     /**
      Checks for equality
@@ -241,7 +241,7 @@ extension BitString: Equatable {
     - parameter rhs: bitstring
     - returns true if the bitstrings are equal, false otherwise
      */
-    public static func == (lhs: BitString, rhs: BitString) -> Bool {
+    public static func == (lhs: Bitstring, rhs: Bitstring) -> Bool {
         if lhs._length != rhs._length {
             return false
         }

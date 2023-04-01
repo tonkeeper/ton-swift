@@ -5,7 +5,7 @@ final class BitStringTest: XCTestCase {
 
     func testBitString() throws {
         // should read bits
-        let bs = BitString(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
+        let bs = Bitstring(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
         XCTAssertTrue(try bs.at(0))
         XCTAssertFalse(try bs.at(1))
         XCTAssertTrue(try bs.at(2))
@@ -17,9 +17,9 @@ final class BitStringTest: XCTestCase {
         XCTAssertEqual(bs.toString(), "AA")
         
         // should equals
-        let a = BitString(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
-        let b = BitString(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
-        let c = BitString(data: Data([0, 0b10101010]), unchecked:(offset: 8, length: 8))
+        let a = Bitstring(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
+        let b = Bitstring(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
+        let c = Bitstring(data: Data([0, 0b10101010]), unchecked:(offset: 8, length: 8))
         XCTAssertEqual(a, b)
         XCTAssertEqual(b, a)
         XCTAssertEqual(a, c)
@@ -29,15 +29,15 @@ final class BitStringTest: XCTestCase {
         XCTAssertEqual(c.toString(), "AA")
         
         // should format strings
-        XCTAssertEqual(try BitString(data: Data([0b00000000]), offset: 0, length: 1).toString(), "4_")
-        XCTAssertEqual(try BitString(data: Data([0b10000000]), offset: 0, length: 1).toString(), "C_")
-        XCTAssertEqual(try BitString(data: Data([0b11000000]), offset: 0, length: 2).toString(), "E_")
-        XCTAssertEqual(try BitString(data: Data([0b11100000]), offset: 0, length: 3).toString(), "F_")
-        XCTAssertEqual(try BitString(data: Data([0b11100000]), offset: 0, length: 4).toString(), "E")
-        XCTAssertEqual(try BitString(data: Data([0b11101000]), offset: 0, length: 5).toString(), "EC_")
+        XCTAssertEqual(try Bitstring(data: Data([0b00000000]), offset: 0, length: 1).toString(), "4_")
+        XCTAssertEqual(try Bitstring(data: Data([0b10000000]), offset: 0, length: 1).toString(), "C_")
+        XCTAssertEqual(try Bitstring(data: Data([0b11000000]), offset: 0, length: 2).toString(), "E_")
+        XCTAssertEqual(try Bitstring(data: Data([0b11100000]), offset: 0, length: 3).toString(), "F_")
+        XCTAssertEqual(try Bitstring(data: Data([0b11100000]), offset: 0, length: 4).toString(), "E")
+        XCTAssertEqual(try Bitstring(data: Data([0b11101000]), offset: 0, length: 5).toString(), "EC_")
         
         // should do subbuffers
-        let bs1 = BitString(data: Data([1, 2, 3, 4, 5, 6, 7, 8]), unchecked:(offset: 0, length: 64))
+        let bs1 = Bitstring(data: Data([1, 2, 3, 4, 5, 6, 7, 8]), unchecked:(offset: 0, length: 64))
         let bs2 = try bs1.subbuffer(offset: 0, length: 16)
         XCTAssertEqual(bs2!.count, 2)
         

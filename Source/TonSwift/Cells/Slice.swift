@@ -5,7 +5,7 @@ import BigInt
 /// Once you have done reading and want to make sure all the data is consumed, call `endParse()`.
 public class Slice {
 
-    private var bitstring: BitString
+    private var bitstring: Bitstring
     private var offset: Int
     private var refs: [Cell]
     
@@ -20,7 +20,7 @@ public class Slice {
     }
 
     /// Allows initializing with bitstring
-    public init(bits: BitString) {
+    public init(bits: Bitstring) {
         self.bitstring = bits
         self.offset = 0
         self.refs = []
@@ -29,13 +29,13 @@ public class Slice {
     /// Initializes Slice with a byte buffer to read the bits from.
     /// This does not parse bag-of-cells. To parse BoC, see `Cell` API instead.
     public init(data: Data) {
-        self.bitstring = BitString(data: data)
+        self.bitstring = Bitstring(data: data)
         self.offset = 0
         self.refs = []
     }
     
     /// Unchecked initializer for cloning
-    private init(bitstring: BitString, offset: Int, refs: [Cell]) {
+    private init(bitstring: Bitstring, offset: Int, refs: [Cell]) {
         self.bitstring = bitstring
         self.offset = offset
         self.refs = refs
@@ -229,14 +229,14 @@ public class Slice {
     }
 
     /// Loads the specified number of bits in a `BitString`.
-    public func loadBits(_ bits: Int) throws -> BitString {
+    public func loadBits(_ bits: Int) throws -> Bitstring {
         let r = try bitstring.substring(offset: offset, length: bits)
         offset += bits
         return r
     }
 
     /// Preloads the specified number of bits in a `BitString` without advancing the cursor.
-    public func preloadBits(_ bits: Int) throws -> BitString {
+    public func preloadBits(_ bits: Int) throws -> Bitstring {
         return try bitstring.substring(offset: offset, length: bits)
     }
 
@@ -259,7 +259,7 @@ public class Slice {
      Load bit string that was padded to make it byte alligned. Used in BOC serialization
     - parameter bytes: number of bytes to read
     */
-    func loadPaddedBits(bits: Int) throws -> BitString {
+    func loadPaddedBits(bits: Int) throws -> Bitstring {
         // Check that number of bits is byte alligned
         guard bits % 8 == 0 else {
             throw TonError.custom("Invalid number of bits")

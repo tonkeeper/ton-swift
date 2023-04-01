@@ -114,7 +114,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         }
                 
         // Serialize keys
-        var paddedMap: [BitString: V.T] = [:]
+        var paddedMap: [Bitstring: V.T] = [:]
         for (k, v) in map {
             let b = Builder()
             try keyCoder.storeValue(k, to: b)
@@ -187,21 +187,21 @@ enum Node<T> {
 }
 
 class Edge<T> {
-    let label: BitString
+    let label: Bitstring
     let node: Node<T>
     
-    init(label: BitString, node: Node<T>) {
+    init(label: Bitstring, node: Node<T>) {
         self.label = label
         self.node = node
     }
 }
 
 /// Removes `n` bits from all the keys in a map
-func removePrefixMap<T>(_ src: [BitString: T], _ length: Int) -> [BitString: T] {
+func removePrefixMap<T>(_ src: [Bitstring: T], _ length: Int) -> [Bitstring: T] {
     if length == 0 {
         return src
     }
-    var res: [BitString: T] = [:]
+    var res: [Bitstring: T] = [:]
     for (k, d) in src {
         res[try! k.dropFirst(length)] = d
     }
@@ -210,11 +210,11 @@ func removePrefixMap<T>(_ src: [BitString: T], _ length: Int) -> [BitString: T] 
 
 /// Splits the dictionary by the value of the first bit of the keys. 0-prefixed keys go into left map, 1-prefixed keys go into the right one.
 /// First bit is removed from the keys.
-func forkMap<T>(_ src: [BitString: T]) throws -> (left: [BitString: T], right: [BitString: T]) {
+func forkMap<T>(_ src: [Bitstring: T]) throws -> (left: [Bitstring: T], right: [Bitstring: T]) {
     try invariant(!src.isEmpty)
     
-    var left: [BitString: T] = [:]
-    var right: [BitString: T] = [:]
+    var left: [Bitstring: T] = [:]
+    var right: [Bitstring: T] = [:]
     for (k, d) in src {
         if k.at(unchecked: 0) == false {
             left[try! k.dropFirst(1)] = d
@@ -228,7 +228,7 @@ func forkMap<T>(_ src: [BitString: T]) throws -> (left: [BitString: T], right: [
     return (left, right)
 }
 
-func buildNode<T>(_ src: [BitString: T]) throws -> Node<T> {
+func buildNode<T>(_ src: [Bitstring: T]) throws -> Node<T> {
     try invariant(!src.isEmpty)
     if src.count == 1 {
         return .leaf(value: src.values.first!)
@@ -238,7 +238,7 @@ func buildNode<T>(_ src: [BitString: T]) throws -> Node<T> {
     }
 }
 
-func buildEdge<T>(_ src: [BitString: T]) throws -> Edge<T> {
+func buildEdge<T>(_ src: [Bitstring: T]) throws -> Edge<T> {
     try invariant(!src.isEmpty)
     let label = findCommonPrefix(src: Array(src.keys))
     return Edge(label: label, node: try buildNode(removePrefixMap(src, label.length)))
@@ -287,7 +287,7 @@ func buildEdge<T>(_ src: [BitString: T]) throws -> Edge<T> {
 ///   cb.store_bits(label, len);
 /// }
 /// ```
-func writeLabel(src: BitString, keyLength: Int, to: Builder) throws {
+func writeLabel(src: Bitstring, keyLength: Int, to: Builder) throws {
     let k = bitsForInt(keyLength)
     let n = src.length
    
@@ -335,10 +335,10 @@ func writeEdge<T, V>(src: Edge<T>, keyLength: Int, valueCoder: V, to: Builder) t
     try writeNode(src: src.node, keyLength: keyLength - src.label.length, valueCoder: valueCoder, to: to)
 }
 
-func findCommonPrefix(src: some Collection<BitString>) -> BitString {
+func findCommonPrefix(src: some Collection<Bitstring>) -> Bitstring {
     // Corner cases
     if src.isEmpty {
-        return BitString()
+        return Bitstring()
     }
     if src.count == 1 {
         return src.first!
