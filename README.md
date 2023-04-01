@@ -9,7 +9,7 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] TON mnemonic and key pairs
 - [x] Bitstrings
 - [x] Cells
-- [x] Hashmap (aka “dictionary”)
+- [x] Hashmaps (aka “dictionary”)
 - [x] Contract
 - [x] StateInit
 - [x] CommonMsgInfo

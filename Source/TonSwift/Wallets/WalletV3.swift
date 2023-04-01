@@ -6,7 +6,7 @@ public enum WalletContractV3Revision {
     case r1, r2
 }
 
-public final class WalletContractV3: WalletContract {
+public final class WalletV3: WalletContract {
     public let workchain: Int8
     public let stateInit: StateInit
     public let publicKey: Data

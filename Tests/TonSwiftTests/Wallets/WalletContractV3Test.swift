@@ -14,7 +14,7 @@ final class WalletContractV3Test: XCTestCase {
     }
     
     private func testR1() throws {
-        let contractR1 = try WalletContractV3(workchain: 0, publicKey: publicKey, revision: .r1)
+        let contractR1 = try WalletV3(workchain: 0, publicKey: publicKey, revision: .r1)
         
         XCTAssertEqual(try contractR1.address(), try Address.parse("EQBJp7j5N40GXJbAqFSnfTV1Af4ZTyHIMpRbKcudNhWJbbNO"))
         XCTAssertEqual(try contractR1.stateInit.data?.toString(), "x{0000000029A9A3175754865E86D0ADE1199301BBB0319A25ED6B129C4B0A57F28F62449B3DF9C522}")
@@ -28,7 +28,7 @@ final class WalletContractV3Test: XCTestCase {
     }
     
     private func testR2() throws {
-        let contractR2 = try WalletContractV3(workchain: 0, publicKey: publicKey, revision: .r2)
+        let contractR2 = try WalletV3(workchain: 0, publicKey: publicKey, revision: .r2)
         
         XCTAssertEqual(try contractR2.address(), try Address.parse("EQA0D_5WdusaCB-SpnoE6l5TzdBmgOkzTcXrdh0px6g3zJSk"))
         XCTAssertEqual(try contractR2.stateInit.data?.toString(), "x{0000000029A9A3175754865E86D0ADE1199301BBB0319A25ED6B129C4B0A57F28F62449B3DF9C522}")
