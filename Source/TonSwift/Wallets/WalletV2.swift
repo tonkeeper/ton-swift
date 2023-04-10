@@ -39,12 +39,8 @@ public final class WalletV2: WalletContract {
         }
         
         let signingMessage = try Builder().store(uint: args.seqno, bits: 32)
-        if args.seqno == 0 {
-            try signingMessage.store(bit: 1, repeat: 32)
-        } else {
-            let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
-            try signingMessage.store(uint: args.timeout ?? defaultTimeout, bits: 32)
-        }
+        let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
+        try signingMessage.store(uint: args.timeout ?? defaultTimeout, bits: 32)
         
         for message in args.messages {
             try signingMessage.store(uint: UInt64(args.sendMode.rawValue), bits: 8)
