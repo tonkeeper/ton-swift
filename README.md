@@ -6,16 +6,15 @@ The focus of the library is type safety and serialization. It does not support c
 
 # Current status
 
-- [x] TON mnemonic and key pairs
+- [x] Mnemonic and keys
 - [x] Bitstrings
 - [x] Cells
-- [x] Hashmaps (aka “dictionary”)
+- [x] Hashmaps aka “dictionaries”
 - [x] Contract
 - [x] StateInit
 - [x] CommonMsgInfo
 - [x] Send Flags
-- [x] Text encoding (aka “snake data”)
-- [x] Signatures
+- [x] Snake text encoding
 - [x] Standard wallets
 - [ ] Data signatures [TEP/PR104](https://github.com/ton-blockchain/TEPs/pull/104)
 - [ ] Subscriptions V1
