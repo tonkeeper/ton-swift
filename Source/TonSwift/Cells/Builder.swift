@@ -268,6 +268,16 @@ public class Builder {
         return try store(bit: bit ? 1 : 0)
     }
     
+    /// Write repeating bit a given number of times.
+    @discardableResult
+    public func store(bit: Int, repeat count: Int) throws -> Self {
+        if count < 0 { throw TonError.custom("In store(bit:repeat:) repeat count must be non-negative.") }
+        for _ in 0..<count {
+            try store(bit: bit)
+        }
+        return self
+    }
+    
     /// Writes bits from a bitstring
     @discardableResult
     public func store(bits: Bitstring) throws -> Self {

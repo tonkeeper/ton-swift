@@ -194,10 +194,9 @@ public struct Bitstring: Hashable {
     }
     
     public func padLeft(_ n: Int = 0) -> Bitstring {
-        let b = Builder(capacity: max(n, self.length))
-        for _ in self.length..<n {
-            try! b.store(bit: 0)
-        }
+        let cap = max(n, self.length)
+        let b = Builder(capacity: cap)
+        try! b.store(bit: 0, repeat: cap - self.length)
         try! b.store(bits: self)
         return try! b.endCell().bits
     }

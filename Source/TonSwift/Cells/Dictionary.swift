@@ -148,9 +148,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
                 // Same label detected
                 let bit = try slice.loadBit()
                 pfxlen = Int(try slice.loadUint(bits: k))
-                for _ in 0..<pfxlen {
-                    try prefix.store(bit: bit)
-                }
+                try prefix.store(bit: bit ? 1 : 0, repeat: pfxlen)
             }
         }
         

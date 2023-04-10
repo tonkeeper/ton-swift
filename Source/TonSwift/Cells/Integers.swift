@@ -10,10 +10,8 @@ public struct Unary: CellCodable {
     }
     
     public func storeTo(builder: Builder) throws {
-        for _ in 0..<value {
-            try builder.store(bit: true)
-        }
-        try builder.store(bit: false)
+        try builder.store(bit: 1, repeat: value)
+        try builder.store(bit: 0)
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
