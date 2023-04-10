@@ -134,13 +134,13 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
         var pfxlen: Int = 0
         
         // short mode: $0
-        if try slice.loadBit() == false {
+        if try slice.loadBit() == 0 {
             // Read
             pfxlen = try Unary.loadFrom(slice: slice).value
             try prefix.store(bits: try slice.loadBits(pfxlen))
         } else {
             // long mode: $10
-            if try slice.loadBit() == false {
+            if try slice.loadBit() == 0 {
                 pfxlen = Int(try slice.loadUint(bits: k))
                 try prefix.store(bits: try slice.loadBits(pfxlen))
             // same mode: $11
@@ -148,7 +148,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
                 // Same label detected
                 let bit = try slice.loadBit()
                 pfxlen = Int(try slice.loadUint(bits: k))
-                try prefix.store(bit: bit ? 1 : 0, repeat: pfxlen)
+                try prefix.store(bit: bit, repeat: pfxlen)
             }
         }
         
@@ -214,7 +214,7 @@ func forkMap<T>(_ src: [Bitstring: T]) throws -> (left: [Bitstring: T], right: [
     var left: [Bitstring: T] = [:]
     var right: [Bitstring: T] = [:]
     for (k, d) in src {
-        if k.at(unchecked: 0) == false {
+        if k.at(unchecked: 0) == 0 {
             left[try! k.dropFirst(1)] = d
         } else {
             right[try! k.dropFirst(1)] = d

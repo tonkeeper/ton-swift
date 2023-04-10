@@ -1,5 +1,7 @@
 import Foundation
 
+
+
 public struct Bitstring: Hashable {
     
     public static let empty = Bitstring(data: .init(), unchecked: (offset: 0, length: 0))
@@ -68,7 +70,7 @@ public struct Bitstring: Hashable {
      - throws error: if index is out of bounds
      - returns true if the bit is set, false otherwise
      */
-    public func at(_ index: Int) throws -> Bool {
+    public func at(_ index: Int) throws -> Bit {
         guard index <= _length && index >= 0 else {
             throw TonError.indexOutOfBounds(index)
         }
@@ -78,19 +80,19 @@ public struct Bitstring: Hashable {
     
     /// Performs access to a bit at a given index without checking bounds.
     /// Use only in the internal implementation.
-    internal func at(unchecked index: Int) -> Bool {
+    internal func at(unchecked index: Int) -> Bit {
         let byteIndex = (_offset + index) >> 3
         let bitIndex = 7 - ((_offset + index) % 8) // NOTE: We are using big endian
         
-        return (_data[byteIndex] & (1 << bitIndex)) != 0
+        return (_data[byteIndex] & (1 << bitIndex)) != 0 ? 1 : 0
     }
     
     /// Returns `.some(bit)` if the string is empty of consists of a repeating bit.
     /// Empty strings return `.some(false)`.
     /// Otherwise returns `nil`.
-    public func repeatsSameBit() -> Optional<Bool> {
+    public func repeatsSameBit() -> Optional<Bit> {
         if length == 0 {
-            return .some(false)
+            return .some(0)
         }
         let firstbit = at(unchecked: 0)
         if length == 1 {
@@ -177,7 +179,7 @@ public struct Bitstring: Hashable {
     public func toBinary() -> String {
         var s = ""
         for i in 0..<length {
-            s.append(at(unchecked:i) ? "1" : "0")
+            s.append(at(unchecked:i) == 1 ? "1" : "0")
         }
         return s
     }
@@ -225,8 +227,8 @@ extension Bitstring: Comparable {
         for i in 0..<min(lhs.length, rhs.length) {
             let l = lhs.at(unchecked: i)
             let r = rhs.at(unchecked: i)
-            if !l && r { return true }
-            if l && !r { return false }
+            if l==0 && r==1 { return true }
+            if l==1 && r==0 { return false }
         }
         return lhs.length <= rhs.length // shorter string comes first, tie is in favor of the LHS
     }

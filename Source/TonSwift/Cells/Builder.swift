@@ -251,7 +251,7 @@ public class Builder {
 
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     @discardableResult
-    public func store(bit: Int) throws -> Self {
+    public func store(bit: Bit) throws -> Self {
         try checkCapacity(1)
         
         if bit > 0 {
@@ -270,7 +270,7 @@ public class Builder {
     
     /// Write repeating bit a given number of times.
     @discardableResult
-    public func store(bit: Int, repeat count: Int) throws -> Self {
+    public func store(bit: Bit, repeat count: Int) throws -> Self {
         if count < 0 { throw TonError.custom("In store(bit:repeat:) repeat count must be non-negative.") }
         for _ in 0..<count {
             try store(bit: bit)
@@ -289,7 +289,7 @@ public class Builder {
 
     /// Writes bits from a literal sequence of numbers
     @discardableResult
-    public func store(bits: Int...) throws -> Self {
+    public func store(bits: Bit...) throws -> Self {
         try checkCapacity(bits.count)
         for bit in bits {
             if bit > 0 {

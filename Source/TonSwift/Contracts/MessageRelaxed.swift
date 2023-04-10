@@ -17,8 +17,8 @@ public struct MessageRelaxed: CellCodable {
         let info = try CommonMsgInfoRelaxed.loadFrom(slice: slice)
             
         var stateInit: StateInit? = nil
-        if try slice.loadBit() {
-            if !(try slice.loadBit()) {
+        if try slice.loadBoolean() {
+            if !(try slice.loadBoolean()) {
                 stateInit = try StateInit.loadFrom(slice: slice)
             } else {
                 stateInit = try StateInit.loadFrom(slice: try slice.loadRef().beginParse())
@@ -26,7 +26,7 @@ public struct MessageRelaxed: CellCodable {
         }
         
         var body: Cell
-        if try slice.loadBit() {
+        if try slice.loadBoolean() {
             body = try slice.loadRef()
         } else {
             body = try slice.loadRemainder()

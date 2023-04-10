@@ -1,6 +1,10 @@
 import Foundation
 import BigInt
 
+/// All APIs that take bit as a parameter or return a bit are expressed using typealias `Bit` based on `Int`.
+/// An API that produces `Bit` guarantees that it is in range `[0,1]`.
+public typealias Bit = Int
+
 /// Represents unary integer encoding: `0` for 0, `10` for 1, `110` for 2, `1{n}0` for n.
 public struct Unary: CellCodable {
     public let value: Int
@@ -16,7 +20,7 @@ public struct Unary: CellCodable {
     
     public static func loadFrom(slice: Slice) throws -> Self {
         var v: Int = 0
-        while try slice.loadBit() {
+        while try slice.loadBit() == 1 {
             v += 1
         }
         return Unary(v)
@@ -31,7 +35,7 @@ extension Bool: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try slice.loadBit()
+        return try slice.loadBoolean()
     }
 }
 

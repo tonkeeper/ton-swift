@@ -77,8 +77,8 @@ struct TickTock: CellCodable {
     
     static func loadFrom(slice: Slice) throws -> TickTock {
         return TickTock(
-            tick: try slice.loadBit(),
-            tock: try slice.loadBit()
+            tick: try slice.loadBoolean(),
+            tock: try slice.loadBoolean()
         )
     }
 }
@@ -98,7 +98,7 @@ extension SimpleLibrary: CellCodable {
     }
     public static func loadFrom(slice: Slice) throws -> SimpleLibrary {
         return Self(
-            public: try slice.loadBit(),
+            public: try slice.loadBoolean(),
             root: try slice.loadRef()
         )
     }

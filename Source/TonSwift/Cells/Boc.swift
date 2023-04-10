@@ -42,9 +42,9 @@ struct Boc {
                     }
                 }
             case .V3:
-                let hasIdx = try reader.loadBit()
-                let hasCrc32c = try reader.loadBit()
-                let _/*hasCacheBits*/ = try reader.loadBit()
+                let hasIdx = try reader.loadBoolean()
+                let hasCrc32c = try reader.loadBoolean()
+                let _/*hasCacheBits*/ = try reader.loadBoolean()
                 let _/*flags*/ = try reader.loadUint(bits: 2) // Must be 0
                 size = Int(try reader.loadUint(bits: 3))
                 offBytes = Int(try reader.loadUint(bits: 8))

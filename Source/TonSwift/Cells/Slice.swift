@@ -116,7 +116,7 @@ public class Slice {
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try closure(self)
         } else {
             return nil
@@ -157,7 +157,7 @@ public class Slice {
     
     /// Loads an optional cell reference.
     public func loadMaybeRef() throws -> Cell? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try loadRef()
         } else {
             return nil
@@ -166,7 +166,7 @@ public class Slice {
     
     /// Preloads an optional cell reference.
     public func preloadMaybeRef() throws -> Cell? {
-        if try preloadBit() {
+        if try preloadBit() == 1 {
             return try preloadRef()
         } else {
             return nil
@@ -203,7 +203,7 @@ public class Slice {
     }
 
     /// Load a single bit.
-    public func loadBit() throws -> Bool {
+    public func loadBit() throws -> Bit {
         let r = try bitstring.at(offset)
         offset += 1
         return r
@@ -211,12 +211,12 @@ public class Slice {
     
     /// Load a single bit as a boolean value.
     public func loadBoolean() throws -> Bool {
-        return try loadBit()
+        return try loadBit() == 1
     }
     
     /// Loads an optional boolean.
     public func loadMaybeBoolean() throws -> Bool? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try loadBoolean()
         } else {
             return nil
@@ -224,7 +224,7 @@ public class Slice {
     }
 
     /// Preload a single bit without advancing the cursor.
-    public func preloadBit() throws -> Bool {
+    public func preloadBit() throws -> Bit {
         return try bitstring.at(offset)
     }
 
@@ -268,7 +268,7 @@ public class Slice {
         // Skip padding
         var length = bits
         while true {
-            if try bitstring.at(offset + length - 1) {
+            if try bitstring.at(offset + length - 1) == 1 {
                 length -= 1
                 break
             } else {
@@ -358,7 +358,7 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUint(bits: Int) throws -> UInt64? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try loadUint(bits: bits)
         } else {
             return nil
@@ -371,7 +371,7 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try loadUintBig(bits: bits)
         } else {
             return nil
@@ -431,12 +431,12 @@ public class Slice {
         let sign = try bitstring.at(offset)
         var res = BigInt(0)
         for i in 0..<bits - 1 {
-            if try bitstring.at(offset + 1 + i) {
+            if try bitstring.at(offset + 1 + i) == 1 {
                 res += BigInt(1) << BigInt(bits - i - 1 - 1)
             }
         }
         
-        if sign {
+        if sign == 1 {
             res = res - (BigInt(1) << BigInt(bits - 1))
         }
         
@@ -448,7 +448,7 @@ public class Slice {
         
         var res = BigUInt(0)
         for i in 0..<bits {
-            if try bitstring.at(offset + i) {
+            if try bitstring.at(offset + i) == 1 {
                 res += 1 << BigUInt(bits - i - 1)
             }
         }
@@ -462,12 +462,12 @@ public class Slice {
         let sign = try bitstring.at(offset)
         var res = Int64(0)
         for i in 0..<bits - 1 {
-            if try bitstring.at(offset + 1 + i) {
+            if try bitstring.at(offset + 1 + i) == 1 {
                 res += 1 << Int64(bits - i - 1 - 1)
             }
         }
         
-        if sign {
+        if sign == 1 {
             res = res - (1 << Int64(bits - 1))
         }
         
@@ -479,7 +479,7 @@ public class Slice {
         
         var res = UInt64(0)
         for i in 0..<bits {
-            if try bitstring.at(offset + i) {
+            if try bitstring.at(offset + i) == 1 {
                 res += 1 << UInt64(bits - i - 1)
             }
         }

@@ -6,14 +6,14 @@ final class BitStringTest: XCTestCase {
     func testBitString() throws {
         // should read bits
         let bs = Bitstring(data: Data([0b10101010]), unchecked:(offset: 0, length: 8))
-        XCTAssertTrue(try bs.at(0))
-        XCTAssertFalse(try bs.at(1))
-        XCTAssertTrue(try bs.at(2))
-        XCTAssertFalse(try bs.at(3))
-        XCTAssertTrue(try bs.at(4))
-        XCTAssertFalse(try bs.at(5))
-        XCTAssertTrue(try bs.at(6))
-        XCTAssertFalse(try bs.at(7))
+        XCTAssertEqual(try bs.at(0), 1)
+        XCTAssertEqual(try bs.at(1), 0)
+        XCTAssertEqual(try bs.at(2), 1)
+        XCTAssertEqual(try bs.at(3), 0)
+        XCTAssertEqual(try bs.at(4), 1)
+        XCTAssertEqual(try bs.at(5), 0)
+        XCTAssertEqual(try bs.at(6), 1)
+        XCTAssertEqual(try bs.at(7), 0)
         XCTAssertEqual(bs.toString(), "AA")
         
         // should equals

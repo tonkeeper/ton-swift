@@ -45,7 +45,7 @@ extension Slice {
     
     /// Load optionals Coins value.
     public func loadMaybeCoins() throws -> Coins? {
-        if try loadBit() {
+        if try loadBoolean() {
             return try loadCoins()
         }
         return nil

@@ -48,10 +48,10 @@ public enum CommonMsgInfoRelaxed: CellCodable {
     
     public static func loadFrom(slice: Slice) throws -> CommonMsgInfoRelaxed {
         // Internal message
-        if !(try slice.loadBit()) {
-            let ihrDisabled = try slice.loadBit()
-            let bounce = try slice.loadBit()
-            let bounced = try slice.loadBit()
+        if !(try slice.loadBoolean()) {
+            let ihrDisabled = try slice.loadBoolean()
+            let bounce = try slice.loadBoolean()
+            let bounced = try slice.loadBoolean()
             let src: AnyAddress = try slice.loadType()
             let dest: Address = try slice.loadType()
             let value: CurrencyCollection = try slice.loadType()
@@ -77,7 +77,7 @@ public enum CommonMsgInfoRelaxed: CellCodable {
         }
         
         // External In message
-        if !(try slice.loadBit()) {
+        if !(try slice.loadBoolean()) {
             throw TonError.custom("External In message is not possible for CommonMessageInfoRelaxed")
         } else {
             // External Out mesage

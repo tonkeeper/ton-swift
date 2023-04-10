@@ -55,10 +55,10 @@ public enum CommonMsgInfo: CellCodable {
     
     public static func loadFrom(slice: Slice) throws -> CommonMsgInfo {
         // Internal message
-        if !(try slice.loadBit()) {
-            let ihrDisabled = try slice.loadBit()
-            let bounce = try slice.loadBit()
-            let bounced = try slice.loadBit()
+        if !(try slice.loadBoolean()) {
+            let ihrDisabled = try slice.loadBoolean()
+            let bounce = try slice.loadBoolean()
+            let bounced = try slice.loadBoolean()
             let src: Address = try slice.loadType()
             let dest: Address = try slice.loadType()
             let value: CurrencyCollection = try slice.loadType()
@@ -84,7 +84,7 @@ public enum CommonMsgInfo: CellCodable {
         }
         
         // External In message
-        if !(try slice.loadBit()) {
+        if !(try slice.loadBoolean()) {
             let src: AnyAddress = try slice.loadType()
             let dest: Address = try slice.loadType()
             let importFee = try slice.loadCoins()
@@ -117,7 +117,7 @@ public enum CommonMsgInfo: CellCodable {
     public func storeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
-            try builder.store(bit: false)
+            try builder.store(bit: 0)
             try builder.store(bit: info.ihrDisabled)
             try builder.store(bit: info.bounce)
             try builder.store(bit: info.bounced)
@@ -130,8 +130,8 @@ public enum CommonMsgInfo: CellCodable {
             try builder.store(uint: UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
-            try builder.store(bit: true)
-            try builder.store(bit: true)
+            try builder.store(bit: 1)
+            try builder.store(bit: 1)
             try builder.store(AnyAddress(info.src))
             try builder.store(AnyAddress(info.dest))
             try builder.store(uint: info.createdLt, bits: 64)
