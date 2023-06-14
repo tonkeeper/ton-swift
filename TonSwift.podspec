@@ -15,10 +15,10 @@ Pod::Spec.new do |s|
 
   s.dependency 'BigInt'
   s.dependency 'TweetNacl'
-  s.frameworks = 'XCTest'
 
   s.test_spec 'Tests' do |test_spec|
     test_spec.source_files = ["Tests/*.{swift,h}", "Tests/**/*.{swift,c,h}", "Tests/**/**/*.{swift,c,h}"]
+    test_spec.frameworks = 'XCTest'
   end
   
 end
