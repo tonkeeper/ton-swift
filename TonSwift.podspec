@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'TonSwift'
-  s.version          = '0.0.1'
+  s.version          = '1.0.1'
   s.homepage         = 'https://github.com/tonkeeper/ton-swift'
   s.source           = { :git => 'https://github.com/tonkeeper/ton-swift.git', :tag => s.version.to_s }
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
