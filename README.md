@@ -32,7 +32,7 @@ Ready for use on iOS 13+.
 [CocoaPods](https://cocoapods.org) is a dependency manager. For usage and installation instructions, visit their website. To integrate using CocoaPods, specify it in your `Podfile`:
 
 ```ruby
-pod 'TonSwift', '1.0.2'
+pod 'TonSwift', '1.0.3'
 ```
 
 ### Swift Package Manager
@@ -43,7 +43,7 @@ Once you have your Swift package set up, adding TonSwift as a dependency is as e
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tonkeeper/ton-swift", .exact("1.0.2"))
+    .package(url: "https://github.com/tonkeeper/ton-swift", .exact("1.0.3"))
 ]
 ```
 
