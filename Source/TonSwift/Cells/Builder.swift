@@ -314,7 +314,7 @@ public class Builder {
 
     /// Writes bytes from the src data.
     @discardableResult
-    func store(data: Data) throws -> Self {
+    public func store(data: Data) throws -> Self {
         try checkCapacity(data.count*8)
         
         // Special case for aligned offsets
@@ -421,7 +421,7 @@ public class Builder {
     
     
     @discardableResult
-    func store(int value: any BinaryInteger, bits: Int) throws -> Self {
+    public func store(int value: any BinaryInteger, bits: Int) throws -> Self {
         return try store(bigint: BigInt(value), bits: bits)
     }
         
