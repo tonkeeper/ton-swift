@@ -1,11 +1,6 @@
 import Foundation
 import TweetNacl
 
-public struct KeyPair {
-    public let publicKey: Data
-    public let secretKey: Data
-}
-
 public enum Mnemonic {
     public static let words = String.englishMnemonics
     
@@ -148,7 +143,7 @@ public enum Mnemonic {
         
         do {
             let keyPair = try TweetNacl.NaclSign.KeyPair.keyPair(fromSeed: seed)
-            return KeyPair(publicKey: keyPair.publicKey, secretKey: keyPair.secretKey)
+            return KeyPair(publicKey: .init(data: keyPair.publicKey), privateKey: .init(data: keyPair.secretKey))
             
         } catch {
             throw error
