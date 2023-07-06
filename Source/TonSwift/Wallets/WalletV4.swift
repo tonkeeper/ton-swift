@@ -85,8 +85,8 @@ public class WalletV4: WalletContract {
             try signingMessage.store(uint: UInt64(args.sendMode.rawValue), bits: 8)
             try signingMessage.store(ref: try Builder().store(message))
         }
-        
-        let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
+    
+        let signature = try NaclSign.signDetached(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
         
         let body = Builder()
         try body.store(data: signature)
