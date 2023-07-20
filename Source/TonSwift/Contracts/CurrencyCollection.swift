@@ -30,6 +30,6 @@ struct CurrencyCollection: CellCodable {
     
     func storeTo(builder: Builder) throws {
         try builder.store(coins: coins)
-        try builder.store(other)
+            .store(other)
     }
 }

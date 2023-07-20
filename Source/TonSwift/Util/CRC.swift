@@ -34,7 +34,7 @@ extension Data {
         let poly: UInt32 = 0x82f63b78
         var crc: UInt32 = 0 ^ 0xffffffff
         
-        for i in 0..<self.count {
+        for i in 0..<count {
             crc ^= UInt32(self[i])
             crc = ((crc & 1) != 0) ? (crc >> 1) ^ poly : crc >> 1
             crc = ((crc & 1) != 0) ? (crc >> 1) ^ poly : crc >> 1

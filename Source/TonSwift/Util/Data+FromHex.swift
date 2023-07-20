@@ -21,5 +21,12 @@ public extension Data {
         
         self = data
     }
-    
+
+    func subdata(in range: ClosedRange<Index>) -> Data {
+        subdata(in: range.lowerBound ..< range.upperBound)
+    }
+
+    func hexString() -> String {
+        map { String(format: "%02hhx", $0) }.joined()
+    }
 }

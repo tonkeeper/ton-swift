@@ -70,7 +70,7 @@ public enum Mnemonic {
      - returns: 64 byte entropy
      */
     public static func mnemonicToEntropy(mnemonicArray: [String], password: String = "") -> Data {
-        return hmacSha512(phrase: mnemonicArray.joined(separator: " "), password: password)
+        hmacSha512(phrase: mnemonicArray.joined(separator: " "), password: password)
     }
     
     /**
@@ -127,7 +127,7 @@ public enum Mnemonic {
     }
     
     public static func normalizeMnemonic(src: [String]) -> [String] {
-        return src.map({ $0.lowercased() })
+        src.map({ $0.lowercased() })
     }
     
     /**

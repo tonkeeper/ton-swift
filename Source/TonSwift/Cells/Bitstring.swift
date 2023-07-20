@@ -1,8 +1,6 @@
 import Foundation
 
-
-
-public struct Bitstring: Hashable {
+public struct Bitstring: Hashable, Comparable, Equatable {
     
     public static let empty = Bitstring(data: .init(), unchecked: (offset: 0, length: 0))
     
@@ -58,8 +56,9 @@ public struct Bitstring: Hashable {
     
     /// Constructs BitString from a binary string of 1s and 0s.
     public init(binaryString: String) throws {
-        let cell = try Builder().store(binaryString: binaryString).endCell()
-        self = cell.bits
+        self = try Builder()
+            .store(binaryString: binaryString)
+            .endCell().bits
     }
     
 
@@ -151,15 +150,15 @@ public struct Bitstring: Hashable {
     
     /// Drops first `n` bits from the bitstring.
     public func dropFirst(_ n: Int) throws -> Bitstring {
-        return try substring(offset: n, length: self.length - n)
+        try substring(offset: n, length: length - n)
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
     public func toHex() -> String {
-        let padded = Data(self.bitsToPaddedBuffer())
+        let padded = Data(bitsToPaddedBuffer())
         
         if _length % 4 == 0 {
-            let s = padded[0..<(self._length + 7) / 8].hexString().uppercased()
+            let s = padded[0..<(_length + 7) / 8].hexString().uppercased()
             if _length % 8 == 0 {
                 return s
             } else {
@@ -186,7 +185,7 @@ public struct Bitstring: Hashable {
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
     public func toString() -> String {
-        return toHex()
+        toHex()
     }
     
     private func checkOffset(offset: Int, length: Int) throws {
@@ -196,19 +195,20 @@ public struct Bitstring: Hashable {
     }
     
     public func padLeft(_ n: Int = 0) -> Bitstring {
-        let cap = max(n, self.length)
-        let b = Builder(capacity: cap)
-        try! b.store(bit: 0, repeat: cap - self.length)
-        try! b.store(bits: self)
-        return try! b.endCell().bits
+        let cap = max(n, length)
+        return try! Builder(capacity: cap)
+            .store(bit: 0, repeat: cap - length)
+            .store(bits: self)
+            .endCell()
+            .bits
     }
     
     /// Pads bitstring with `10*` bits.
     public func bitsToPaddedBuffer() -> Data {
-        let builder = Builder(capacity: (self.length + 7) / 8 * 8)
-        try! builder.store(bits: self)
+        let builder = try! Builder(capacity: (length + 7) / 8 * 8)
+            .store(bits: self)
 
-        let padding = (self.length + 7) / 8 * 8 - self.length
+        let padding = (length + 7) / 8 * 8 - length
         for i in 0..<padding {
             if i == 0 {
                 try! builder.store(bit: true)
@@ -219,10 +219,10 @@ public struct Bitstring: Hashable {
         
         return try! builder.alignedBitstring() // we guarantee alignment in this method
     }
-}
 
-/// Bitstring implements lexicographic comparison.
-extension Bitstring: Comparable {
+    // MARK: - Comparable
+    /// Bitstring implements lexicographic comparison.
+
     public static func < (lhs: Self, rhs: Self) -> Bool {
         for i in 0..<min(lhs.length, rhs.length) {
             let l = lhs.at(unchecked: i)
@@ -232,9 +232,8 @@ extension Bitstring: Comparable {
         }
         return lhs.length <= rhs.length // shorter string comes first, tie is in favor of the LHS
     }
-}
 
-extension Bitstring: Equatable {
+    // MARK: - Equatable
     
     /**
      Checks for equality
@@ -261,15 +260,5 @@ extension Bitstring: Equatable {
         }
         
         return true
-    }
-}
-
-extension Data {
-    public func subdata(in range: ClosedRange<Index>) -> Data {
-        return subdata(in: range.lowerBound ..< range.upperBound)
-    }
-    
-    public func hexString() -> String {
-        map({ String(format: "%02hhx", $0) }).joined()
     }
 }

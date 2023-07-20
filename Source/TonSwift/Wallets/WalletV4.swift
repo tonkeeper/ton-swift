@@ -58,16 +58,16 @@ public class WalletV4: WalletContract {
     public var stateInit: StateInit {
         let data = try! Builder()
             .store(uint: 0, bits: 32) // initial seqno = 0
-            .store(uint: self.walletId, bits: 32)
+            .store(uint: walletId, bits: 32)
             .store(data: publicKey)
             .store(dict: Set<CompactAddress>()) // initial plugins list = []
             .endCell()
         
-        return StateInit(code: self.code, data: data)
+        return StateInit(code: code, data: data)
     }
     
     func pluginsCompact() -> Set<CompactAddress> {
-        Set(self.plugins.map{ a in CompactAddress(a) })
+        Set(plugins.map{ a in CompactAddress(a) })
     }
     
     public func createTransfer(args: WalletTransferData) throws -> Cell {
@@ -88,10 +88,9 @@ public class WalletV4: WalletContract {
         
         let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
         
-        let body = Builder()
-        try body.store(data: signature)
-        try body.store(signingMessage)
-        
-        return try body.endCell()
+        return try Builder()
+            .store(data: signature)
+            .store(signingMessage)
+            .endCell()
     }
 }

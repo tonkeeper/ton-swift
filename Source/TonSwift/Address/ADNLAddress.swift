@@ -1,6 +1,6 @@
 import Foundation
 
-struct ADNLAddress {
+struct ADNLAddress: Equatable {
     static func parseFriendly(_ src: String) throws -> ADNLAddress {
         if src.count != 55 {
             throw TonError.custom("Invalid address")
@@ -21,9 +21,7 @@ struct ADNLAddress {
     }
 
     static func parseRaw(_ src: String) throws -> ADNLAddress {
-        let data = Data(base64Encoded: src)
-        
-        return try ADNLAddress(address: data!)
+        try ADNLAddress(address: Data(base64Encoded: src)!)
     }
 
     let address: Data
@@ -37,22 +35,20 @@ struct ADNLAddress {
     }
     
     func toRaw() -> String {
-        return address.map { String(format: "%02X", $0) }.joined().uppercased()
+        address.map { String(format: "%02X", $0) }.joined().uppercased()
     }
 
     func toString() -> String {
-        var data = Data([0x2D]) + self.address
+        var data = Data([0x2D]) + address
         let hash = data.crc16()
         data = data + hash
         
         return String(data.toBase32().dropFirst())
     }
 
-}
+    // MARK: - Equatable
 
-// MARK: - Equatable
-extension ADNLAddress: Equatable {
     static func == (lhs: ADNLAddress, rhs: ADNLAddress) -> Bool {
-        return lhs.address == rhs.address
+        lhs.address == rhs.address
     }
 }

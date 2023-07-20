@@ -5,7 +5,7 @@ fileprivate let alphabet = "abcdefghijklmnopqrstuvwxyz234567"
 extension Data {
     /// Encodes data to base32 format
     public func toBase32() -> String {
-        let length = self.count
+        let length = count
         var bits = 0
         var value = 0
         var output = ""
@@ -28,7 +28,7 @@ extension Data {
 
 extension String {
     func fromBase32() throws -> Data {
-        let cleanedInput = self.lowercased()
+        let cleanedInput = lowercased()
         let length = cleanedInput.count
         var bits = 0
         var value = 0

@@ -1,7 +1,7 @@
 import Foundation
 
 /// By default, addresses are bounceable for safety of TON transfers.
-public let BounceableDefault = true;
+public let BounceableDefault = true
 
 let bounceableTag: UInt8 = 0x11
 let nonBounceableTag: UInt8 = 0x51
@@ -13,8 +13,8 @@ public struct FriendlyAddress: Codable {
     public let isBounceable: Bool
     public let address: Address
     
-    var workchain: Int8 { return self.address.workchain }
-    var hash: Data { return self.address.hash }
+    var workchain: Int8 { address.workchain }
+    var hash: Data { address.hash }
         
     init(string: String) throws {
         // Convert from url-friendly to true base64
@@ -76,10 +76,10 @@ public struct FriendlyAddress: Codable {
         }
         
         var wcByte: UInt8
-        if self.address.workchain == -1 {
+        if address.workchain == -1 {
             wcByte = UInt8.max
         } else {
-            wcByte = UInt8(self.workchain)
+            wcByte = UInt8(workchain)
         }
         
         var addr = Data(count: 34)

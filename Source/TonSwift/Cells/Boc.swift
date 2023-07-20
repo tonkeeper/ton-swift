@@ -1,11 +1,5 @@
 import Foundation
 
-enum BocMagic: UInt32 {
-    case V1 = 0x68ff65f3
-    case V2 = 0xacc3a728
-    case V3 = 0xb5ee9c72
-}
-
 /// BoC = Bag-of-Cells, data structure for efficient storage and transmission of a collection of cells.
 struct Boc {
     let size: Int
@@ -17,7 +11,7 @@ struct Boc {
     let index: Data?
     let cellData: Data
     let rootIndices: [UInt64]
-    
+
     init(data: Data) throws {
         let reader = Slice(data: data)
         guard let magic = BocMagic(rawValue: UInt32(try reader.loadUint(bits: 32))) else {
@@ -78,6 +72,8 @@ struct Boc {
     }
 }
 
+// TODO: Make this functions not global
+
 func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
     let typeFactor: UInt8 = type != .ordinary ? 1 : 0
     return UInt8(refs.count) + typeFactor * 8 + UInt8(level) * 32
@@ -115,7 +111,7 @@ func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: Bits
 }
 
 func calcCellSize(cell: Cell, sizeBytes: Int) -> Int {
-    return 2 /* D1+D2 */ + Int(ceil(Double(cell.bits.length) / 8.0)) + cell.refs.count * sizeBytes
+    2 /* D1+D2 */ + Int(ceil(Double(cell.bits.length) / 8.0)) + cell.refs.count * sizeBytes
 }
 
 func deserializeBoc(src: Data) throws -> [Cell] {
@@ -201,19 +197,19 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     ) * 8
 
     // Serialize
-    var builder = Builder(capacity: totalSize)
-    try builder.store(uint: 0xb5ee9c72, bits: 32) // Magic
-    try builder.store(bit: hasIdx) // Has index
-    try builder.store(bit: hasCrc32c) // Has crc32c
-    try builder.store(bit: hasCacheBits) // Has cache bits
-    try builder.store(uint: flags, bits: 2) // Flags
-    try builder.store(uint: sizeBytes, bits: 3) // Size bytes
-    try builder.store(uint: offsetBytes, bits: 8) // Offset bytes
-    try builder.store(uint: cellsNum, bits: sizeBytes * 8) // Cells num
-    try builder.store(uint: 1, bits: sizeBytes * 8) // Roots num
-    try builder.store(uint: 0, bits: sizeBytes * 8) // Absent num
-    try builder.store(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
-    try builder.store(uint: 0, bits: sizeBytes * 8) // Root id == 0
+    var builder = try Builder(capacity: totalSize)
+        .store(uint: 0xb5ee9c72, bits: 32) // Magic
+        .store(bit: hasIdx) // Has index
+        .store(bit: hasCrc32c) // Has crc32c
+        .store(bit: hasCacheBits) // Has cache bits
+        .store(uint: flags, bits: 2) // Flags
+        .store(uint: sizeBytes, bits: 3) // Size bytes
+        .store(uint: offsetBytes, bits: 8) // Offset bytes
+        .store(uint: cellsNum, bits: sizeBytes * 8) // Cells num
+        .store(uint: 1, bits: sizeBytes * 8) // Roots num
+        .store(uint: 0, bits: sizeBytes * 8) // Absent num
+        .store(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
+        .store(uint: 0, bits: sizeBytes * 8) // Root id == 0
 
     if hasIdx {
         for i in 0 ..< cellsNum {

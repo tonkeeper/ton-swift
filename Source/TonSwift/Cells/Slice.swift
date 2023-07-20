@@ -3,14 +3,12 @@ import BigInt
 
 /// `Slice` is a class that allows to read cell data (bits and refs), consuming it along the way.
 /// Once you have done reading and want to make sure all the data is consumed, call `endParse()`.
-public class Slice {
+public class Slice: CellCodable {
 
     private var bitstring: Bitstring
     private var offset: Int
     private var refs: [Cell]
-    
 
-    
     // MARK: - Initializers
         
     init(cell: Cell) {
@@ -40,28 +38,21 @@ public class Slice {
         self.offset = offset
         self.refs = refs
     }
-    
-    
-    
+
     // MARK: - Metrics
-    
-        
+
     /// Remaining unread refs in this slice.
     public var remainingRefs: Int {
-        return refs.count
+        refs.count
     }
     
     /// Remaining unread bits in this slice.
     public var remainingBits: Int {
-        return bitstring.length - offset
+        bitstring.length - offset
     }
-    
-    
-    
-    
+
     // MARK: - Finalization
-    
-    
+
     /// Checks if the cell is fully processed without unread bits or refs.
     public func endParse() throws {
         if remainingBits > 0 || remainingRefs > 0 {
@@ -72,71 +63,60 @@ public class Slice {
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
     public func loadRemainder() throws -> Cell {
-        return try toBuilder().endCell()
+        try toBuilder().endCell()
     }
     
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
     public func toCell() throws -> Cell {
-        return try toBuilder().endCell()
+        try toBuilder().endCell()
     }
     
     /// Converts slice to a Builder filled with remaining data in this slice.
     public func toBuilder() throws -> Builder {
-        let builder = Builder()
-        try builder.store(slice: self)
-        return builder
+        try Builder()
+            .store(slice: self)
     }
     
     /// Clones slice at its current state.
     public func clone() -> Slice {
-        return Slice(bitstring: bitstring, offset: offset, refs: refs)
+        Slice(bitstring: bitstring, offset: offset, refs: refs)
     }
     
     /// Returns string representation of the slice as a cell.
     public func toString() throws -> String {
-        return try loadRemainder().toString()
+        try loadRemainder().toString()
     }
-    
-    
-    
-    
     
     // MARK: - Loading Generic Types
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
-        return try T.loadFrom(slice: self)
+        try T.loadFrom(slice: self)
     }
     
     /// Preloads type T that implements interface Readable
     public func preloadType<T: CellCodable>() throws -> T {
-        return try T.loadFrom(slice: self.clone())
+        try T.loadFrom(slice: clone())
     }
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
-        if try loadBoolean() {
-            return try closure(self)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try closure(self) : nil
     }
     
     /// Lets you attempt to read a complex data type.
     /// If parsing succeeded, the slice is advanced.
     /// If parsing failed, the slice remains unchanged.
     public func tryLoad<T>(_ closure: (Slice) throws -> T) throws -> T {
-        let tmpslice = self.clone();
-        let result = try closure(tmpslice);
-        self.bitstring = tmpslice.bitstring;
-        self.offset = tmpslice.offset;
-        self.refs = tmpslice.refs;
-        return result;
+        let tmpslice = clone()
+        let result = try closure(tmpslice)
+        bitstring = tmpslice.bitstring
+        offset = tmpslice.offset
+        refs = tmpslice.refs
+        return result
     }
-    
-    
-    
+
     // MARK: - Loading Refs
     
     /// Loads a cell reference.
@@ -157,43 +137,29 @@ public class Slice {
     
     /// Loads an optional cell reference.
     public func loadMaybeRef() throws -> Cell? {
-        if try loadBoolean() {
-            return try loadRef()
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadRef() : nil
     }
     
     /// Preloads an optional cell reference.
     public func preloadMaybeRef() throws -> Cell? {
-        if try preloadBit() == 1 {
-            return try preloadRef()
-        } else {
-            return nil
-        }
+        try preloadBit() == 1 ? try preloadRef() : nil
     }
-    
-    
-    
+
     // MARK: - Loading Dictionaries
-    
+
     
     /// Reads a dictionary from the slice.
     public func loadDict<T>() throws -> T where T: CellCodableDictionary {
-        return try T.loadFrom(slice: self)
+        try T.loadFrom(slice: self)
     }
 
     /// Reads the non-empty dictionary root directly from this slice.
     public func loadDictRoot<T>() throws -> T where T: CellCodableDictionary {
-        return try T.loadRootFrom(slice: self)
+        try T.loadRootFrom(slice: self)
     }
 
-    
-    
-    
     // MARK: - Loading Bits
-    
-    
+
     /// Advances cursor by the specified numbe rof bits.
     public func skip(_ bits: Int) throws {
         if bits < 0 || offset + bits > bitstring.length {
@@ -211,21 +177,17 @@ public class Slice {
     
     /// Load a single bit as a boolean value.
     public func loadBoolean() throws -> Bool {
-        return try loadBit() == 1
+        try loadBit() == 1
     }
     
     /// Loads an optional boolean.
     public func loadMaybeBoolean() throws -> Bool? {
-        if try loadBoolean() {
-            return try loadBoolean()
-        } else {
-            return nil
-        }
+        try? loadBoolean()
     }
 
     /// Preload a single bit without advancing the cursor.
     public func preloadBit() throws -> Bit {
-        return try bitstring.at(offset)
+        try bitstring.at(offset)
     }
 
     /// Loads the specified number of bits in a `BitString`.
@@ -237,7 +199,7 @@ public class Slice {
 
     /// Preloads the specified number of bits in a `BitString` without advancing the cursor.
     public func preloadBits(_ bits: Int) throws -> Bitstring {
-        return try bitstring.substring(offset: offset, length: bits)
+        try bitstring.substring(offset: offset, length: bits)
     }
 
     /// Loads whole number of bytes and returns standard `Data` object.
@@ -250,7 +212,7 @@ public class Slice {
 
     /// Preloads whole number of bytes and returns standard `Data` object without advancing the cursor.
     public func preloadBytes(_ bytes: Int) throws -> Data {
-        return try _preloadBuffer(bytes: bytes)
+        try _preloadBuffer(bytes: bytes)
     }
 
     
@@ -282,12 +244,8 @@ public class Slice {
         
         return substring
     }
-
-    
-    
     
     // MARK: - Loading Integers
-    
     
     /**
      Load uint value
@@ -295,7 +253,7 @@ public class Slice {
     - returns read value as number
     */
     public func loadUint(bits: Int) throws -> UInt64 {
-        return UInt64(try loadUintBig(bits: bits))
+        UInt64(try loadUintBig(bits: bits))
     }
     
     /**
@@ -340,7 +298,7 @@ public class Slice {
     - returns read value as number
     */
     public func preloadUint(bits: Int) throws -> UInt64 {
-        return try _preloadUint(bits: bits, offset: offset)
+        try _preloadUint(bits: bits, offset: offset)
     }
 
     /**
@@ -349,7 +307,7 @@ public class Slice {
     - returns read value as bigint
     */
     public func preloadUintBig(bits: Int) throws -> BigUInt {
-        return try _preloadBigUint(bits: bits, offset: offset)
+        try _preloadBigUint(bits: bits, offset: offset)
     }
     
     /**
@@ -358,11 +316,7 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUint(bits: Int) throws -> UInt64? {
-        if try loadBoolean() {
-            return try loadUint(bits: bits)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadUint(bits: bits) : nil
     }
     
     /**
@@ -371,16 +325,8 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
-        if try loadBoolean() {
-            return try loadUintBig(bits: bits)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadUintBig(bits: bits) : nil
     }
-
-    
-    
-    
     
     // MARK: - Loading Variable-Length Integers
     
@@ -392,7 +338,7 @@ public class Slice {
         if limit > 9 {
             throw TonError.custom("VarUInteger \(limit) cannot store UInt64 (it occupies 8 bytes, so the largest type is VarUInteger 9)")
         }
-        return try UInt64(self.loadVarUintBig(limit: limit))
+        return try UInt64(loadVarUintBig(limit: limit))
     }
 
     /// Loads VarUInteger with a given `limit` in bytes.
@@ -407,13 +353,6 @@ public class Slice {
         }
         return try loadUintBig(bits: size * 8)
     }
-
-    
-
-    
-    
-    
-    
     
     // MARK: - Private methods
     
@@ -498,5 +437,60 @@ public class Slice {
         }
         
         return buf
+    }
+
+    // Slice is encoded inline
+    // MARK: - CellCodable {
+
+    public func storeTo(builder: Builder) throws {
+        try builder.store(slice: self)
+    }
+
+    public static func loadFrom(slice: Slice) throws -> Self {
+        slice.clone() as! Self
+    }
+
+    // MARK: - Snake Encoding
+
+    /// Loads snake-encoded String.
+    /// Fails if the string is malformed or not a valid UTF-8 string.
+    public func loadSnakeString() throws -> String {
+        guard let str = String(data: try loadSnakeData(), encoding: .utf8) else {
+            throw TonError.custom("Cannot read slice to string")
+        }
+        return str
+    }
+
+    /// Loads snake-encoded Data. Fails if the binary string is malformed.
+    public func loadSnakeData() throws -> Data {
+        // Check consistency
+        if remainingBits % 8 != 0 {
+            throw TonError.custom("Invalid string length: \(remainingBits)")
+        }
+        if remainingRefs != 0 && remainingRefs != 1 {
+            throw TonError.custom("Invalid number of refs: \(remainingRefs)")
+        }
+        if remainingRefs == 1 && (BitsPerCell - remainingBits) > 7 {
+            throw TonError.custom("Invalid string length: \(remainingBits / 8)")
+        }
+
+        // Read string
+        var res = Data()
+        if remainingBits == 0 {
+            res = Data()
+        } else {
+            res = try loadBytes(remainingBits / 8)
+        }
+
+        // Read tail
+        if remainingRefs == 1 {
+            res.append(
+                try loadRef()
+                    .beginParse()
+                    .loadSnakeData()
+            )
+        }
+
+        return res
     }
 }

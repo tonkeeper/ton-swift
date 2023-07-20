@@ -9,7 +9,7 @@ public class TupleReader {
     }
     
     public var remaining: Int {
-        return items.count
+        items.count
     }
     
     public func peek() throws -> Tuple {
@@ -76,7 +76,7 @@ public class TupleReader {
     }
     
     public func readAddress() throws -> Address {
-        return try readCell().beginParse().loadType()
+        try readCell().beginParse().loadType()
     }
     
     public func readAddressOpt() throws -> Address? {
