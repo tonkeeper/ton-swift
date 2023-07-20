@@ -26,7 +26,7 @@ public struct Address: Hashable, Codable {
     
     /// Initializes address from the raw format `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
     public static func parse(raw: String) throws -> Address {
-        let parts = raw.split(separator: ":");
+        let parts = raw.split(separator: ":")
         guard parts.count == 2 else {
             throw TonError.custom("Raw address is malformed: should be in the form `<workchain number>:<hex>`")
         }
@@ -96,7 +96,7 @@ extension Address: CellCodable, StaticSize {
             }
             
             // No Anycast supported
-            let anycastPrefix = try s.loadUint(bits: 1);
+            let anycastPrefix = try s.loadUint(bits: 1)
             if anycastPrefix != 0 {
                 throw TonError.custom("Invalid address: anycast not supported")
             }

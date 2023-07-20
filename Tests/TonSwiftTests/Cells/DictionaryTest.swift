@@ -41,7 +41,7 @@ final class DictionaryTest: XCTestCase {
             .store(ref: try builderFrom("1011111011111101111100100001"))
             .endCell()
         
-        let dict: [UInt16: UInt16] = try root.beginParse().loadDictRoot();
+        let dict: [UInt16: UInt16] = try root.beginParse().loadDictRoot()
         XCTAssertEqual(dict[13], 169)
         XCTAssertEqual(dict[17], 289)
         XCTAssertEqual(dict[239], 57121)

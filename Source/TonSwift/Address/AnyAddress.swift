@@ -47,8 +47,8 @@ enum AnyAddress {
     /// Converts to an optional internal address. Throws error if it is an external address.
     public func asInternal() throws -> Address? {
         switch self {
-        case .none: return nil;
-        case .internalAddr(let addr): return addr;
+        case .none: return nil
+        case .internalAddr(let addr): return addr
         case .externalAddr(_): throw TonError.custom("Expected internal address")
         }
     }
@@ -56,9 +56,9 @@ enum AnyAddress {
     /// Converts to an external address. Throws error if it is an internal address.
     public func asExternal() throws -> ExternalAddress? {
         switch self {
-        case .none: return nil;
+        case .none: return nil
         case .internalAddr(_): throw TonError.custom("Expected external address")
-        case .externalAddr(let addr): return addr;
+        case .externalAddr(let addr): return addr
         }
     }
 }
@@ -82,14 +82,14 @@ extension AnyAddress: CellCodable {
         let type = try slice.preloadUint(bits: 2)
         switch type {
         case 0:
-            try slice.skip(2);
-            return .none;
+            try slice.skip(2)
+            return .none
         case 1:
-            return .externalAddr(try slice.loadType());
+            return .externalAddr(try slice.loadType())
         case 2,3:
-            return .internalAddr(try slice.loadType());
+            return .internalAddr(try slice.loadType())
         default:
-            throw TonError.custom("Unreachable error");
+            throw TonError.custom("Unreachable error")
         }
     }
 }

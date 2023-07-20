@@ -12,7 +12,7 @@ public struct Coins {
 }
 
 extension Coins: RawRepresentable {
-    public typealias RawValue = BigUInt;
+    public typealias RawValue = BigUInt
 
     public init?(rawValue: BigUInt) {
         self.amount = rawValue

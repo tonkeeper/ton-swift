@@ -18,11 +18,11 @@ public struct StateInit: CellCodable {
          code: Cell? = nil,
          data: Cell? = nil,
          libraries: [UInt256: SimpleLibrary] = [:]) {
-        self.splitDepth = splitDepth;
-        self.special = special;
-        self.code = code;
-        self.data = data;
-        self.libraries = libraries;
+        self.splitDepth = splitDepth
+        self.special = special
+        self.code = code
+        self.data = data
+        self.libraries = libraries
     }
     
     public func storeTo(builder: Builder) throws {
@@ -48,11 +48,11 @@ public struct StateInit: CellCodable {
     static public func loadFrom(slice: Slice) throws -> StateInit {
         let splitDepth: UInt32? = try slice.loadMaybe { s in
             UInt32(try s.loadUint(bits: 5))
-        };
+        }
 
         let special: TickTock? = try slice.loadMaybe { s in
             try TickTock.loadFrom(slice: slice)
-        };
+        }
 
         let code = try slice.loadMaybeRef()
         let data = try slice.loadMaybeRef()

@@ -127,12 +127,12 @@ public class Slice {
     /// If parsing succeeded, the slice is advanced.
     /// If parsing failed, the slice remains unchanged.
     public func tryLoad<T>(_ closure: (Slice) throws -> T) throws -> T {
-        let tmpslice = self.clone();
-        let result = try closure(tmpslice);
-        self.bitstring = tmpslice.bitstring;
-        self.offset = tmpslice.offset;
-        self.refs = tmpslice.refs;
-        return result;
+        let tmpslice = self.clone()
+        let result = try closure(tmpslice)
+        self.bitstring = tmpslice.bitstring
+        self.offset = tmpslice.offset
+        self.refs = tmpslice.refs
+        return result
     }
     
     

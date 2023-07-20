@@ -1,7 +1,7 @@
 import Foundation
 
 /// By default, addresses are bounceable for safety of TON transfers.
-public let BounceableDefault = true;
+public let BounceableDefault = true
 
 let bounceableTag: UInt8 = 0x11
 let nonBounceableTag: UInt8 = 0x51

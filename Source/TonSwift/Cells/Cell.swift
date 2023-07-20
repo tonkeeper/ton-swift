@@ -65,7 +65,7 @@ public struct Cell: Hashable {
             
             self.basic = BasicCell(type: .ordinary, bits: bits, refs: refs)
         }
-        let precomputed = try self.basic.precompute();
+        let precomputed = try self.basic.precompute()
         self.mask = precomputed.mask
         self._depths = precomputed.depths
         self._hashes = precomputed.hashes
@@ -138,7 +138,7 @@ public struct Cell: Hashable {
     /// Same as `toSlice`.
     public func beginParse(allowExotic: Bool = false) throws -> Slice {
         if isExotic && !allowExotic {
-            throw TonError.custom("Exotic cells cannot be parsed");
+            throw TonError.custom("Exotic cells cannot be parsed")
         }
         
         return Slice(cell: self)
@@ -218,7 +218,7 @@ fileprivate struct BasicCell: Hashable {
         let reader = Slice(bits: bits)
         let typeInt = try reader.preloadUint(bits: 8)
         
-        let type: CellType;
+        let type: CellType
         switch typeInt {
         case 1:
             type = try resolvePruned(bits: bits, refs: refs).type
@@ -417,7 +417,7 @@ func exoticPruned(bits: Bitstring, refs: [Cell]) throws -> ExoticPruned {
     }
 
     if refs.count != 0 {
-        throw TonError.custom("Pruned Branch cell can't has refs, got \(refs.count)");
+        throw TonError.custom("Pruned Branch cell can't has refs, got \(refs.count)")
     }
 
     // Resolve cell
@@ -432,13 +432,13 @@ func exoticPruned(bits: Bitstring, refs: [Cell]) throws -> ExoticPruned {
         let level = UInt32(try reader.loadUint(bits: 8))
         mask = LevelMask(mask: level)
         if mask.level < 1 || mask.level > 3 {
-            throw TonError.custom("Pruned Branch cell level must be >= 1 and <= 3, got \(mask.level)/\(mask.value)");
+            throw TonError.custom("Pruned Branch cell level must be >= 1 and <= 3, got \(mask.level)/\(mask.value)")
         }
 
         // Read pruned
         let size = 8 + 8 + (mask.apply(level: mask.level - 1).hashCount * (256 /* Hash */ + 16 /* Depth */))
         if bits.length != size {
-            throw TonError.custom("Pruned branch cell must have exactly size bits, got \(bits.length)");
+            throw TonError.custom("Pruned branch cell must have exactly size bits, got \(bits.length)")
         }
     }
 

@@ -7,7 +7,7 @@ extension Slice {
         guard let str = String(data: try self.loadSnakeData(), encoding: .utf8) else {
             throw TonError.custom("Cannot read slice to string")
         }
-        return str;
+        return str
     }
 
     /// Loads snake-encoded Data. Fails if the binary string is malformed.
@@ -68,7 +68,7 @@ extension Builder {
 extension String {
     /// Encodes a String into a Cell
     public func toTonCell() throws -> Cell {
-        return try Builder().writeSnakeData(Data(self.utf8)).endCell();
+        return try Builder().writeSnakeData(Data(self.utf8)).endCell()
     }
 }
 

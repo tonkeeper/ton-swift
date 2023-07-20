@@ -13,7 +13,7 @@ final class StateInitTest: XCTestCase {
             .endCell()
             .toBoc(idx: false, crc32: true)
         
-        let enc = boc.base64EncodedString();
+        let enc = boc.base64EncodedString()
         //XCTAssertEqual(boc.base64EncodedString(), "te6cckEBAwEACwACATQCAQACAgACAX/38hg=")
         // TBD: figure out why there is random failure in the above test
         XCTAssertTrue(
