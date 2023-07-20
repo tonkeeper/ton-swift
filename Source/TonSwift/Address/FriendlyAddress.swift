@@ -89,7 +89,7 @@ public struct FriendlyAddress: Codable {
         var addrcrc = Data(count: 36)
         addrcrc[0...] = addr
         addrcrc[34...] = addr.crc16()
-                
+
         if urlSafe {
             return addrcrc.base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_")
         } else {
