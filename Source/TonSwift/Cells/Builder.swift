@@ -8,10 +8,7 @@ public class Builder {
     
     public private(set) var refs: [Cell]
     
-    
-    
     // MARK: - Initializers
-    
         
     /// Initialize the Builder with a given capacity.
     /// Note: Builder can be used to construct larger bitstrings, not only 1023-bit Cells. E.g. to build a BoC.
@@ -34,9 +31,7 @@ public class Builder {
         self.refs = refs
     }
     
-    
     // MARK: - Finalization
-    
     
     /// Clones slice at its current state.
     public func clone() -> Builder {
@@ -67,12 +62,9 @@ public class Builder {
         }
         return _buffer.subdata(in: 0..._length / 8)
     }
-    
-    
-    
+
     // MARK: - Metrics
 
-    
     /// Returns whether the written bits are byte-aligned
     public var aligned: Bool {
         _length % 8 == 0
@@ -120,11 +112,9 @@ public class Builder {
             return nil
         }
     }
-    
-    
+
     // MARK: - Storing Generic Types
-    
-    
+
     /// Stores an object
     @discardableResult
     public func store(_ object: CellCodable) throws -> Self  {
@@ -144,12 +134,9 @@ public class Builder {
         
         return self
     }
-    
-    
-    
+
     // MARK: - Storing Refs
-    
-    
+
     /**
      Store reference
      - parameter cell: cell or builder to store
@@ -163,6 +150,7 @@ public class Builder {
         refs.append(cell)
         return self
     }
+
     @discardableResult
     public func store(ref builder: Builder) throws -> Self {
         try store(ref: try builder.endCell())
@@ -184,6 +172,7 @@ public class Builder {
         
         return self
     }
+
     @discardableResult
     public func storeMaybe(ref builder: Builder?) throws -> Self {
         if let builder = builder {
@@ -225,29 +214,22 @@ public class Builder {
             try store(bit: false)
         }
     }
-    
-    
-    
+
     // MARK: - Storing Dictionaries
-    
-    
+
     @discardableResult
     public func store(dict: any CellCodableDictionary) throws -> Self {
         try dict.storeTo(builder: self)
         return self
     }
-    
+
     @discardableResult
     public func store(dictRoot dict: any CellCodableDictionary) throws -> Self {
         try dict.storeRootTo(builder: self)
         return self
     }
-    
-    
-    
-    
+
     // MARK: - Storing Bits
-    
 
     /// Write a single bit: the bit is set for positive values, not set for zero or negative
     @discardableResult
@@ -261,13 +243,13 @@ public class Builder {
         _length += 1
         return self
     }
-    
+
     /// Writes bit as a boolean (true => 1, false => 0)
     @discardableResult
     public func store(bit: Bool) throws -> Self {
         try store(bit: bit ? 1 : 0)
     }
-    
+
     /// Write repeating bit a given number of times.
     @discardableResult
     public func store(bit: Bit, repeat count: Int) throws -> Self {
@@ -277,7 +259,7 @@ public class Builder {
         }
         return self
     }
-    
+
     /// Writes bits from a bitstring
     @discardableResult
     public func store(bits: Bitstring) throws -> Self {
@@ -330,15 +312,9 @@ public class Builder {
         }
         return self
     }
-    
-    
-    
-    
-    
-    
+
     // MARK: - Storing Integers
-    
-    
+
     /**
      Write uint value
     - parameter value: value as bigint or number
@@ -348,7 +324,7 @@ public class Builder {
     public func store<T>(uint value: T, bits: Int) throws -> Self where T: BinaryInteger {
         try store(biguint: BigUInt(value), bits: bits)
     }
-    
+
     @discardableResult
     public func store(biguint value: BigUInt, bits: Int) throws -> Self {
         try checkCapacity(bits)
@@ -381,7 +357,7 @@ public class Builder {
                 return self
             }
         }
-        
+
         // Corner case for zero bits
         if bits == 0 {
             if value != 0 {
@@ -418,13 +394,12 @@ public class Builder {
         }
         return self
     }
-    
-    
+
     @discardableResult
     public func store(int value: any BinaryInteger, bits: Int) throws -> Self {
         try store(bigint: BigInt(value), bits: bits)
     }
-        
+
     @discardableResult
     func store(bigint value: BigInt, bits: Int) throws -> Self {
         var v = value
@@ -465,14 +440,8 @@ public class Builder {
         return self
     }
 
-    
-    
-    
-    
-    
     // MARK: - Storing Variable-Length Integers
-    
-    
+
     /// Stores VarUInteger with a given `limit` in bytes.
     /// The integer must be at most `limit-1` bytes long.
     /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes) and uses 4 bits to encode length prefix 0...15.
@@ -480,7 +449,7 @@ public class Builder {
     func store(varuint v: UInt64, limit: Int) throws -> Self {
         try store(varuint: BigUInt(v), limit: limit)
     }
-    
+
     /// Stores VarUInteger with a given `limit` in bytes.
     /// The integer must be at most `limit-1` bytes long.
     /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes) and uses 4 bits to encode length prefix 0...15.
@@ -515,12 +484,10 @@ public class Builder {
         
         return self
     }
-    
 
     private func checkCapacity(_ bits: Int) throws {
         if availableBits < bits || bits < 0 {
             throw TonError.custom("Builder overflow: need to write \(bits), but available \(availableBits)")
         }
     }
-
 }

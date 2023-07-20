@@ -1,11 +1,5 @@
 import Foundation
 
-enum BocMagic: UInt32 {
-    case V1 = 0x68ff65f3
-    case V2 = 0xacc3a728
-    case V3 = 0xb5ee9c72
-}
-
 /// BoC = Bag-of-Cells, data structure for efficient storage and transmission of a collection of cells.
 struct Boc {
     let size: Int
@@ -17,7 +11,7 @@ struct Boc {
     let index: Data?
     let cellData: Data
     let rootIndices: [UInt64]
-    
+
     init(data: Data) throws {
         let reader = Slice(data: data)
         guard let magic = BocMagic(rawValue: UInt32(try reader.loadUint(bits: 32))) else {

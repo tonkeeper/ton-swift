@@ -16,7 +16,7 @@ import Foundation
 /// _ _:MsgAddressExt = MsgAddress;
 /// ```
 ///
-enum AnyAddress {
+enum AnyAddress: CellCodable {
     case none
     case internalAddr(Address)
     case externalAddr(ExternalAddress)
@@ -61,9 +61,9 @@ enum AnyAddress {
         case .externalAddr(let addr): return addr
         }
     }
-}
 
-extension AnyAddress: CellCodable {
+    // MARK: - CellCodable
+
     func storeTo(builder: Builder) throws {
         switch self {
         case .none:

@@ -1,6 +1,6 @@
 import Foundation
 
-struct ADNLAddress {
+struct ADNLAddress: Equatable {
     static func parseFriendly(_ src: String) throws -> ADNLAddress {
         if src.count != 55 {
             throw TonError.custom("Invalid address")
@@ -46,10 +46,8 @@ struct ADNLAddress {
         return String(data.toBase32().dropFirst())
     }
 
-}
+    // MARK: - Equatable
 
-// MARK: - Equatable
-extension ADNLAddress: Equatable {
     static func == (lhs: ADNLAddress, rhs: ADNLAddress) -> Bool {
         lhs.address == rhs.address
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Address: Hashable, Codable {
+public struct Address: Hashable, Codable, Equatable, CellCodable, StaticSize {
     public let workchain: Int8
     public let hash: Data
     
@@ -49,27 +49,25 @@ public struct Address: Hashable, Codable {
     public func toString(urlSafe: Bool = true, testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> String {
         toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
     }
-}
 
-// MARK: - Equatable
-extension Address: Equatable {
+    // MARK: - Equatable
+
     public static func == (lhs: Address, rhs: Address) -> Bool {
         lhs.workchain != rhs.workchain ? false : lhs.hash == rhs.hash
     }
-}
 
-/// ```
-/// anycast_info$_ depth:(#<= 30) { depth >= 1 }
-///                rewrite_pfx:(bits depth)        = Anycast;
-/// addr_std$10 anycast:(Maybe Anycast)
-///             workchain_id:int8
-///             address:bits256                    = MsgAddressInt;
-/// addr_var$11 anycast:(Maybe Anycast)
-///             addr_len:(## 9)
-///             workchain_id:int32
-///             address:(bits addr_len)            = MsgAddressInt;
-/// ```
-extension Address: CellCodable, StaticSize {
+    // MARK: - CellCodable, StaticSize
+    /// ```
+    /// anycast_info$_ depth:(#<= 30) { depth >= 1 }
+    ///                rewrite_pfx:(bits depth)        = Anycast;
+    /// addr_std$10 anycast:(Maybe Anycast)
+    ///             workchain_id:int8
+    ///             address:bits256                    = MsgAddressInt;
+    /// addr_var$11 anycast:(Maybe Anycast)
+    ///             addr_len:(## 9)
+    ///             workchain_id:int32
+    ///             address:(bits addr_len)            = MsgAddressInt;
+    /// ```
     
     public static var bitWidth: Int = 267
     
@@ -102,28 +100,3 @@ extension Address: CellCodable, StaticSize {
         }
     }
 }
-
-/// The most compact address encoding that's often used within smart contracts: workchain + hash.
-public struct CompactAddress: Hashable, CellCodable, StaticSize {
-    public static var bitWidth: Int = 8 + 256
-    public let inner: Address
-    
-    init(_ inner: Address) {
-        self.inner = inner
-    }
-    
-    public func storeTo(builder: Builder) throws {
-        try builder
-            .store(int: inner.workchain, bits: 8)
-            .store(data: inner.hash)
-    }
-    
-    public static func loadFrom(slice: Slice) throws -> CompactAddress {
-        try slice.tryLoad { s in
-            let wc = Int8(try s.loadInt(bits: 8))
-            let hash = try s.loadBytes(32)
-            return CompactAddress(Address(workchain: wc, hash: hash))
-        }
-    }
-}
-

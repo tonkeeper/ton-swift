@@ -1,8 +1,6 @@
 import Foundation
 
-
-
-public struct Bitstring: Hashable {
+public struct Bitstring: Hashable, Comparable, Equatable {
     
     public static let empty = Bitstring(data: .init(), unchecked: (offset: 0, length: 0))
     
@@ -221,10 +219,10 @@ public struct Bitstring: Hashable {
         
         return try! builder.alignedBitstring() // we guarantee alignment in this method
     }
-}
 
-/// Bitstring implements lexicographic comparison.
-extension Bitstring: Comparable {
+    // MARK: - Comparable
+    /// Bitstring implements lexicographic comparison.
+
     public static func < (lhs: Self, rhs: Self) -> Bool {
         for i in 0..<min(lhs.length, rhs.length) {
             let l = lhs.at(unchecked: i)
@@ -234,9 +232,8 @@ extension Bitstring: Comparable {
         }
         return lhs.length <= rhs.length // shorter string comes first, tie is in favor of the LHS
     }
-}
 
-extension Bitstring: Equatable {
+    // MARK: - Equatable
     
     /**
      Checks for equality
@@ -263,15 +260,5 @@ extension Bitstring: Equatable {
         }
         
         return true
-    }
-}
-
-extension Data {
-    public func subdata(in range: ClosedRange<Index>) -> Data {
-        subdata(in: range.lowerBound ..< range.upperBound)
-    }
-    
-    public func hexString() -> String {
-        map({ String(format: "%02hhx", $0) }).joined()
     }
 }

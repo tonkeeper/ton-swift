@@ -4,7 +4,7 @@ import Foundation
 /// ```
 /// addr_extern$01 len:(## 9) external_address:(bits len) = MsgAddressExt;
 /// ```
-public struct ExternalAddress {
+public struct ExternalAddress: CellCodable {
     private(set) var value: Bitstring
 
     public init(value: Bitstring) {
@@ -18,9 +18,7 @@ public struct ExternalAddress {
     public static func mock(seed: String) throws -> Self {
         ExternalAddress(value: Bitstring(data: Data(seed.utf8).sha256()))
     }
-}
 
-extension ExternalAddress: CellCodable {
     public func storeTo(builder: Builder) throws {
         try builder
             .store(uint: 1, bits: 2)
