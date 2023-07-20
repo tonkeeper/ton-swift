@@ -1,4 +1,10 @@
-import Foundation
+//
+//  SenderArguments.swift
+//  
+//
+//  Created by Kirill Kirilenko on 20/07/2023.
+//
+
 import BigInt
 
 public struct SenderArguments {
@@ -8,9 +14,4 @@ public struct SenderArguments {
     let bounce: Bool
     let stateInit: StateInit?
     let body: Cell
-}
-
-public struct Sender {
-    let address: Address?
-    let send: ((SenderArguments) async throws -> Void)
 }

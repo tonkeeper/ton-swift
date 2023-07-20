@@ -1,65 +1,38 @@
 import Foundation
 
 /*
- Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L123
+ Source: https://github.com/ton-blockchain/ton/blob/24dc184a2ea67f9c47042b4104bbb4d82289fac1/crypto/block/block.tlb#L132
  int_msg_info$0 ihr_disabled:Bool
                 bounce:Bool
                 bounced:Bool
-                src:MsgAddressInt
+                src:MsgAddress
                 dest:MsgAddressInt
                 value:CurrencyCollection
                 ihr_fee:Grams
                 fwd_fee:Grams
                 created_lt:uint64
-                created_at:uint32 = CommonMsgInfo;
+                created_at:uint32 = CommonMsgInfoRelaxed;
  
- ext_in_msg_info$10 src:MsgAddressExt
-                    dest:MsgAddressInt
-                    import_fee:Grams = CommonMsgInfo;
- ext_out_msg_info$11 src:MsgAddressInt
+ 
+ 
+ 
+ ext_out_msg_info$11 src:MsgAddress
                      dest:MsgAddressExt
                      created_lt:uint64
-                     created_at:uint32 = CommonMsgInfo;
+                     created_at:uint32 = CommonMsgInfoRelaxed;
  */
 
-public struct CommonMsgInfoInternal {
-    let ihrDisabled: Bool
-    let bounce: Bool
-    let bounced: Bool
-    let src: Address
-    let dest: Address
-    let value: CurrencyCollection
-    let ihrFee: Coins
-    let forwardFee: Coins
-    let createdLt: UInt64
-    let createdAt: UInt32
-}
-
-public struct CommonMsgInfoExternalIn {
-    let src: ExternalAddress?
-    let dest: Address
-    let importFee: Coins
-}
-
-public struct CommonMsgInfoExternalOut {
-    let src: Address
-    let dest: ExternalAddress?
-    let createdLt: UInt64
-    let createdAt: UInt32
-}
-
-public enum CommonMsgInfo: CellCodable {
-    case internalInfo(info: CommonMsgInfoInternal)
-    case externalOutInfo(info: CommonMsgInfoExternalOut)
-    case externalInInfo(info: CommonMsgInfoExternalIn)
+public enum CommonMsgInfoRelaxed: CellCodable {
+    case internalInfo(info: CommonMsgInfoRelaxedInternal)
+    case externalOutInfo(info: CommonMsgInfoRelaxedExternalOut)
     
-    public static func loadFrom(slice: Slice) throws -> CommonMsgInfo {
+    public static func loadFrom(slice: Slice) throws -> CommonMsgInfoRelaxed {
         // Internal message
         if !(try slice.loadBoolean()) {
             let ihrDisabled = try slice.loadBoolean()
             let bounce = try slice.loadBoolean()
             let bounced = try slice.loadBoolean()
-            let src: Address = try slice.loadType()
+            let src: AnyAddress = try slice.loadType()
             let dest: Address = try slice.loadType()
             let value: CurrencyCollection = try slice.loadType()
             let ihrFee = try slice.loadCoins()
@@ -67,7 +40,7 @@ public enum CommonMsgInfo: CellCodable {
             let createdLt = try slice.loadUint(bits: 64)
             let createdAt = UInt32(try slice.loadUint(bits: 32))
             
-            return CommonMsgInfo.internalInfo(
+            return CommonMsgInfoRelaxed.internalInfo(
                 info: .init(
                     ihrDisabled: ihrDisabled,
                     bounce: bounce,
@@ -85,25 +58,15 @@ public enum CommonMsgInfo: CellCodable {
         
         // External In message
         if !(try slice.loadBoolean()) {
-            let src: AnyAddress = try slice.loadType()
-            let dest: Address = try slice.loadType()
-            let importFee = try slice.loadCoins()
-            
-            return CommonMsgInfo.externalInInfo(
-                info: .init(
-                    src: try src.asExternal(),
-                    dest: dest,
-                    importFee: importFee
-                )
-            )
+            throw TonError.custom("External In message is not possible for CommonMessageInfoRelaxed")
         } else {
             // External Out mesage
-            let src: Address = try slice.loadType()
+            let src: AnyAddress = try slice.loadType()
             let dest: AnyAddress = try slice.loadType()
             let createdLt = try slice.loadUint(bits: 64)
             let createdAt = UInt32(try slice.loadUint(bits: 32))
             
-            return CommonMsgInfo.externalOutInfo(
+            return CommonMsgInfoRelaxed.externalOutInfo(
                 info: .init(
                     src: src,
                     dest: try dest.asExternal(),
@@ -117,11 +80,11 @@ public enum CommonMsgInfo: CellCodable {
     public func storeTo(builder: Builder) throws {
         switch self {
         case .internalInfo(let info):
-            try builder.store(bit: 0)
+            try builder.store(bit: false)
                 .store(bit: info.ihrDisabled)
                 .store(bit: info.bounce)
                 .store(bit: info.bounced)
-                .store(AnyAddress(info.src))
+                .store(info.src)
                 .store(AnyAddress(info.dest))
                 .store(info.value)
                 .store(coins: info.ihrFee)
@@ -130,19 +93,12 @@ public enum CommonMsgInfo: CellCodable {
                 .store(uint: UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
-            try builder.store(bit: 1)
-                .store(bit: 1)
-                .store(AnyAddress(info.src))
+            try builder.store(bit:true)
+                .store(bit:true)
+                .store(info.src)
                 .store(AnyAddress(info.dest))
                 .store(uint: info.createdLt, bits: 64)
                 .store(uint: UInt64(info.createdAt), bits: 32)
-            
-        case .externalInInfo(let info):
-            try builder.store(bit: true)
-                .store(bit: false)
-                .store(AnyAddress(info.src))
-                .store(AnyAddress(info.dest))
-                .store(coins: info.importFee)
         }
     }
 }
