@@ -72,6 +72,8 @@ struct Boc {
     }
 }
 
+// TODO: Make this functions not global
+
 func getRefsDescriptor(refs: [Cell], level: UInt32, type: CellType) -> UInt8 {
     let typeFactor: UInt8 = type != .ordinary ? 1 : 0
     return UInt8(refs.count) + typeFactor * 8 + UInt8(level) * 32

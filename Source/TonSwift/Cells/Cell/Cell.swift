@@ -195,7 +195,7 @@ public struct Cell: Hashable, Equatable, CellCodable {
     }
 }
 
-// MARK: - Internal implementation
+// TODO: Make this functions not global
 
 func getRepr(bits: Bitstring, refs: [Cell], level: UInt32, type: CellType) throws -> Data {
     // Allocate

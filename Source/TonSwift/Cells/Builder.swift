@@ -501,4 +501,29 @@ public class Builder: CellCodable {
     public static func loadFrom(slice: Slice) throws -> Self {
         try slice.clone().toBuilder() as! Self
     }
+
+    // MARK: SnakeEncoding
+
+    /// Writes snake-encoded data
+    @discardableResult
+    public func writeSnakeData(_ src: Data) throws -> Self {
+        if src.count > 0 {
+            let bytes = Int(floor(Double(availableBits / 8)))
+            if src.count > bytes {
+                let a = src.subdata(in: 0..<bytes)
+                let t = src.subdata(in: bytes..<src.endIndex)
+                try store(data: a)
+                let cell = try (try Builder().writeSnakeData(t)).endCell()
+                try store(ref:cell)
+            } else {
+                try store(data: src)
+            }
+        }
+        return self
+    }
+
+    /// Writes snake-encoded UTF-8 string.
+    public func writeSnakeString(_ src: String) throws -> Self {
+        try writeSnakeData(Data(src.utf8))
+    }
 }

@@ -449,4 +449,48 @@ public class Slice: CellCodable {
     public static func loadFrom(slice: Slice) throws -> Self {
         slice.clone() as! Self
     }
+
+    // MARK: - Snake Encoding
+
+    /// Loads snake-encoded String.
+    /// Fails if the string is malformed or not a valid UTF-8 string.
+    public func loadSnakeString() throws -> String {
+        guard let str = String(data: try loadSnakeData(), encoding: .utf8) else {
+            throw TonError.custom("Cannot read slice to string")
+        }
+        return str
+    }
+
+    /// Loads snake-encoded Data. Fails if the binary string is malformed.
+    public func loadSnakeData() throws -> Data {
+        // Check consistency
+        if remainingBits % 8 != 0 {
+            throw TonError.custom("Invalid string length: \(remainingBits)")
+        }
+        if remainingRefs != 0 && remainingRefs != 1 {
+            throw TonError.custom("Invalid number of refs: \(remainingRefs)")
+        }
+        if remainingRefs == 1 && (BitsPerCell - remainingBits) > 7 {
+            throw TonError.custom("Invalid string length: \(remainingBits / 8)")
+        }
+
+        // Read string
+        var res = Data()
+        if remainingBits == 0 {
+            res = Data()
+        } else {
+            res = try loadBytes(remainingBits / 8)
+        }
+
+        // Read tail
+        if remainingRefs == 1 {
+            res.append(
+                try loadRef()
+                    .beginParse()
+                    .loadSnakeData()
+            )
+        }
+
+        return res
+    }
 }
