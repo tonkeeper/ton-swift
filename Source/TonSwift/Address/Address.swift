@@ -73,11 +73,12 @@ extension Address: CellCodable, StaticSize {
     
     public static var bitWidth: Int = 267
     
-    public func storeTo(builder b: Builder) throws {
-        try b.store(uint: 2, bits: 2) // $10
-        try b.store(uint: 0, bits: 1)
-        try b.store(int: workchain, bits: 8)
-        try b.store(data: hash)
+    public func storeTo(builder: Builder) throws {
+        try builder
+            .store(uint: 2, bits: 2)
+            .store(uint: 0, bits: 1)
+            .store(int: workchain, bits: 8)
+            .store(data: hash)
     }
     
     public static func loadFrom(slice: Slice) throws -> Address {
@@ -111,9 +112,10 @@ public struct CompactAddress: Hashable, CellCodable, StaticSize {
         self.inner = inner
     }
     
-    public func storeTo(builder b: Builder) throws {
-        try b.store(int: inner.workchain, bits: 8)
-        try b.store(data: inner.hash)
+    public func storeTo(builder: Builder) throws {
+        try builder
+            .store(int: inner.workchain, bits: 8)
+            .store(data: inner.hash)
     }
     
     public static func loadFrom(slice: Slice) throws -> CompactAddress {

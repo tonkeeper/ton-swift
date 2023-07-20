@@ -22,9 +22,10 @@ public struct ExternalAddress {
 
 extension ExternalAddress: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.store(uint: 1, bits: 2)
-        try builder.store(uint: value.length, bits: 9)
-        try builder.store(bits: value)
+        try builder
+            .store(uint: 1, bits: 2)
+            .store(uint: value.length, bits: 9)
+            .store(bits: value)
     }
     
     public static func loadFrom(slice: Slice) throws -> ExternalAddress {

@@ -201,19 +201,19 @@ func serializeBoc(root: Cell, idx: Bool, crc32: Bool) throws -> Data {
     ) * 8
 
     // Serialize
-    var builder = Builder(capacity: totalSize)
-    try builder.store(uint: 0xb5ee9c72, bits: 32) // Magic
-    try builder.store(bit: hasIdx) // Has index
-    try builder.store(bit: hasCrc32c) // Has crc32c
-    try builder.store(bit: hasCacheBits) // Has cache bits
-    try builder.store(uint: flags, bits: 2) // Flags
-    try builder.store(uint: sizeBytes, bits: 3) // Size bytes
-    try builder.store(uint: offsetBytes, bits: 8) // Offset bytes
-    try builder.store(uint: cellsNum, bits: sizeBytes * 8) // Cells num
-    try builder.store(uint: 1, bits: sizeBytes * 8) // Roots num
-    try builder.store(uint: 0, bits: sizeBytes * 8) // Absent num
-    try builder.store(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
-    try builder.store(uint: 0, bits: sizeBytes * 8) // Root id == 0
+    var builder = try Builder(capacity: totalSize)
+        .store(uint: 0xb5ee9c72, bits: 32) // Magic
+        .store(bit: hasIdx) // Has index
+        .store(bit: hasCrc32c) // Has crc32c
+        .store(bit: hasCacheBits) // Has cache bits
+        .store(uint: flags, bits: 2) // Flags
+        .store(uint: sizeBytes, bits: 3) // Size bytes
+        .store(uint: offsetBytes, bits: 8) // Offset bytes
+        .store(uint: cellsNum, bits: sizeBytes * 8) // Cells num
+        .store(uint: 1, bits: sizeBytes * 8) // Roots num
+        .store(uint: 0, bits: sizeBytes * 8) // Absent num
+        .store(uint: totalCellSize, bits: offsetBytes * 8) // Total cell size
+        .store(uint: 0, bits: sizeBytes * 8) // Root id == 0
 
     if hasIdx {
         for i in 0 ..< cellsNum {

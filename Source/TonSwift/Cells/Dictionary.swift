@@ -115,12 +115,12 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
                 
         // Serialize keys
         var paddedMap: [Bitstring: V.T] = [:]
-        for (k, v) in map {
-            let b = Builder()
-            try keyCoder.storeValue(k, to: b)
-            let keybits = b.bitstring()
+        for (key, value) in map {
+            let builder = Builder()
+            try keyCoder.storeValue(key, to: builder)
+            let keybits = builder.bitstring()
             let paddedKey = keybits.padLeft(keyLength)
-            paddedMap[paddedKey] = v
+            paddedMap[paddedKey] = value
         }
 
         // Calculate root label

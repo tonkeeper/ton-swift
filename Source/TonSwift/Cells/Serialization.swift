@@ -39,9 +39,9 @@ public class DefaultCoder<X: CellCodable>: TypeCoder {
 public extension TypeCoder {
     /// Serializes type to Cell
     func serializeToCell(_ src: T) throws -> Cell {
-        let b = Builder()
-        try storeValue(src, to: b)
-        return try b.endCell()
+        let builder = Builder()
+        try storeValue(src, to: builder)
+        return try builder.endCell()
     }
 }
 

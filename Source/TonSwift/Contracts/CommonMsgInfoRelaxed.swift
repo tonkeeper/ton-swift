@@ -101,24 +101,24 @@ public enum CommonMsgInfoRelaxed: CellCodable {
         switch self {
         case .internalInfo(let info):
             try builder.store(bit: false)
-            try builder.store(bit: info.ihrDisabled)
-            try builder.store(bit: info.bounce)
-            try builder.store(bit: info.bounced)
-            try builder.store(info.src)
-            try builder.store(AnyAddress(info.dest))
-            try builder.store(info.value)
-            try builder.store(coins: info.ihrFee)
-            try builder.store(coins: info.forwardFee)
-            try builder.store(uint: info.createdLt, bits: 64)
-            try builder.store(uint: UInt64(info.createdAt), bits: 32)
+                .store(bit: info.ihrDisabled)
+                .store(bit: info.bounce)
+                .store(bit: info.bounced)
+                .store(info.src)
+                .store(AnyAddress(info.dest))
+                .store(info.value)
+                .store(coins: info.ihrFee)
+                .store(coins: info.forwardFee)
+                .store(uint: info.createdLt, bits: 64)
+                .store(uint: UInt64(info.createdAt), bits: 32)
             
         case .externalOutInfo(let info):
             try builder.store(bit:true)
-            try builder.store(bit:true)
-            try builder.store(info.src)
-            try builder.store(AnyAddress(info.dest))
-            try builder.store(uint: info.createdLt, bits: 64)
-            try builder.store(uint: UInt64(info.createdAt), bits: 32)
+                .store(bit:true)
+                .store(info.src)
+                .store(AnyAddress(info.dest))
+                .store(uint: info.createdLt, bits: 64)
+                .store(uint: UInt64(info.createdAt), bits: 32)
         }
     }
 }

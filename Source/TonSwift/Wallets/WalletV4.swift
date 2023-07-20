@@ -88,10 +88,9 @@ public class WalletV4: WalletContract {
         
         let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
         
-        let body = Builder()
-        try body.store(data: signature)
-        try body.store(signingMessage)
-        
-        return try body.endCell()
+        return try Builder()
+            .store(data: signature)
+            .store(signingMessage)
+            .endCell()
     }
 }

@@ -45,10 +45,10 @@ public struct MessageRelaxed: CellCodable {
             // check if we fit the cell inline with 2 bits for the stateinit and the body
             if let space = builder.fit(initCell.metrics), space.bitsCount >= 2 {
                 try builder.store(bit: 0)
-                try builder.store(initCell)
+                    .store(initCell)
             } else {
                 try builder.store(bit: 1)
-                try builder.store(ref:initCell)
+                    .store(ref:initCell)
             }
         } else {
             try builder.store(bit: 0)
@@ -56,10 +56,10 @@ public struct MessageRelaxed: CellCodable {
         
         if let space = builder.fit(body.metrics), space.bitsCount >= 1 {
             try builder.store(bit: 0)
-            try builder.store(body.toBuilder())
+                .store(body.toBuilder())
         } else {
             try builder.store(bit: 1)
-            try builder.store(ref: body)
+                .store(ref: body)
         }
     }
     
