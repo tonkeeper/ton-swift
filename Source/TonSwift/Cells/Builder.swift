@@ -1,7 +1,7 @@
 import Foundation
 import BigInt
 
-public class Builder {
+public class Builder: CellCodable {
     public let capacity: Int
     private var _buffer: Data
     private var _length: Int
@@ -489,5 +489,16 @@ public class Builder {
         if availableBits < bits || bits < 0 {
             throw TonError.custom("Builder overflow: need to write \(bits), but available \(availableBits)")
         }
+    }
+
+    // Builder is encoded inline
+    // MARK: - CellCodable
+
+    public func storeTo(builder: Builder) throws {
+        try builder.store(slice: endCell().beginParse())
+    }
+
+    public static func loadFrom(slice: Slice) throws -> Self {
+        try slice.clone().toBuilder() as! Self
     }
 }

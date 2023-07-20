@@ -7,7 +7,7 @@ public let BitsPerCell = 1023
 public let RefsPerCell = 4
 
 /// TON cell
-public struct Cell: Hashable, Equatable {
+public struct Cell: Hashable, Equatable, CellCodable {
     
     private let basic: BasicCell
     
@@ -182,6 +182,16 @@ public struct Cell: Hashable, Equatable {
     */
     public static func == (lhs: Cell, rhs: Cell) -> Bool {
         lhs.hash() == rhs.hash()
+    }
+
+    // Cell is encoded as a separate ref
+    // MARK: - CellCodable
+    public func storeTo(builder: Builder) throws {
+        try builder.store(ref: self)
+    }
+
+    public static func loadFrom(slice: Slice) throws -> Self {
+        try slice.loadRef()
     }
 }
 

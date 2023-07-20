@@ -3,14 +3,12 @@ import BigInt
 
 /// `Slice` is a class that allows to read cell data (bits and refs), consuming it along the way.
 /// Once you have done reading and want to make sure all the data is consumed, call `endParse()`.
-public class Slice {
+public class Slice: CellCodable {
 
     private var bitstring: Bitstring
     private var offset: Int
     private var refs: [Cell]
-    
 
-    
     // MARK: - Initializers
         
     init(cell: Cell) {
@@ -40,12 +38,9 @@ public class Slice {
         self.offset = offset
         self.refs = refs
     }
-    
-    
-    
+
     // MARK: - Metrics
-    
-        
+
     /// Remaining unread refs in this slice.
     public var remainingRefs: Int {
         refs.count
@@ -55,13 +50,9 @@ public class Slice {
     public var remainingBits: Int {
         bitstring.length - offset
     }
-    
-    
-    
-    
+
     // MARK: - Finalization
-    
-    
+
     /// Checks if the cell is fully processed without unread bits or refs.
     public func endParse() throws {
         if remainingBits > 0 || remainingRefs > 0 {
@@ -97,10 +88,6 @@ public class Slice {
         try loadRemainder().toString()
     }
     
-    
-    
-    
-    
     // MARK: - Loading Generic Types
 
     /// Loads type T that implements interface Readable
@@ -129,9 +116,7 @@ public class Slice {
         refs = tmpslice.refs
         return result
     }
-    
-    
-    
+
     // MARK: - Loading Refs
     
     /// Loads a cell reference.
@@ -159,11 +144,9 @@ public class Slice {
     public func preloadMaybeRef() throws -> Cell? {
         try preloadBit() == 1 ? try preloadRef() : nil
     }
-    
-    
-    
+
     // MARK: - Loading Dictionaries
-    
+
     
     /// Reads a dictionary from the slice.
     public func loadDict<T>() throws -> T where T: CellCodableDictionary {
@@ -175,12 +158,8 @@ public class Slice {
         try T.loadRootFrom(slice: self)
     }
 
-    
-    
-    
     // MARK: - Loading Bits
-    
-    
+
     /// Advances cursor by the specified numbe rof bits.
     public func skip(_ bits: Int) throws {
         if bits < 0 || offset + bits > bitstring.length {
@@ -265,12 +244,8 @@ public class Slice {
         
         return substring
     }
-
-    
-    
     
     // MARK: - Loading Integers
-    
     
     /**
      Load uint value
@@ -352,10 +327,6 @@ public class Slice {
     public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
         try loadBoolean() ? try loadUintBig(bits: bits) : nil
     }
-
-    
-    
-    
     
     // MARK: - Loading Variable-Length Integers
     
@@ -382,13 +353,6 @@ public class Slice {
         }
         return try loadUintBig(bits: size * 8)
     }
-
-    
-
-    
-    
-    
-    
     
     // MARK: - Private methods
     
@@ -473,5 +437,16 @@ public class Slice {
         }
         
         return buf
+    }
+
+    // Slice is encoded inline
+    // MARK: - CellCodable {
+
+    public func storeTo(builder: Builder) throws {
+        try builder.store(slice: self)
+    }
+
+    public static func loadFrom(slice: Slice) throws -> Self {
+        slice.clone() as! Self
     }
 }
