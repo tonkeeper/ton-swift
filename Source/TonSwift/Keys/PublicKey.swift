@@ -21,7 +21,7 @@ extension PublicKey: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> PublicKey {
-        return try slice.tryLoad { s in
+        try slice.tryLoad { s in
             let data = try s.loadBytes(.publicKeyLength)
             return PublicKey(data: data)
         }

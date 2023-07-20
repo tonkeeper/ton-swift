@@ -12,16 +12,12 @@ public struct Address: Hashable, Codable {
     
     /// Generates a test address
     public static func mock(workchain: Int8, seed: String) -> Self {
-        return Address(workchain: workchain, hash: Data(seed.utf8).sha256())
+        Address(workchain: workchain, hash: Data(seed.utf8).sha256())
     }
 
     /// Parses address from any format
     public static func parse(_ source: String) throws -> Address {
-        if source.firstIndex(of: ":") == nil {
-            return try FriendlyAddress(string: source).address
-        } else {
-            return try parse(raw: source)
-        }
+        source.firstIndex(of: ":") == nil ? try FriendlyAddress(string: source).address : try parse(raw: source)
     }
     
     /// Initializes address from the raw format `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
@@ -41,28 +37,24 @@ public struct Address: Hashable, Codable {
 
     /// Returns raw format of the address: `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
     public func toRaw() -> String {
-        return "\(workchain):\(hash.hexString())"
+        "\(workchain):\(hash.hexString())"
     }
     
     /// Returns raw format of the address: `<workchain>:<hash>` (decimal workchain, hex-encoded hash part)
     public func toFriendly(testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> FriendlyAddress {
-        return FriendlyAddress(address: self, testOnly: testOnly, bounceable: bounceable)
+        FriendlyAddress(address: self, testOnly: testOnly, bounceable: bounceable)
     }
     
     /// Shortcut for constructing FriendlyAddress with all the options.
     public func toString(urlSafe: Bool = true, testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> String {
-        return self.toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
+        self.toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
     }
 }
 
 // MARK: - Equatable
 extension Address: Equatable {
     public static func == (lhs: Address, rhs: Address) -> Bool {
-        if lhs.workchain != rhs.workchain {
-            return false
-        }
-        
-        return lhs.hash == rhs.hash
+        lhs.workchain != rhs.workchain ? false : lhs.hash == rhs.hash
     }
 }
 
@@ -89,7 +81,7 @@ extension Address: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Address {
-        return try slice.tryLoad { s in
+        try slice.tryLoad { s in
             let type = try s.loadUint(bits: 2)
             if type != 2 {
                 throw TonError.custom("Unsupported address type: expecting internal address `addr_std$10`")
@@ -125,7 +117,7 @@ public struct CompactAddress: Hashable, CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> CompactAddress {
-        return try slice.tryLoad { s in
+        try slice.tryLoad { s in
             let wc = Int8(try s.loadInt(bits: 8))
             let hash = try s.loadBytes(32)
             return CompactAddress(Address(workchain: wc, hash: hash))

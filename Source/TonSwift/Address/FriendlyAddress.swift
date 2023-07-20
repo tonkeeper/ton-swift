@@ -13,8 +13,8 @@ public struct FriendlyAddress: Codable {
     public let isBounceable: Bool
     public let address: Address
     
-    var workchain: Int8 { return self.address.workchain }
-    var hash: Data { return self.address.hash }
+    var workchain: Int8 { self.address.workchain }
+    var hash: Data { self.address.hash }
         
     init(string: String) throws {
         // Convert from url-friendly to true base64

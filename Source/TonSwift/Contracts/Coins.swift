@@ -19,7 +19,7 @@ extension Coins: RawRepresentable {
     }
 
     public var rawValue: BigUInt {
-        return self.amount
+        self.amount
     }
 }
 
@@ -28,27 +28,24 @@ extension Coins: CellCodable {
         try builder.store(varuint: self.amount, limit: 16)
     }
     public static func loadFrom(slice: Slice) throws -> Coins {
-        return Coins(try slice.loadVarUintBig(limit: 16))
+        Coins(try slice.loadVarUintBig(limit: 16))
     }
 }
 
 extension Slice {
     /// Loads Coins value
     public func loadCoins() throws -> Coins {
-        return try loadType()
+        try loadType()
     }
     
     /// Preloads Coins value
     public func preloadCoins() throws -> Coins {
-        return try preloadType()
+        try preloadType()
     }
     
     /// Load optionals Coins value.
     public func loadMaybeCoins() throws -> Coins? {
-        if try loadBoolean() {
-            return try loadCoins()
-        }
-        return nil
+        try loadBoolean() ? try loadCoins() : nil
     }
 }
 
@@ -57,7 +54,7 @@ extension Builder {
     /// Write coins amount in varuint format
     @discardableResult
     func store(coins: Coins) throws -> Self {
-        return try store(varuint: coins.amount, limit: 16)
+        try store(varuint: coins.amount, limit: 16)
     }
     
     /**

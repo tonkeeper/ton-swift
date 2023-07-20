@@ -63,7 +63,7 @@ public struct Message: CellCodable {
     }
     
     public static func external(to: Address, stateInit: StateInit?, body: Cell = .empty) -> Message {
-        return Message(
+        Message(
             info: .externalInInfo(
                 info: CommonMsgInfoExternalIn(
                     src: nil,

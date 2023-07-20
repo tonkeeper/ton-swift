@@ -12,12 +12,11 @@ public struct ExternalAddress {
     }
 
     public func toString() -> String {
-        return "External<\(value.length):\(value.toString())>"
+        "External<\(value.length):\(value.toString())>"
     }
     
     public static func mock(seed: String) throws -> Self {
-        let value = Bitstring(data: Data(seed.utf8).sha256())
-        return ExternalAddress(value: value)
+        ExternalAddress(value: Bitstring(data: Data(seed.utf8).sha256()))
     }
 }
 
@@ -29,7 +28,7 @@ extension ExternalAddress: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> ExternalAddress {
-        return try slice.tryLoad { s in
+        try slice.tryLoad { s in
             let type = try s.loadUint(bits: 2)
             if type != 1 {
                 throw TonError.custom("Invalid ExternalAddress")

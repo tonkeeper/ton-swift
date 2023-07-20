@@ -35,7 +35,7 @@ extension Bool: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try slice.loadBoolean()
+        try slice.loadBoolean()
     }
 }
 
@@ -54,7 +54,7 @@ public struct UInt256: Hashable, CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(biguint: try slice.loadUintBig(bits: Self.bitWidth))
+        Self(biguint: try slice.loadUintBig(bits: Self.bitWidth))
     }
 }
 
@@ -68,7 +68,7 @@ extension UInt8: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadUint(bits: Self.bitWidth))
+        Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -80,7 +80,7 @@ extension UInt16: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadUint(bits: Self.bitWidth))
+        Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -92,7 +92,7 @@ extension UInt32: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadUint(bits: Self.bitWidth))
+        Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -104,7 +104,7 @@ extension UInt64: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadUint(bits: Self.bitWidth))
+        Self(try slice.loadUint(bits: Self.bitWidth))
     }
 }
 
@@ -118,7 +118,7 @@ extension Int8: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadInt(bits: Self.bitWidth))
+        Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -130,7 +130,7 @@ extension Int16: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadInt(bits: Self.bitWidth))
+        Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -142,7 +142,7 @@ extension Int32: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadInt(bits: Self.bitWidth))
+        Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -154,7 +154,7 @@ extension Int64: CellCodable, StaticSize {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(try slice.loadInt(bits: Self.bitWidth))
+        Self(try slice.loadInt(bits: Self.bitWidth))
     }
 }
 
@@ -171,7 +171,7 @@ public struct VarUInt248: Hashable, CellCodable {
         try builder.store(varuint: value, limit: 32)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.loadVarUintBig(limit: 32))
+        Self(value: try slice.loadVarUintBig(limit: 32))
     }
 }
 
@@ -182,7 +182,7 @@ public struct VarUInt120: Hashable, CellCodable {
         try builder.store(varuint: value, limit: 16)
     }
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Self(value: try slice.loadVarUintBig(limit: 16))
+        Self(value: try slice.loadVarUintBig(limit: 16))
     }
 }
 
@@ -200,7 +200,7 @@ public struct IntCoder: TypeCoder {
     }
     
     public func loadValue(from src: Slice) throws -> T {
-        return try src.loadIntBig(bits: bits)
+        try src.loadIntBig(bits: bits)
     }
 }
 
@@ -218,7 +218,7 @@ public struct UIntCoder: TypeCoder {
     }
     
     public func loadValue(from src: Slice) throws -> T {
-        return try src.loadUintBig(bits: bits)
+        try src.loadUintBig(bits: bits)
     }
 }
 
@@ -243,6 +243,6 @@ public struct VarUIntCoder: TypeCoder {
     }
     
     public func loadValue(from src: Slice) throws -> T {
-        return try src.loadVarUintBig(limit: limit)
+        try src.loadVarUintBig(limit: limit)
     }
 }

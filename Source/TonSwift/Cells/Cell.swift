@@ -35,7 +35,7 @@ public struct Cell: Hashable {
     public var isExotic: Bool { type != .ordinary }
     
     public var metrics: CellMetrics {
-        return CellMetrics(bitsCount: bits.length, refsCount: refs.count)
+        CellMetrics(bitsCount: bits.length, refsCount: refs.count)
     }
 
     // Precomputed data
@@ -88,7 +88,7 @@ public struct Cell: Hashable {
     - returns array of cells
     */
     static func fromBoc(src: Data) throws -> [Cell] {
-        return try deserializeBoc(src: src)
+        try deserializeBoc(src: src)
     }
 
     /**
@@ -114,14 +114,14 @@ public struct Cell: Hashable {
     - returns cell hash
     */
     public func hash(level: Int = 3) -> Data {
-        return _hashes[min(_hashes.count - 1, level)]
+        _hashes[min(_hashes.count - 1, level)]
     }
     
     /// Returns the lowest-order hash that represents an actual tree of cells, possibly pruned.
     /// This is the hash of the data being transmitted.
     /// For the hash of the underlying contents see  `hash(level:)` method.
     public func representationHash() -> Data {
-        return _hashes[0]
+        _hashes[0]
     }
     
     
@@ -131,7 +131,7 @@ public struct Cell: Hashable {
     - returns cell depth
     */
     public func depth(level: Int = 3) -> UInt32 {
-        return _depths[min(_depths.count - 1, level)]
+        _depths[min(_depths.count - 1, level)]
     }
     
     /// Convert cell to slice so it can be parsed.
@@ -147,19 +147,19 @@ public struct Cell: Hashable {
     /// Convert cell to slice so it can be parsed.
     /// Same as `beginParse`.
     public func toSlice() throws -> Slice {
-        return try beginParse()
+        try beginParse()
     }
 
     /// Convert cell to a builder that has this cell pre-stored. Finalizing this builder yields the same cell.
     public func toBuilder() throws -> Builder {
-        return try Builder().store(slice: toSlice())
+        try Builder().store(slice: toSlice())
     }
     /**
      Serializes cell to BOC
     - parameter opts: options
     */
     func toBoc(idx: Bool = false, crc32: Bool = true) throws -> Data {
-        return try serializeBoc(root: self, idx: idx, crc32: crc32)
+        try serializeBoc(root: self, idx: idx, crc32: crc32)
     }
     
     /**
@@ -200,7 +200,7 @@ extension Cell: Equatable {
     - returns true if cells are equal
     */
     public static func == (lhs: Cell, rhs: Cell) -> Bool {
-        return lhs.hash() == rhs.hash()
+        lhs.hash() == rhs.hash()
     }
 }
 
@@ -582,33 +582,33 @@ public struct LevelMask {
     }
     
     public var value: UInt32 {
-        return _mask
+        _mask
     }
     
     public var level: UInt32 {
-        return UInt32(32 - _mask.leadingZeroBitCount)
+        UInt32(32 - _mask.leadingZeroBitCount)
     }
     
     public var hashIndex: UInt32 {
-        return _hashIndex
+        _hashIndex
     }
     
     public var hashCount: UInt32 {
-        return _hashCount
+        _hashCount
     }
     
     public func apply(level: UInt32) -> LevelMask {
-        return LevelMask(mask: _mask & ((1 << level) - 1))
+        LevelMask(mask: _mask & ((1 << level) - 1))
     }
     
     public func isSignificant(level: UInt32) -> Bool {
-        return level == 0 || (_mask >> (level - 1)) % 2 != 0
+        level == 0 || (_mask >> (level - 1)) % 2 != 0
     }
 }
 
 extension LevelMask: Hashable {
     public static func == (lhs: LevelMask, rhs: LevelMask) -> Bool {
-        return lhs._mask == rhs._mask &&
+        lhs._mask == rhs._mask &&
         lhs._hashIndex == rhs._hashIndex &&
         lhs._hashCount == rhs._hashCount
     }
@@ -634,5 +634,5 @@ func countSetBits(_ n: UInt32) -> UInt32 {
 /// denotes the subtype of the natural numbers type #, consisting of integers 0 . . . p;
 /// it is serialized into ⌈log2(p + 1)⌉ bits as an unsigned big-endian integer.
 public func bitsForInt(_ n: Int) -> Int {
-    return Int(ceil(log2(Double(n + 1))))
+    Int(ceil(log2(Double(n + 1))))
 }

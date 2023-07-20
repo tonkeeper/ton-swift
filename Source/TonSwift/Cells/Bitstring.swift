@@ -151,7 +151,7 @@ public struct Bitstring: Hashable {
     
     /// Drops first `n` bits from the bitstring.
     public func dropFirst(_ n: Int) throws -> Bitstring {
-        return try substring(offset: n, length: self.length - n)
+        try substring(offset: n, length: self.length - n)
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
@@ -186,7 +186,7 @@ public struct Bitstring: Hashable {
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
     public func toString() -> String {
-        return toHex()
+        toHex()
     }
     
     private func checkOffset(offset: Int, length: Int) throws {
@@ -266,7 +266,7 @@ extension Bitstring: Equatable {
 
 extension Data {
     public func subdata(in range: ClosedRange<Index>) -> Data {
-        return subdata(in: range.lowerBound ..< range.upperBound)
+        subdata(in: range.lowerBound ..< range.upperBound)
     }
     
     public func hexString() -> String {

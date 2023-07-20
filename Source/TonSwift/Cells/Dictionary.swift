@@ -9,7 +9,7 @@ public protocol CellCodableDictionary: CellCodable {
 
 extension Dictionary: CellCodable where Key: CellCodable & StaticSize, Value: CellCodable {
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try DictionaryCoder.default().load(slice)
+        try DictionaryCoder.default().load(slice)
     }
     public func storeTo(builder: Builder) throws {
         try DictionaryCoder.default().store(map: self, builder: builder)
@@ -23,7 +23,7 @@ extension Dictionary: CellCodableDictionary where Key: CellCodable & StaticSize,
     }
     
     public static func loadRootFrom(slice: Slice) throws -> Self {
-        return try DictionaryCoder.default().loadRoot(slice)
+        try DictionaryCoder.default().loadRoot(slice)
     }
 }
 
@@ -70,7 +70,7 @@ public class DictionaryCoder<K: TypeCoder, V: TypeCoder> where K.T: Hashable {
               VT: CellCodable,
               K == DefaultCoder<KT>,
               V == DefaultCoder<VT> {
-        return DictionaryCoder(
+        DictionaryCoder(
             keyLength: KT.bitWidth,
             DefaultCoder<KT>(),
             DefaultCoder<VT>()

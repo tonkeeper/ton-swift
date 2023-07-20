@@ -30,6 +30,6 @@ extension BigInt {
 
 extension Int {
     public func bitsCount(mode: BitsMode) throws -> Int {
-        return try BigInt(self).bitsCount(mode: mode)
+        try BigInt(self).bitsCount(mode: mode)
     }
 }

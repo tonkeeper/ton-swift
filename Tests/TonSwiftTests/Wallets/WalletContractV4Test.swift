@@ -44,7 +44,7 @@ final class WalletContractV4Test: XCTestCase {
     }
     
     private func args() throws -> WalletTransferData {
-        return try WalletTransferData(
+        try WalletTransferData(
             seqno: 62,
             secretKey: secretKey,
             messages: [

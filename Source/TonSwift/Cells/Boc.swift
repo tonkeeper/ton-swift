@@ -115,7 +115,7 @@ func readCell(reader: Slice, sizeBytes: Int) throws -> (exotic: Bool, bits: Bits
 }
 
 func calcCellSize(cell: Cell, sizeBytes: Int) -> Int {
-    return 2 /* D1+D2 */ + Int(ceil(Double(cell.bits.length) / 8.0)) + cell.refs.count * sizeBytes
+    2 /* D1+D2 */ + Int(ceil(Double(cell.bits.length) / 8.0)) + cell.refs.count * sizeBytes
 }
 
 func deserializeBoc(src: Data) throws -> [Cell] {

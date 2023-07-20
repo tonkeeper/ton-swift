@@ -25,7 +25,7 @@ public struct SendMode {
     /// and ignore errors so that sequence number can be bumped securely,
     /// so that bad transactions cannot be replayed indefinitely.
     static func walletDefault() -> Self {
-        return SendMode(payMsgFees: true, ignoreErrors: true)
+        SendMode(payMsgFees: true, ignoreErrors: true)
     }
 }
 

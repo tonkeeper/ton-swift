@@ -48,12 +48,12 @@ public class Slice {
         
     /// Remaining unread refs in this slice.
     public var remainingRefs: Int {
-        return refs.count
+        refs.count
     }
     
     /// Remaining unread bits in this slice.
     public var remainingBits: Int {
-        return bitstring.length - offset
+        bitstring.length - offset
     }
     
     
@@ -72,13 +72,13 @@ public class Slice {
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `asCell`, but reads better when you intend to read all the remaining data as a cell.
     public func loadRemainder() throws -> Cell {
-        return try toBuilder().endCell()
+        try toBuilder().endCell()
     }
     
     /// Converts the remaining data in the slice to a Cell.
     /// This is the same as `loadRemainder`, but reads better when you intend to serialize/inspect the slice.
     public func toCell() throws -> Cell {
-        return try toBuilder().endCell()
+        try toBuilder().endCell()
     }
     
     /// Converts slice to a Builder filled with remaining data in this slice.
@@ -90,12 +90,12 @@ public class Slice {
     
     /// Clones slice at its current state.
     public func clone() -> Slice {
-        return Slice(bitstring: bitstring, offset: offset, refs: refs)
+        Slice(bitstring: bitstring, offset: offset, refs: refs)
     }
     
     /// Returns string representation of the slice as a cell.
     public func toString() throws -> String {
-        return try loadRemainder().toString()
+        try loadRemainder().toString()
     }
     
     
@@ -106,21 +106,17 @@ public class Slice {
 
     /// Loads type T that implements interface Readable
     public func loadType<T: CellCodable>() throws -> T {
-        return try T.loadFrom(slice: self)
+        try T.loadFrom(slice: self)
     }
     
     /// Preloads type T that implements interface Readable
     public func preloadType<T: CellCodable>() throws -> T {
-        return try T.loadFrom(slice: self.clone())
+        try T.loadFrom(slice: self.clone())
     }
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
     public func loadMaybe<T>(_ closure: (Slice) throws -> T) throws -> T? {
-        if try loadBoolean() {
-            return try closure(self)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try closure(self) : nil
     }
     
     /// Lets you attempt to read a complex data type.
@@ -157,20 +153,12 @@ public class Slice {
     
     /// Loads an optional cell reference.
     public func loadMaybeRef() throws -> Cell? {
-        if try loadBoolean() {
-            return try loadRef()
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadRef() : nil
     }
     
     /// Preloads an optional cell reference.
     public func preloadMaybeRef() throws -> Cell? {
-        if try preloadBit() == 1 {
-            return try preloadRef()
-        } else {
-            return nil
-        }
+        try preloadBit() == 1 ? try preloadRef() : nil
     }
     
     
@@ -180,12 +168,12 @@ public class Slice {
     
     /// Reads a dictionary from the slice.
     public func loadDict<T>() throws -> T where T: CellCodableDictionary {
-        return try T.loadFrom(slice: self)
+        try T.loadFrom(slice: self)
     }
 
     /// Reads the non-empty dictionary root directly from this slice.
     public func loadDictRoot<T>() throws -> T where T: CellCodableDictionary {
-        return try T.loadRootFrom(slice: self)
+        try T.loadRootFrom(slice: self)
     }
 
     
@@ -211,21 +199,17 @@ public class Slice {
     
     /// Load a single bit as a boolean value.
     public func loadBoolean() throws -> Bool {
-        return try loadBit() == 1
+        try loadBit() == 1
     }
     
     /// Loads an optional boolean.
     public func loadMaybeBoolean() throws -> Bool? {
-        if try loadBoolean() {
-            return try loadBoolean()
-        } else {
-            return nil
-        }
+        try? loadBoolean()
     }
 
     /// Preload a single bit without advancing the cursor.
     public func preloadBit() throws -> Bit {
-        return try bitstring.at(offset)
+        try bitstring.at(offset)
     }
 
     /// Loads the specified number of bits in a `BitString`.
@@ -237,7 +221,7 @@ public class Slice {
 
     /// Preloads the specified number of bits in a `BitString` without advancing the cursor.
     public func preloadBits(_ bits: Int) throws -> Bitstring {
-        return try bitstring.substring(offset: offset, length: bits)
+        try bitstring.substring(offset: offset, length: bits)
     }
 
     /// Loads whole number of bytes and returns standard `Data` object.
@@ -250,7 +234,7 @@ public class Slice {
 
     /// Preloads whole number of bytes and returns standard `Data` object without advancing the cursor.
     public func preloadBytes(_ bytes: Int) throws -> Data {
-        return try _preloadBuffer(bytes: bytes)
+        try _preloadBuffer(bytes: bytes)
     }
 
     
@@ -295,7 +279,7 @@ public class Slice {
     - returns read value as number
     */
     public func loadUint(bits: Int) throws -> UInt64 {
-        return UInt64(try loadUintBig(bits: bits))
+        UInt64(try loadUintBig(bits: bits))
     }
     
     /**
@@ -340,7 +324,7 @@ public class Slice {
     - returns read value as number
     */
     public func preloadUint(bits: Int) throws -> UInt64 {
-        return try _preloadUint(bits: bits, offset: offset)
+        try _preloadUint(bits: bits, offset: offset)
     }
 
     /**
@@ -349,7 +333,7 @@ public class Slice {
     - returns read value as bigint
     */
     public func preloadUintBig(bits: Int) throws -> BigUInt {
-        return try _preloadBigUint(bits: bits, offset: offset)
+        try _preloadBigUint(bits: bits, offset: offset)
     }
     
     /**
@@ -358,11 +342,7 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUint(bits: Int) throws -> UInt64? {
-        if try loadBoolean() {
-            return try loadUint(bits: bits)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadUint(bits: bits) : nil
     }
     
     /**
@@ -371,11 +351,7 @@ public class Slice {
     - returns uint value or null
      */
     public func loadMaybeUintBig(bits: Int) throws -> BigUInt? {
-        if try loadBoolean() {
-            return try loadUintBig(bits: bits)
-        } else {
-            return nil
-        }
+        try loadBoolean() ? try loadUintBig(bits: bits) : nil
     }
 
     

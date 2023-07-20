@@ -21,9 +21,7 @@ struct ADNLAddress {
     }
 
     static func parseRaw(_ src: String) throws -> ADNLAddress {
-        let data = Data(base64Encoded: src)
-        
-        return try ADNLAddress(address: data!)
+        try ADNLAddress(address: Data(base64Encoded: src)!)
     }
 
     let address: Data
@@ -37,7 +35,7 @@ struct ADNLAddress {
     }
     
     func toRaw() -> String {
-        return address.map { String(format: "%02X", $0) }.joined().uppercased()
+        address.map { String(format: "%02X", $0) }.joined().uppercased()
     }
 
     func toString() -> String {
@@ -53,6 +51,6 @@ struct ADNLAddress {
 // MARK: - Equatable
 extension ADNLAddress: Equatable {
     static func == (lhs: ADNLAddress, rhs: ADNLAddress) -> Bool {
-        return lhs.address == rhs.address
+        lhs.address == rhs.address
     }
 }

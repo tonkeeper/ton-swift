@@ -32,7 +32,7 @@ public class DefaultCoder<X: CellCodable>: TypeCoder {
         try src.storeTo(builder: builder)
     }
     public func loadValue(from src: Slice) throws -> T {
-        return try T.loadFrom(slice: src)
+        try T.loadFrom(slice: src)
     }
 }
 
@@ -58,7 +58,7 @@ public class BytesCoder: TypeCoder {
         try builder.store(data: src)
     }
     public func loadValue(from src: Slice) throws -> T {
-        return try src.loadBytes(self.size)
+        try src.loadBytes(self.size)
     }
 }
 
@@ -69,7 +69,7 @@ extension Cell: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try slice.loadRef()
+        try slice.loadRef()
     }
 }
 
@@ -80,7 +80,7 @@ extension Slice: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return slice.clone() as! Self
+        slice.clone() as! Self
     }
 }
 
@@ -91,14 +91,14 @@ extension Builder: CellCodable {
     }
     
     public static func loadFrom(slice: Slice) throws -> Self {
-        return try slice.clone().toBuilder() as! Self
+        try slice.clone().toBuilder() as! Self
     }
 }
 
 /// Empty struct to store empty leafs in the dictionaries to form sets.
 public struct Empty: CellCodable {
     public static func loadFrom(slice: Slice) throws -> Self {
-        return Empty()
+        Empty()
     }
     public func storeTo(builder: Builder) throws {
         // store nothing

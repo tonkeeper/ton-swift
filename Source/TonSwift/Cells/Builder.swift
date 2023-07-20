@@ -40,7 +40,7 @@ public class Builder {
     
     /// Clones slice at its current state.
     public func clone() -> Builder {
-        return Builder(capacity: capacity, buffer: _buffer, length: _length, refs: refs)
+        Builder(capacity: capacity, buffer: _buffer, length: _length, refs: refs)
     }
     
     /// Completes cell
@@ -51,12 +51,12 @@ public class Builder {
     
     /// Same as `endCell`
     public func asCell() throws -> Cell {
-        return try endCell()
+        try endCell()
     }
 
     /// Converts builder into BitString
     public func bitstring() -> Bitstring {
-        return Bitstring(data: _buffer, unchecked:(offset: 0, length: _length))
+        Bitstring(data: _buffer, unchecked:(offset: 0, length: _length))
     }
     
     /// Converts to data if the bitstring contains a whole number of bytes.
@@ -75,37 +75,37 @@ public class Builder {
     
     /// Returns whether the written bits are byte-aligned
     public var aligned: Bool {
-        return _length % 8 == 0
+        _length % 8 == 0
     }
     
     /// Number of written bits
     public var bitsCount: Int {
-        return _length
+        _length
     }
     
     /// Number of references added to this cell
     public var refsCount: Int {
-        return refs.count
+        refs.count
     }
     
     /// Remaining bits available
     public var availableBits: Int {
-        return capacity - bitsCount
+        capacity - bitsCount
     }
     
     /// Remaining refs available
     public var availableRefs: Int {
-        return RefsPerCell - refsCount
+        RefsPerCell - refsCount
     }
     
     /// Returns metrics for the currently stored data
     public var metrics: CellMetrics {
-        return CellMetrics(bitsCount: bitsCount, refsCount: refsCount)
+        CellMetrics(bitsCount: bitsCount, refsCount: refsCount)
     }
     
     /// Returns metrics for the remaining space in the cell
     public var remainingMetrics: CellMetrics {
-        return CellMetrics(bitsCount: availableBits, refsCount: availableRefs)
+        CellMetrics(bitsCount: availableBits, refsCount: availableRefs)
     }
     
     /// Tries to fit the cell with the given metrics and returns the remaining space.
@@ -165,7 +165,7 @@ public class Builder {
     }
     @discardableResult
     public func store(ref builder: Builder) throws -> Self {
-        return try store(ref: try builder.endCell())
+        try store(ref: try builder.endCell())
     }
     
     /**
@@ -265,7 +265,7 @@ public class Builder {
     /// Writes bit as a boolean (true => 1, false => 0)
     @discardableResult
     public func store(bit: Bool) throws -> Self {
-        return try store(bit: bit ? 1 : 0)
+        try store(bit: bit ? 1 : 0)
     }
     
     /// Write repeating bit a given number of times.
@@ -346,7 +346,7 @@ public class Builder {
     */
     @discardableResult
     public func store<T>(uint value: T, bits: Int) throws -> Self where T: BinaryInteger {
-        return try store(biguint: BigUInt(value), bits: bits)
+        try store(biguint: BigUInt(value), bits: bits)
     }
     
     @discardableResult
@@ -422,7 +422,7 @@ public class Builder {
     
     @discardableResult
     public func store(int value: any BinaryInteger, bits: Int) throws -> Self {
-        return try store(bigint: BigInt(value), bits: bits)
+        try store(bigint: BigInt(value), bits: bits)
     }
         
     @discardableResult
@@ -478,7 +478,7 @@ public class Builder {
     /// Therefore, `(VarUInteger 16)` accepts 120-bit number (15 bytes) and uses 4 bits to encode length prefix 0...15.
     @discardableResult
     func store(varuint v: UInt64, limit: Int) throws -> Self {
-        return try store(varuint: BigUInt(v), limit: limit)
+        try store(varuint: BigUInt(v), limit: limit)
     }
     
     /// Stores VarUInteger with a given `limit` in bytes.

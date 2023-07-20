@@ -61,14 +61,14 @@ extension Builder {
 
     /// Writes snake-encoded UTF-8 string.
     public func writeSnakeString(_ src: String) throws -> Self {
-        return try writeSnakeData(Data(src.utf8))
+        try writeSnakeData(Data(src.utf8))
     }
 }
 
 extension String {
     /// Encodes a String into a Cell
     public func toTonCell() throws -> Cell {
-        return try Builder().writeSnakeData(Data(self.utf8)).endCell()
+        try Builder().writeSnakeData(Data(self.utf8)).endCell()
     }
 }
 
