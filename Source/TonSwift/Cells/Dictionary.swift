@@ -33,7 +33,7 @@ extension Set: CellCodable where Element: CellCodable & StaticSize {
         return Set(dict.keys)
     }
     public func storeTo(builder: Builder) throws {
-        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: self.map { k in (k, Empty()) })
+        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: map { k in (k, Empty()) })
         try DictionaryCoder.default().store(map: dict, builder: builder)
     }
 }
@@ -44,7 +44,7 @@ extension Set: CellCodableDictionary where Element: CellCodable & StaticSize {
         return Set(dict.keys)
     }
     public func storeRootTo(builder: Builder) throws {
-        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: self.map { k in (k, Empty()) })
+        let dict: [Element: Empty] = Dictionary(uniqueKeysWithValues: map { k in (k, Empty()) })
         try DictionaryCoder.default().storeRoot(map: dict, builder: builder)
     }
 }

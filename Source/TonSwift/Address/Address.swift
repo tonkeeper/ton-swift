@@ -47,7 +47,7 @@ public struct Address: Hashable, Codable {
     
     /// Shortcut for constructing FriendlyAddress with all the options.
     public func toString(urlSafe: Bool = true, testOnly: Bool = false, bounceable: Bool = BounceableDefault) -> String {
-        self.toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
+        toFriendly(testOnly: testOnly, bounceable: bounceable).toString(urlSafe: urlSafe)
     }
 }
 
@@ -76,8 +76,8 @@ extension Address: CellCodable, StaticSize {
     public func storeTo(builder b: Builder) throws {
         try b.store(uint: 2, bits: 2) // $10
         try b.store(uint: 0, bits: 1)
-        try b.store(int: self.workchain, bits: 8)
-        try b.store(data: self.hash)
+        try b.store(int: workchain, bits: 8)
+        try b.store(data: hash)
     }
     
     public static func loadFrom(slice: Slice) throws -> Address {

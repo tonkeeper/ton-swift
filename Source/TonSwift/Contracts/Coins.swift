@@ -7,7 +7,7 @@ public struct Coins {
     
     init(_ a: some BinaryInteger) {
         // we use signed integer here because of `0` literal is a signed Int.
-        self.amount = BigUInt(a)
+        amount = BigUInt(a)
     }
 }
 
@@ -15,17 +15,17 @@ extension Coins: RawRepresentable {
     public typealias RawValue = BigUInt
 
     public init?(rawValue: BigUInt) {
-        self.amount = rawValue
+        amount = rawValue
     }
 
     public var rawValue: BigUInt {
-        self.amount
+        amount
     }
 }
 
 extension Coins: CellCodable {
     public func storeTo(builder: Builder) throws {
-        try builder.store(varuint: self.amount, limit: 16)
+        try builder.store(varuint: amount, limit: 16)
     }
     public static func loadFrom(slice: Slice) throws -> Coins {
         Coins(try slice.loadVarUintBig(limit: 16))

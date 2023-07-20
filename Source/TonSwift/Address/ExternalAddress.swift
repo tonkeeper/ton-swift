@@ -23,8 +23,8 @@ public struct ExternalAddress {
 extension ExternalAddress: CellCodable {
     public func storeTo(builder: Builder) throws {
         try builder.store(uint: 1, bits: 2)
-        try builder.store(uint: self.value.length, bits: 9)
-        try builder.store(bits: self.value)
+        try builder.store(uint: value.length, bits: 9)
+        try builder.store(bits: value)
     }
     
     public static func loadFrom(slice: Slice) throws -> ExternalAddress {

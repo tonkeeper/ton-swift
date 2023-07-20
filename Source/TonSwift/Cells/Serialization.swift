@@ -58,7 +58,7 @@ public class BytesCoder: TypeCoder {
         try builder.store(data: src)
     }
     public func loadValue(from src: Slice) throws -> T {
-        try src.loadBytes(self.size)
+        try src.loadBytes(size)
     }
 }
 

@@ -111,7 +111,7 @@ public class Slice {
     
     /// Preloads type T that implements interface Readable
     public func preloadType<T: CellCodable>() throws -> T {
-        try T.loadFrom(slice: self.clone())
+        try T.loadFrom(slice: clone())
     }
     
     /// Loads optional type T via closure. Function reads one bit that indicates the presence of data. If the bit is set, the closure is called to read T.
@@ -123,11 +123,11 @@ public class Slice {
     /// If parsing succeeded, the slice is advanced.
     /// If parsing failed, the slice remains unchanged.
     public func tryLoad<T>(_ closure: (Slice) throws -> T) throws -> T {
-        let tmpslice = self.clone()
+        let tmpslice = clone()
         let result = try closure(tmpslice)
-        self.bitstring = tmpslice.bitstring
-        self.offset = tmpslice.offset
-        self.refs = tmpslice.refs
+        bitstring = tmpslice.bitstring
+        offset = tmpslice.offset
+        refs = tmpslice.refs
         return result
     }
     
@@ -368,7 +368,7 @@ public class Slice {
         if limit > 9 {
             throw TonError.custom("VarUInteger \(limit) cannot store UInt64 (it occupies 8 bytes, so the largest type is VarUInteger 9)")
         }
-        return try UInt64(self.loadVarUintBig(limit: limit))
+        return try UInt64(loadVarUintBig(limit: limit))
     }
 
     /// Loads VarUInteger with a given `limit` in bytes.

@@ -13,8 +13,8 @@ public struct FriendlyAddress: Codable {
     public let isBounceable: Bool
     public let address: Address
     
-    var workchain: Int8 { self.address.workchain }
-    var hash: Data { self.address.hash }
+    var workchain: Int8 { address.workchain }
+    var hash: Data { address.hash }
         
     init(string: String) throws {
         // Convert from url-friendly to true base64
@@ -76,10 +76,10 @@ public struct FriendlyAddress: Codable {
         }
         
         var wcByte: UInt8
-        if self.address.workchain == -1 {
+        if address.workchain == -1 {
             wcByte = UInt8.max
         } else {
-            wcByte = UInt8(self.workchain)
+            wcByte = UInt8(workchain)
         }
         
         var addr = Data(count: 34)

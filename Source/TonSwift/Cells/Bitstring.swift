@@ -151,15 +151,15 @@ public struct Bitstring: Hashable {
     
     /// Drops first `n` bits from the bitstring.
     public func dropFirst(_ n: Int) throws -> Bitstring {
-        try substring(offset: n, length: self.length - n)
+        try substring(offset: n, length: length - n)
     }
     
     /// Formats the bitstring as a hex-encoded string with a `_` trailing symbol indicating `10*` padding to 4-bit alignment.
     public func toHex() -> String {
-        let padded = Data(self.bitsToPaddedBuffer())
+        let padded = Data(bitsToPaddedBuffer())
         
         if _length % 4 == 0 {
-            let s = padded[0..<(self._length + 7) / 8].hexString().uppercased()
+            let s = padded[0..<(_length + 7) / 8].hexString().uppercased()
             if _length % 8 == 0 {
                 return s
             } else {
@@ -196,19 +196,19 @@ public struct Bitstring: Hashable {
     }
     
     public func padLeft(_ n: Int = 0) -> Bitstring {
-        let cap = max(n, self.length)
+        let cap = max(n, length)
         let b = Builder(capacity: cap)
-        try! b.store(bit: 0, repeat: cap - self.length)
+        try! b.store(bit: 0, repeat: cap - length)
         try! b.store(bits: self)
         return try! b.endCell().bits
     }
     
     /// Pads bitstring with `10*` bits.
     public func bitsToPaddedBuffer() -> Data {
-        let builder = Builder(capacity: (self.length + 7) / 8 * 8)
+        let builder = Builder(capacity: (length + 7) / 8 * 8)
         try! builder.store(bits: self)
 
-        let padding = (self.length + 7) / 8 * 8 - self.length
+        let padding = (length + 7) / 8 * 8 - length
         for i in 0..<padding {
             if i == 0 {
                 try! builder.store(bit: true)
