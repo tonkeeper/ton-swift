@@ -5,6 +5,8 @@
 //  Created by Kirill Kirilenko on 20/07/2023.
 //
 
+import Foundation
+
 public class BytesCoder: TypeCoder {
     public typealias T = Data
     let size: Int
