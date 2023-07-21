@@ -24,7 +24,7 @@ public struct SendMode {
     /// Standard flags for the wallet is to pay msg fees on behalf of the sender
     /// and ignore errors so that sequence number can be bumped securely,
     /// so that bad transactions cannot be replayed indefinitely.
-    static func walletDefault() -> Self {
+    public static func walletDefault() -> Self {
         return SendMode(payMsgFees: true, ignoreErrors: true)
     }
 }

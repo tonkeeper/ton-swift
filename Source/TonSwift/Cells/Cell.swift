@@ -158,7 +158,7 @@ public struct Cell: Hashable {
      Serializes cell to BOC
     - parameter opts: options
     */
-    func toBoc(idx: Bool = false, crc32: Bool = true) throws -> Data {
+    public func toBoc(idx: Bool = false, crc32: Bool = true) throws -> Data {
         return try serializeBoc(root: self, idx: idx, crc32: crc32)
     }
     

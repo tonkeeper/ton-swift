@@ -57,7 +57,7 @@ public final class WalletV3: WalletContract {
             try signingMessage.store(ref: try Builder().store(message))
         }
         
-        let signature = try NaclSign.sign(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
+        let signature = try NaclSign.signDetached(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
         
         let body = Builder()
         try body.store(data: signature)
