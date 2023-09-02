@@ -16,7 +16,7 @@ struct NFTTransferData: CellCodable {
     let forwardPayload: Cell?
 
     func storeTo(builder: Builder) throws {
-        try builder.store(uint: 0xf8a7ea5, bits: 32) // transfer op
+        try builder.store(uint: 0x5fcc3d14, bits: 32) // transfer op
         try builder.store(uint: queryId, bits: 64)
         try builder.store(AnyAddress(newOwnerAddress))
         try builder.store(AnyAddress(responseAddress))
