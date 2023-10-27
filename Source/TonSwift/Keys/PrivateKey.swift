@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PrivateKey: Key, Equatable {
+public struct PrivateKey: Key, Equatable, Codable {
     public let data: Data
     
     public init(data: Data) {
