@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PublicKey: Key {
+public struct PublicKey: Key, Codable {
     public let data: Data
     
     public init(data: Data) {
