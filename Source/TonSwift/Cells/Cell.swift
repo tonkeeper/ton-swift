@@ -87,7 +87,7 @@ public struct Cell: Hashable {
     - parameter src: source buffer
     - returns array of cells
     */
-    static func fromBoc(src: Data) throws -> [Cell] {
+    public static func fromBoc(src: Data) throws -> [Cell] {
         return try deserializeBoc(src: src)
     }
 
@@ -95,7 +95,7 @@ public struct Cell: Hashable {
      Helper class that deserializes a single cell from BOC in base64
     - parameter src: source string
     */
-    static func fromBase64(src: String) throws -> Cell {
+    public static func fromBase64(src: String) throws -> Cell {
         guard let data = Data(base64Encoded: src) else {
             throw NSError()
         }
