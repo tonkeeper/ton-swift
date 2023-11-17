@@ -36,7 +36,7 @@ public final class WalletV1: WalletContract {
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
     
-    public func createTransfer(args: WalletTransferData) throws -> Cell {
+    public func createTransfer(args: WalletTransferData) throws -> WalletTransfer {
         let signingMessage = try Builder().store(uint: args.seqno, bits: 32)
         
         if let message = args.messages.first {
@@ -44,12 +44,6 @@ public final class WalletV1: WalletContract {
             try signingMessage.store(ref:try Builder().store(message))
         }
         
-        let signature = try NaclSign.signDetached(message: signingMessage.endCell().hash(), secretKey: args.secretKey)
-        
-        let body = Builder()
-        try body.store(data: signature)
-        try body.store(signingMessage)
-        
-        return try body.endCell()
+        return WalletTransfer(signingMessage: signingMessage)
     }
 }
