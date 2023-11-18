@@ -26,6 +26,8 @@ public struct WalletTransferSecretKeySigner: WalletTransferSigner {
 }
 
 public struct WalletTransferEmptyKeySigner: WalletTransferSigner {
+    public init() {}
+    
     public func signMessage(_ message: Data) throws -> Data {
         guard let data = String(repeating: "0", count: .signatureBytesCount).data(using: .utf8) else {
             throw WalletTransferSignerError.failedToSignMessage

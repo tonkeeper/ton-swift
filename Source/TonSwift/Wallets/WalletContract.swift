@@ -30,7 +30,7 @@ public struct WalletTransfer {
         self.signingMessage = signingMessage
     }
     
-    func signMessage(signer: WalletTransferSigner) throws -> Cell {
+    public func signMessage(signer: WalletTransferSigner) throws -> Cell {
         let signature = try signer.signMessage(signingMessage.endCell().hash())
         let body = Builder()
         try body.store(data: signature)
