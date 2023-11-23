@@ -26,7 +26,7 @@ public struct WalletTransferData {
 public struct WalletTransfer {
     private let signingMessage: Builder
     
-    init(signingMessage: Builder) {
+    public init(signingMessage: Builder) {
         self.signingMessage = signingMessage
     }
     
