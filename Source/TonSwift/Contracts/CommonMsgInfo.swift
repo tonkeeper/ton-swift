@@ -23,29 +23,29 @@ import Foundation
  */
 
 public struct CommonMsgInfoInternal {
-    let ihrDisabled: Bool
-    let bounce: Bool
-    let bounced: Bool
-    let src: Address
-    let dest: Address
-    let value: CurrencyCollection
-    let ihrFee: Coins
-    let forwardFee: Coins
-    let createdLt: UInt64
-    let createdAt: UInt32
+    public let ihrDisabled: Bool
+    public let bounce: Bool
+    public let bounced: Bool
+    public let src: Address
+    public let dest: Address
+    public let value: CurrencyCollection
+    public let ihrFee: Coins
+    public let forwardFee: Coins
+    public let createdLt: UInt64
+    public let createdAt: UInt32
 }
 
 public struct CommonMsgInfoExternalIn {
-    let src: ExternalAddress?
-    let dest: Address
-    let importFee: Coins
+    public let src: ExternalAddress?
+    public let dest: Address
+    public let importFee: Coins
 }
 
 public struct CommonMsgInfoExternalOut {
-    let src: Address
-    let dest: ExternalAddress?
-    let createdLt: UInt64
-    let createdAt: UInt32
+    public let src: Address
+    public let dest: ExternalAddress?
+    public let createdLt: UInt64
+    public let createdAt: UInt32
 }
 
 public enum CommonMsgInfo: CellCodable {

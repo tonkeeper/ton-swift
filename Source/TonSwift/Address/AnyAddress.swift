@@ -16,7 +16,7 @@ import Foundation
 /// _ _:MsgAddressExt = MsgAddress;
 /// ```
 ///
-enum AnyAddress {
+public enum AnyAddress {
     case none
     case internalAddr(Address)
     case externalAddr(ExternalAddress)
@@ -64,7 +64,7 @@ enum AnyAddress {
 }
 
 extension AnyAddress: CellCodable {
-    func storeTo(builder: Builder) throws {
+    public func storeTo(builder: Builder) throws {
         switch self {
         case .none:
             try builder.store(uint: UInt64(0), bits: 2)
@@ -78,7 +78,7 @@ extension AnyAddress: CellCodable {
         }
     }
     
-    static func loadFrom(slice: Slice) throws -> AnyAddress {
+    public static func loadFrom(slice: Slice) throws -> AnyAddress {
         let type = try slice.preloadUint(bits: 2)
         switch type {
         case 0:

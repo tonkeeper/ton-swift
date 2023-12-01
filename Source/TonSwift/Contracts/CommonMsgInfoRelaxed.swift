@@ -23,23 +23,23 @@ import Foundation
  */
 
 public struct CommonMsgInfoRelaxedInternal {
-    let ihrDisabled: Bool
-    let bounce: Bool
-    let bounced: Bool
-    let src: AnyAddress
-    let dest: Address
-    let value: CurrencyCollection
-    let ihrFee: Coins
-    let forwardFee: Coins
-    let createdLt: UInt64
-    let createdAt: UInt32
+    public let ihrDisabled: Bool
+    public let bounce: Bool
+    public let bounced: Bool
+    public let src: AnyAddress
+    public let dest: Address
+    public let value: CurrencyCollection
+    public let ihrFee: Coins
+    public let forwardFee: Coins
+    public let createdLt: UInt64
+    public let createdAt: UInt32
 }
 
 public struct CommonMsgInfoRelaxedExternalOut {
-    let src: AnyAddress
-    let dest: ExternalAddress?
-    let createdLt: UInt64
-    let createdAt: UInt32
+    public let src: AnyAddress
+    public let dest: ExternalAddress?
+    public let createdLt: UInt64
+    public let createdAt: UInt32
 }
 
 public enum CommonMsgInfoRelaxed: CellCodable {

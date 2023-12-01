@@ -8,14 +8,14 @@
 import Foundation
 import BigInt
 
-struct NFTTransferData: CellCodable {
-    let queryId: UInt64
-    let newOwnerAddress: Address
-    let responseAddress: Address
-    let forwardAmount: BigUInt
-    let forwardPayload: Cell?
-
-    func storeTo(builder: Builder) throws {
+public struct NFTTransferData: CellCodable {
+    public let queryId: UInt64
+    public let newOwnerAddress: Address
+    public let responseAddress: Address
+    public let forwardAmount: BigUInt
+    public let forwardPayload: Cell?
+    
+    public func storeTo(builder: Builder) throws {
         try builder.store(uint: 0x5fcc3d14, bits: 32) // transfer op
         try builder.store(uint: queryId, bits: 64)
         try builder.store(AnyAddress(newOwnerAddress))
@@ -26,7 +26,7 @@ struct NFTTransferData: CellCodable {
         try builder.storeMaybe(ref: forwardPayload)
     }
     
-    static func loadFrom(slice: Slice) throws -> NFTTransferData {
+    public static func loadFrom(slice: Slice) throws -> NFTTransferData {
         try slice.skip(32)
         let queryId = try slice.loadUint(bits: 64)
         let newOwnerAddress: Address = try slice.loadType()
