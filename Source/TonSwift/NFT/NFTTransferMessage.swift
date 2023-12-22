@@ -11,6 +11,7 @@ import BigInt
 public struct NFTTransferMessage {
     public static func internalMessage(nftAddress: Address,
                                        nftTransferAmount: BigUInt,
+                                       bounce: Bool,
                                        to: Address,
                                        from: Address,
                                        forwardPayload: Cell?) throws -> MessageRelaxed {
@@ -27,6 +28,7 @@ public struct NFTTransferMessage {
         return MessageRelaxed.internal(
             to: nftAddress,
             value: nftTransferAmount,
+            bounce: bounce,
             body: try Builder().store(nftTransferData).endCell())
     }
 }

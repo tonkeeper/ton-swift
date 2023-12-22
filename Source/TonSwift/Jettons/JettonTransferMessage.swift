@@ -11,6 +11,7 @@ import BigInt
 public struct JettonTransferMessage {
     public static func internalMessage(jettonAddress: Address,
                                        amount: BigInt,
+                                       bounce: Bool,
                                        to: Address,
                                        from: Address,
                                        comment: String? = nil) throws -> MessageRelaxed {
@@ -28,6 +29,7 @@ public struct JettonTransferMessage {
         return MessageRelaxed.internal(
             to: jettonAddress,
             value: jettonTransferAmount,
+            bounce: bounce,
             body: try Builder().store(jettonTransferData).endCell()
         )
     }
