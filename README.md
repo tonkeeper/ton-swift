@@ -43,7 +43,7 @@ Once you have your Swift package set up, adding TonSwift as a dependency is as e
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tonkeeper/ton-swift", .exact("1.0.3"))
+    .package(url: "https://github.com/tonkeeper/ton-swift", .exact("1.0.4"))
 ]
 ```
 
