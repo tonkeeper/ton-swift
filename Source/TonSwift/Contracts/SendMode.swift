@@ -15,7 +15,7 @@ public struct SendMode {
     /// Options for sending the value.
     public let value: SendValueOptions
 
-    init(payMsgFees: Bool = false, ignoreErrors: Bool = false, value: SendValueOptions = .messageValue) {
+    public init(payMsgFees: Bool = false, ignoreErrors: Bool = false, value: SendValueOptions = .messageValue) {
         self.payMsgFees = payMsgFees
         self.ignoreErrors = ignoreErrors
         self.value = value
@@ -26,6 +26,11 @@ public struct SendMode {
     /// so that bad transactions cannot be replayed indefinitely.
     public static func walletDefault() -> Self {
         return SendMode(payMsgFees: true, ignoreErrors: true)
+    }
+  
+    /// Flags to send all available Toncoins
+    public static func sendMaxTon() -> Self {
+        return SendMode(payMsgFees: false, ignoreErrors: false, value: .sendRemainingBalance)
     }
 }
 
