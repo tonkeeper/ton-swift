@@ -16,7 +16,7 @@ public struct FriendlyAddress: Codable {
     var workchain: Int8 { return self.address.workchain }
     var hash: Data { return self.address.hash }
         
-    init(string: String) throws {
+    public init(string: String) throws {
         // Convert from url-friendly to true base64
         let string = string.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
         guard let data = Data(base64Encoded: string) else {
@@ -25,7 +25,7 @@ public struct FriendlyAddress: Codable {
         try self.init(data: data)
     }
     
-    init(data: Data) throws {
+    public init(data: Data) throws {
         // 1byte tag + 1byte workchain + 32 bytes hash + 2 byte crc
         if data.count != 36 {
             throw TonError.custom("Unknown address type: byte length is not equal to 36")
@@ -63,7 +63,7 @@ public struct FriendlyAddress: Codable {
         self.address = Address(workchain: wc, hash: hash)
     }
     
-    init(address: Address, testOnly: Bool = false, bounceable: Bool = BounceableDefault) {
+    public init(address: Address, testOnly: Bool = false, bounceable: Bool = BounceableDefault) {
         self.isTestOnly = testOnly
         self.isBounceable = bounceable
         self.address = address
