@@ -28,7 +28,6 @@ public struct JettonTransferData: CellCodable {
         if let comment = comment {
             commentCell = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment.utf8)).endCell()
         }
-        try builder.store(bit: commentCell != nil)
         try builder.storeMaybe(ref: commentCell)
     }
     
