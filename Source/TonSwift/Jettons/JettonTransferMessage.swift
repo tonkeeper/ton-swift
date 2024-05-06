@@ -18,13 +18,18 @@ public struct JettonTransferMessage {
         let forwardAmount = BigUInt(stringLiteral: "1")
         let jettonTransferAmount = BigUInt(stringLiteral: "640000000")
         let queryId = UInt64(Date().timeIntervalSince1970)
+      
+        var commentCell: Cell?
+        if let comment = comment {
+            commentCell = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment.utf8)).endCell()
+        }
         
         let jettonTransferData = JettonTransferData(queryId: queryId,
                                                     amount: amount.magnitude,
                                                     toAddress: to,
                                                     responseAddress: from,
                                                     forwardAmount: forwardAmount,
-                                                    comment: comment)
+                                                    forwardPayload: commentCell)
         
         return MessageRelaxed.internal(
             to: jettonAddress,

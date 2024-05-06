@@ -14,21 +14,17 @@ public struct JettonTransferData: CellCodable {
     public let toAddress: Address
     public let responseAddress: Address
     public let forwardAmount: BigUInt
-    public let comment: String?
-    
+    public let forwardPayload: Cell?
+
     public func storeTo(builder: Builder) throws {
-        try builder.store(uint: 0xf8a7ea5, bits: 32)
+        try builder.store(uint: OpCodes.JETTON_TRANSFER, bits: 32)
         try builder.store(uint: queryId, bits: 64)
         try builder.store(coins: Coins(amount.magnitude))
         try builder.store(AnyAddress(toAddress))
         try builder.store(AnyAddress(responseAddress))
         try builder.store(bit: false)
         try builder.store(coins: Coins(forwardAmount.magnitude))
-        var commentCell: Cell?
-        if let comment = comment {
-            commentCell = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment.utf8)).endCell()
-        }
-        try builder.storeMaybe(ref: commentCell)
+        try builder.storeMaybe(ref: forwardPayload)
     }
     
     public static func loadFrom(slice: Slice) throws -> JettonTransferData {
@@ -41,19 +37,14 @@ public struct JettonTransferData: CellCodable {
         let forwardAmount = try slice.loadCoins().amount
         
         let hasComment = try slice.loadBoolean()
-        var comment: String?
-        if hasComment {
-            let commentCell = try slice.loadRef()
-            let slice = try commentCell.toSlice()
-            try slice.skip(32)
-            comment = try slice.loadSnakeString()
-        }
+        let forwardPayload = try slice.loadRef()
+   
         
         return JettonTransferData(queryId: queryId,
                                   amount: amount,
                                   toAddress: toAddress,
                                   responseAddress: responseAddress,
                                   forwardAmount: forwardAmount,
-                                  comment: comment)
+                                  forwardPayload: forwardPayload)
     }
 }
