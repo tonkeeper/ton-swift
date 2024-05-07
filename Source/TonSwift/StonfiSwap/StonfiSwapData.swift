@@ -27,7 +27,12 @@ public struct StonfiSwapData: CellCodable {
         let minAskAmount = try slice.loadCoins().amount
         
         let userWalletAddress: Address = try slice.loadType()
-        let referralAddress: Address? = try slice.loadType()
+        let withReferral = try slice.loadBoolean()
+      
+        var referralAddress: Address? = nil
+        if withReferral {
+            referralAddress = try slice.loadType()
+        }
 
                 
         return StonfiSwapData(assetToSwap: assetToSwap, minAskAmount: minAskAmount, userWalletAddress: userWalletAddress, referralAddress: referralAddress)
