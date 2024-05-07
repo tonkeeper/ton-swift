@@ -24,18 +24,13 @@ public struct WalletTransferData {
 }
 
 public struct WalletTransfer {
-    private let signingMessage: Builder
+    public let signingMessage: Builder
     
     public init(signingMessage: Builder) {
         self.signingMessage = signingMessage
     }
     
-    public func signMessage(signer: WalletTransferSigner) throws -> Cell {
-        let signature = try signer.signMessage(signingMessage.endCell().hash())
-        let body = Builder()
-        try body.store(data: signature)
-        try body.store(signingMessage)
-        
-        return try body.endCell()
+    public func signMessage(signer: WalletTransferSigner) throws -> Data {
+        return try signer.signMessage(signingMessage.endCell().hash())
     }
 }

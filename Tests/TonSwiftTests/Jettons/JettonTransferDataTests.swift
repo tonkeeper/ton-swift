@@ -21,7 +21,6 @@ final class JettonTransferDataTests: XCTestCase {
             let comment = "Hello, this is a comment"
             let forwardPayload = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment.utf8)).endCell()
             
-            
             return JettonTransferData(queryId: queryId,
                                       amount: amount,
                                       toAddress: toAddress,
