@@ -35,9 +35,7 @@ public struct JettonTransferData: CellCodable {
         let responseAddress: Address = try slice.loadType()
         try slice.skip(1)
         let forwardAmount = try slice.loadCoins().amount
-        
-        let hasComment = try slice.loadBoolean()
-        let forwardPayload = try slice.loadRef()
+        let forwardPayload = try slice.loadMaybeRef()
    
         
         return JettonTransferData(queryId: queryId,
