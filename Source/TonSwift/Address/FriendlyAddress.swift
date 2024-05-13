@@ -8,7 +8,7 @@ let nonBounceableTag: UInt8 = 0x51
 let testFlag: UInt8 = 0x80
 
 /// Address encoded in a friendly format
-public struct FriendlyAddress: Codable {
+public struct FriendlyAddress: Codable, Hashable {
     public let isTestOnly: Bool
     public let isBounceable: Bool
     public let address: Address
