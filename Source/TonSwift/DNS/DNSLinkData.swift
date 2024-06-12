@@ -6,7 +6,7 @@ public struct DNSLinkData: CellCodable {
   public let linkAddress: Address?
   
   public func storeTo(builder: Builder) throws {
-    try builder.store(uint: OpCodes.CHANGE_DNS_LINK, bits: 32)
+    try builder.store(uint: OpCodes.CHANGE_DNS_RECORD, bits: 32)
     try builder.store(uint: queryId, bits: 64)
     try builder.store(
       biguint: BigUInt("e8d44050873dba865aa7c170ab4cce64d90839a34dcfd6cf71d14e0205443b1b", radix: 16) ?? 0,
