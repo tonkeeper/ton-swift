@@ -9,9 +9,7 @@ final class WalletContractV5Test: XCTestCase {
     private let secretKey = Data(hex: "34aebb9ea454967f16c407c0f8877763e86212116468169d93a3dcbcafe530c95754865e86d0ade1199301bbb0319a25ed6b129c4b0a57f28f62449b3df9c522")!
     
     func testR1() throws {
-      let contractR1 = WalletV5R1(workchain: 0, publicKey: publicKey, walletId: WalletId(networkGlobalId: -239, workchain: 0))
-      
-      print(try contractR1.address())
+        let contractR1 = WalletV5R1(workchain: 0, publicKey: publicKey, walletId: WalletId(networkGlobalId: -239, workchain: 0))
         
         XCTAssertEqual(try contractR1.address(), try Address.parse("UQCRix440npsvDU88REZ8uUJ4jedPEiX_QlCgi954nhZUrBP"))
         XCTAssertEqual(try contractR1.stateInit.data?.toString(), "x{000000007FFFFF888000000000002BAA432F436856F08CC980DDD818CD12F6B5894E25852BF947B1224D9EFCE2912_}")
