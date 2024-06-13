@@ -36,7 +36,7 @@ public final class WalletV1: WalletContract {
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
     
-    public func createTransfer(args: WalletTransferData) throws -> WalletTransfer {
+    public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
         let signingMessage = try Builder().store(uint: args.seqno, bits: 32)
         
         if let message = args.messages.first {
@@ -44,6 +44,6 @@ public final class WalletV1: WalletContract {
             try signingMessage.store(ref:try Builder().store(message))
         }
         
-        return WalletTransfer(signingMessage: signingMessage)
+        return WalletTransfer(signingMessage: signingMessage, signaturePosition: .front)
     }
 }

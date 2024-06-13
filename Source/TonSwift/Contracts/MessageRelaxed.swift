@@ -85,7 +85,12 @@ public struct MessageRelaxed: CellCodable {
         )
     }
     public static func `internal`(to: Address, value: BigUInt, bounce: Bool = true, stateInit: StateInit? = nil, textPayload: String) throws -> MessageRelaxed {
-        let body = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(textPayload.utf8)).endCell()
+        let body: Cell
+        if (textPayload.isEmpty) {
+            body = .empty
+        } else {
+            body = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(textPayload.utf8)).endCell()
+        }
         return .internal(to: to, value: value, bounce: bounce, stateInit: stateInit, body: body)
     }
 }

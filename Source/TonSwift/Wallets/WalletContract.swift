@@ -3,7 +3,19 @@ import Foundation
 
 /// All wallets implement a compatible interface for sending messages
 public protocol WalletContract: Contract {
-    func createTransfer(args: WalletTransferData) throws -> WalletTransfer
+    func createTransfer(args: WalletTransferData, messageType: MessageType) throws -> WalletTransfer
+}
+
+/// Message type (external | internal) to sign. Is using in v5 wallet contract
+public enum MessageType {
+    case int, ext
+    
+    var opCode: Int32 {
+        switch self {
+        case .int: return OpCodes.SIGNED_INTERNAL
+        case .ext: return OpCodes.SIGNED_EXTERNAL
+        }
+    }
 }
 
 public struct WalletTransferData {
@@ -23,11 +35,17 @@ public struct WalletTransferData {
     }
 }
 
+public enum SignaturePosition {
+    case front, tail
+}
+
 public struct WalletTransfer {
     public let signingMessage: Builder
+    public let signaturePosition: SignaturePosition
     
-    public init(signingMessage: Builder) {
+    public init(signingMessage: Builder, signaturePosition: SignaturePosition) {
         self.signingMessage = signingMessage
+        self.signaturePosition = signaturePosition
     }
     
     public func signMessage(signer: WalletTransferSigner) throws -> Data {

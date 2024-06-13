@@ -10,6 +10,7 @@ public let RefsPerCell = 4
 public enum CellType: Int {
     case ordinary = -1
     case prunedBranch = 1
+    case library = 2
     case merkleProof = 3
     case merkleUpdate = 4
 }
@@ -224,7 +225,7 @@ fileprivate struct BasicCell: Hashable {
             type = try resolvePruned(bits: bits, refs: refs).type
             
         case 2:
-            throw TonError.custom("Library cell must be loaded automatically")
+            type = .library
             
         case 3:
             type = try resolveMerkleProof(bits: bits, refs: refs).type
@@ -246,7 +247,7 @@ fileprivate struct BasicCell: Hashable {
         var pruned: ExoticPruned? = nil
         
         switch type {
-        case .ordinary:
+        case .ordinary, .library:
             var mask: UInt32 = 0
             for r in refs {
                 mask = mask | r.mask.value
