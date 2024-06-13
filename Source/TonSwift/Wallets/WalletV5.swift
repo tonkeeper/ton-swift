@@ -87,7 +87,7 @@ public class WalletV5: WalletContract {
         var latestCell = Builder()
         for message in messages {
             latestCell = try Builder()
-                .store(uint: 0x0ec3c86d, bits: 32)
+                .store(uint: OpCodes.OUT_ACTION_SEND_MSG_TAG, bits: 32)
                 .store(uint: sendMode, bits: 8)
                 .store(ref: latestCell)
                 .store(ref: try Builder().store(message))

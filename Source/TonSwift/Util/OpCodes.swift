@@ -1,4 +1,5 @@
 public enum OpCodes {
+  public static var OUT_ACTION_SEND_MSG_TAG: Int32 = 0x0ec3c86d
   public static var SIGNED_EXTERNAL: Int32 = 0x7369676e
   public static var SIGNED_INTERNAL: Int32 = 0x73696e74
   public static var JETTON_TRANSFER: Int32 = 0xf8a7ea5
