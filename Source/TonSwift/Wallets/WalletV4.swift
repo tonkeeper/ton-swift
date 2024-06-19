@@ -34,13 +34,13 @@ public class WalletV4: WalletContract {
     public let walletId: UInt32
     public let plugins: Set<Address>
     public let code: Cell
-
+    
     fileprivate init(code: Cell,
-         seqno: Int64 = 0,
-         workchain: Int8 = 0,
-         publicKey: Data,
-         walletId: UInt32? = nil,
-         plugins: Set<Address> = []
+                     seqno: Int64 = 0,
+                     workchain: Int8 = 0,
+                     publicKey: Data,
+                     walletId: UInt32? = nil,
+                     plugins: Set<Address> = []
     ) {
         self.code = code
         self.seqno = seqno
@@ -70,7 +70,7 @@ public class WalletV4: WalletContract {
         Set(self.plugins.map{ a in CompactAddress(a) })
     }
     
-    public func createTransfer(args: WalletTransferData) throws -> WalletTransfer {
+    public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
         guard args.messages.count <= 4 else {
             throw TonError.custom("Maximum number of messages in a single transfer is 4")
         }
@@ -86,6 +86,6 @@ public class WalletV4: WalletContract {
             try signingMessage.store(ref: try Builder().store(message))
         }
         
-        return WalletTransfer(signingMessage: signingMessage)
+        return WalletTransfer(signingMessage: signingMessage, signaturePosition: .front)
     }
 }

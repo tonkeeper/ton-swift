@@ -42,7 +42,7 @@ public final class WalletV3: WalletContract {
         self.stateInit = StateInit(code: cell, data: try data.endCell())
     }
     
-    public func createTransfer(args: WalletTransferData) throws -> WalletTransfer {
+    public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
         guard args.messages.count <= 4 else {
             throw TonError.custom("Maximum number of messages in a single transfer is 4")
         }
@@ -56,7 +56,7 @@ public final class WalletV3: WalletContract {
             try signingMessage.store(uint: UInt64(args.sendMode.rawValue), bits: 8)
             try signingMessage.store(ref: try Builder().store(message))
         }
-      
-        return WalletTransfer(signingMessage: signingMessage)
+        
+        return WalletTransfer(signingMessage: signingMessage, signaturePosition: .front)
     }
 }

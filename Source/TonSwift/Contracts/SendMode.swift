@@ -30,7 +30,7 @@ public struct SendMode {
   
     /// Flags to send all available Toncoins
     public static func sendMaxTon() -> Self {
-        return SendMode(payMsgFees: false, ignoreErrors: false, value: .sendRemainingBalance)
+        return SendMode(payMsgFees: false, ignoreErrors: true, value: .sendRemainingBalance)
     }
 }
 
