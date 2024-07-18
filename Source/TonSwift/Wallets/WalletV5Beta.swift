@@ -2,40 +2,38 @@ import Foundation
 import BigInt
 import TweetNacl
 
-public struct WalletId {
+public struct WalletIdBeta {
     public let walletVersion: Int8 = 0
-    public let subwalletNumber: Int32
+    public let subwalletNumber: Int32 = 0
     public let networkGlobalId: Int32
     public let workchain: Int8
-    
-    public init(networkGlobalId: Int32, workchain: Int8 = 0, subwalletNumber: Int32 = 0) {
+  
+    public init(networkGlobalId: Int32, workchain: Int8) {
         self.networkGlobalId = networkGlobalId
         self.workchain = workchain
-        self.subwalletNumber = subwalletNumber
     }
 }
 
-public class WalletV5R1: WalletV5 {
+/// WARNING: WalletW5 contract is still in beta. use at your own risk
+public class WalletV5Beta: WalletV5BetaContract {
     public init(seqno: Int64 = 0,
                 workchain: Int8 = 0,
                 publicKey: Data,
-                walletId: WalletId,
+                walletId: WalletIdBeta,
                 plugins: Set<Address> = []
     ) {
-      
-      // https://github.com/ton-blockchain/wallet-contract-v5/blob/4fab977f4fae3a37c1aac216ed2b7e611a9bc2af/build/wallet_v5.compiled.json
-        let code = try! Cell.fromBase64(src: "te6cckECFAEAAoEAART/APSkE/S88sgLAQIBIAINAgFIAwQC3NAg10nBIJFbj2Mg1wsfIIIQZXh0br0hghBzaW50vbCSXwPgghBleHRuuo60gCDXIQHQdNch+kAw+kT4KPpEMFi9kVvg7UTQgQFB1yH0BYMH9A5voTGRMOGAQNchcH/bPOAxINdJgQKAuZEw4HDiEA8CASAFDAIBIAYJAgFuBwgAGa3OdqJoQCDrkOuF/8AAGa8d9qJoQBDrkOuFj8ACAUgKCwAXsyX7UTQcdch1wsfgABGyYvtRNDXCgCAAGb5fD2omhAgKDrkPoCwBAvIOAR4g1wsfghBzaWduuvLgin8PAeaO8O2i7fshgwjXIgKDCNcjIIAg1yHTH9Mf0x/tRNDSANMfINMf0//XCgAK+QFAzPkQmiiUXwrbMeHywIffArNQB7Dy0IRRJbry4IVQNrry4Ib4I7vy0IgikvgA3gGkf8jKAMsfAc8Wye1UIJL4D95w2zzYEAP27aLt+wL0BCFukmwhjkwCIdc5MHCUIccAs44tAdcoIHYeQ2wg10nACPLgkyDXSsAC8uCTINcdBscSwgBSMLDy0InXTNc5MAGk6GwShAe78uCT10rAAPLgk+1V4tIAAcAAkVvg69csCBQgkXCWAdcsCBwS4lIQseMPINdKERITAJYB+kAB+kT4KPpEMFi68uCR7UTQgQFB1xj0BQSdf8jKAEAEgwf0U/Lgi44UA4MH9Fvy4Iwi1woAIW4Bs7Dy0JDiyFADzxYS9ADJ7VQAcjDXLAgkji0h8uCS0gDtRNDSAFETuvLQj1RQMJExnAGBAUDXIdcKAPLgjuLIygBYzxbJ7VST8sCN4gAQk1vbMeHXTNC01sNe"
+        let code = try! Cell.fromBase64(src: "te6cckEBAQEAIwAIQgLkzzsvTG1qYeoPK1RH0mZ4WyavNjfbLe7mvNGqgm80Eg3NjhE="
         )
         super.init(code:code, seqno: seqno, workchain: workchain, publicKey: publicKey, walletId: walletId, plugins: plugins)
     }
 }
 
 /// Internal WalletV5 implementation. Use specific revision `WalletV5R1` instead.
-public class WalletV5: WalletContract {
+public class WalletV5BetaContract: WalletContract {
     public let seqno: Int64
     public let workchain: Int8
     public let publicKey: Data
-    public let walletId: WalletId
+    public let walletId: WalletIdBeta
     public let plugins: Set<Address>
     public let code: Cell
     
@@ -43,7 +41,7 @@ public class WalletV5: WalletContract {
                      seqno: Int64 = 0,
                      workchain: Int8 = 0,
                      publicKey: Data,
-                     walletId: WalletId,
+                     walletId: WalletIdBeta,
                      plugins: Set<Address> = []
     ) {
         self.code = code
@@ -56,25 +54,17 @@ public class WalletV5: WalletContract {
         self.plugins = plugins
     }
     
-    // TODO: support minimized version
     func storeWalletId() -> Builder {
-        let context = try! Builder()
-            .store(bit: true)
+        return try! Builder()
+            .store(int: self.walletId.networkGlobalId, bits: 32)
             .store(int: self.walletId.workchain, bits: 8)
             .store(uint: self.walletId.walletVersion, bits: 8)
-            .store(uint: self.walletId.subwalletNumber, bits: 15)
-            .endCell()
-            .beginParse()
-            .loadInt(bits: 32)
-
-        return try! Builder()
-            .store(int: self.walletId.networkGlobalId ^ Int32(context), bits: 32)
+            .store(uint: self.walletId.subwalletNumber, bits: 32)
     }
     
     public var stateInit: StateInit {
         let data = try! Builder()
-            .store(bit: true) // is signature auth allowed
-            .store(uint: 0, bits: 32) // initial seqno
+            .store(uint: 0, bits: 33) // initial seqno = 0
             .store(self.storeWalletId())
             .store(data: publicKey)
             .store(bit: 0)
@@ -108,8 +98,8 @@ public class WalletV5: WalletContract {
     
     private func storeOutListExtended(messages: [MessageRelaxed], sendMode: UInt64) throws -> Builder {
         try Builder()
-            .storeMaybe(ref: self.storeOutList(messages: messages, sendMode: sendMode))
             .store(uint: 0, bits: 1)
+            .store(ref: self.storeOutList(messages: messages, sendMode: sendMode))
     }
     
     public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
@@ -130,7 +120,7 @@ public class WalletV5: WalletContract {
             let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
             try signingMessage.store(uint: args.timeout ?? defaultTimeout, bits: 32)
         }
-
+        
         try signingMessage
             .store(uint: args.seqno, bits: 32)
             .store(
