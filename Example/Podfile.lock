@@ -1,9 +1,9 @@
 PODS:
   - BigInt (5.2.0)
-  - TonSwift (0.0.1):
+  - TonSwift (1.0.3):
     - BigInt
     - TweetNacl
-  - TonSwift/Tests (0.0.1):
+  - TonSwift/Tests (1.0.3):
     - BigInt
     - TweetNacl
   - TweetNacl (1.0.2)
@@ -23,9 +23,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  TonSwift: 72bbfc1d924a4eebac87c8651afea7d2323771c6
+  TonSwift: 8263886e6a34c81a721cde1674cc70229a1d0d44
   TweetNacl: 3abf4d1d2082b0114e7a67410e300892448951e6
 
-PODFILE CHECKSUM: 4414c00005d2c10cd52b412b3080f767ee316ec4
+PODFILE CHECKSUM: adb693e82e588cc090eb72c366a3aff89a95e709
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.15.2
