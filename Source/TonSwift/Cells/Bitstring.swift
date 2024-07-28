@@ -71,7 +71,7 @@ public struct Bitstring: Hashable {
      - returns true if the bit is set, false otherwise
      */
     public func at(_ index: Int) throws -> Bit {
-        guard index <= _length && index >= 0 else {
+        guard index < _length && index >= 0 else {
             throw TonError.indexOutOfBounds(index)
         }
         
