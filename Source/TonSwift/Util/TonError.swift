@@ -1,6 +1,6 @@
 import Foundation
 
-public enum TonError: Error {
+public enum TonError: Error, Equatable {
     case indexOutOfBounds(Int)
     case offsetOutOfBounds(Int)
     case custom(String)

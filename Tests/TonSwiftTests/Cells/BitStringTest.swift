@@ -105,4 +105,20 @@ final class BitStringTest: XCTestCase {
             XCTAssertEqual(r.toString(), hex)
         }
     }
+  
+    func testCorrectBoundsCheckForBitAccess() throws {
+        let dataHexString = "00240000000054657374205152207369676e6572"
+        let offset = 16
+        let length = 144
+        
+        let bitstring = try Bitstring(
+            data: Data(hex: dataHexString)!,
+            offset: offset,
+            length: length
+        )
+        
+        XCTAssertThrowsError(try bitstring.at(144)) { error in
+            XCTAssertEqual(error as! TonError, TonError.indexOutOfBounds(144))
+        }
+    }
 }
