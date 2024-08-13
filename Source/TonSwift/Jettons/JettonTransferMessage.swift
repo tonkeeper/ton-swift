@@ -14,7 +14,10 @@ public struct JettonTransferMessage {
                                        bounce: Bool,
                                        to: Address,
                                        from: Address,
-                                       comment: String? = nil) throws -> MessageRelaxed {
+                                       comment: String? = nil,
+                                       customPayload: Cell? = nil,
+                                       stateInit: StateInit? = nil
+                                       ) throws -> MessageRelaxed {
         let forwardAmount = BigUInt(stringLiteral: "1")
         let jettonTransferAmount = BigUInt(stringLiteral: "640000000")
         let queryId = UInt64(Date().timeIntervalSince1970)
@@ -29,12 +32,14 @@ public struct JettonTransferMessage {
                                                     toAddress: to,
                                                     responseAddress: from,
                                                     forwardAmount: forwardAmount,
-                                                    forwardPayload: commentCell)
+                                                    forwardPayload: commentCell,
+                                                    customPayload: customPayload)
         
         return MessageRelaxed.internal(
             to: jettonAddress,
             value: jettonTransferAmount,
             bounce: bounce,
+            stateInit: stateInit,
             body: try Builder().store(jettonTransferData).endCell()
         )
     }

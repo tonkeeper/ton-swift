@@ -15,6 +15,7 @@ public struct JettonTransferData: CellCodable {
     public let responseAddress: Address
     public let forwardAmount: BigUInt
     public let forwardPayload: Cell?
+    public var customPayload: Cell?
 
     public func storeTo(builder: Builder) throws {
         try builder.store(uint: OpCodes.JETTON_TRANSFER, bits: 32)
@@ -22,7 +23,7 @@ public struct JettonTransferData: CellCodable {
         try builder.store(coins: Coins(amount.magnitude))
         try builder.store(AnyAddress(toAddress))
         try builder.store(AnyAddress(responseAddress))
-        try builder.store(bit: false)
+        try builder.storeMaybe(ref: customPayload)
         try builder.store(coins: Coins(forwardAmount.magnitude))
         try builder.storeMaybe(ref: forwardPayload)
     }
@@ -33,7 +34,7 @@ public struct JettonTransferData: CellCodable {
         let amount = try slice.loadCoins().amount
         let toAddress: Address = try slice.loadType()
         let responseAddress: Address = try slice.loadType()
-        try slice.skip(1)
+        let customPayload = try slice.loadMaybeRef()
         let forwardAmount = try slice.loadCoins().amount
         let forwardPayload = try slice.loadMaybeRef()
    
@@ -43,6 +44,8 @@ public struct JettonTransferData: CellCodable {
                                   toAddress: toAddress,
                                   responseAddress: responseAddress,
                                   forwardAmount: forwardAmount,
-                                  forwardPayload: forwardPayload)
+                                  forwardPayload: forwardPayload,
+                                  customPayload: customPayload
+        )
     }
 }
