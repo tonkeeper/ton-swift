@@ -24,7 +24,8 @@ public struct StonfiSwapMessage {
             toAddress: try! Address.parse(STONFI_CONSTANTS.RouterAddress),
             responseAddress: userWalletAddress,
             forwardAmount: forwardAmount,
-            forwardPayload: stonfiSwapCell
+            forwardPayload: stonfiSwapCell,
+            customPayload: nil
         )
         
         return MessageRelaxed.internal(
