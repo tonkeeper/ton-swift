@@ -23,8 +23,8 @@ public struct JettonTransferMessage {
         let queryId = UInt64(Date().timeIntervalSince1970)
       
         var commentCell: Cell?
-        if let comment = comment {
-            commentCell = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment.utf8)).endCell()
+        if comment != nil && comment != "" {
+            commentCell = try Builder().store(int: 0, bits: 32).writeSnakeData(Data(comment!.utf8)).endCell()
         }
         
         let jettonTransferData = JettonTransferData(queryId: queryId,
