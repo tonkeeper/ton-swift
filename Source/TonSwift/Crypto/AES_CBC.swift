@@ -17,7 +17,7 @@ public struct AES_CBC {
   }
   
   public func decrypt(cipherData: Data) throws -> Data {
-    var outputBuffer = Array<UInt8>(repeating: 0, count: cipherData.count)
+    var outputBuffer = Array<UInt8>(repeating: 0, count: cipherData.count + kCCBlockSizeAES128)
     var numBytesDecrypted = 0
     
     let status = CCCrypt(CCOperation(kCCDecrypt),
@@ -29,20 +29,19 @@ public struct AES_CBC {
                          Array(cipherData),
                          cipherData.count,
                          &outputBuffer,
-                         cipherData.count,
+                         outputBuffer.count,
                          &numBytesDecrypted)
     
     guard status == kCCSuccess else {
       throw Error.decryptionError(status: status)
     }
     
-    
     let outputBytes = outputBuffer.prefix(numBytesDecrypted)
     return Data(outputBytes)
   }
   
   public func encrypt(data: Data) throws -> Data {
-    var outputBuffer = Array<UInt8>(repeating: 0, count: data.count)
+    var outputBuffer = Array<UInt8>(repeating: 0, count: data.count + kCCBlockSizeAES128)
     var numBytesEncrypted = 0
     
     let status = CCCrypt(CCOperation(kCCEncrypt),
@@ -54,7 +53,7 @@ public struct AES_CBC {
                          Array(data),
                          data.count,
                          &outputBuffer,
-                         data.count,
+                         outputBuffer.count,
                          &numBytesEncrypted)
     
     guard status == kCCSuccess else {
