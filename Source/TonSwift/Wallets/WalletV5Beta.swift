@@ -1,6 +1,5 @@
 import Foundation
 import BigInt
-import TweetNacl
 
 public struct WalletIdBeta {
     public let walletVersion: Int8 = 0

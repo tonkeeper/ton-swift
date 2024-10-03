@@ -1,5 +1,5 @@
 import Foundation
-import TweetNacl
+import Sodium
 
 public enum WalletTransferSignerError: Swift.Error {
     case failedToSignMessage
@@ -17,11 +17,10 @@ public struct WalletTransferSecretKeySigner: WalletTransferSigner {
     }
     
     public func signMessage(_ message: Data) throws -> Data {
-        do {
-            return try NaclSign.signDetached(message: message, secretKey: secretKey)
-        } catch {
+        guard let signatureBytes = Sodium().sign.signature(message: Bytes(message), secretKey: Bytes(secretKey)) else {
             throw WalletTransferSignerError.failedToSignMessage
         }
+        return Data(signatureBytes)
     }
 }
 

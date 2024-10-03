@@ -1,6 +1,5 @@
 import Foundation
 import BigInt
-import TweetNacl
 
 public class WalletV4R1: WalletV4 {
     public init(seqno: Int64 = 0,
