@@ -1,5 +1,6 @@
 import Foundation
 import BigInt
+import TweetNacl
 
 public enum WalletContractV2Revision {
     case r1, r2

@@ -1,4 +1,5 @@
 import XCTest
+import TweetNacl
 import BigInt
 @testable import TonSwift
 

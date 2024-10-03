@@ -1,13 +1,7 @@
 import Foundation
-import Sodium
-
+import TweetNacl
 
 public enum Mnemonic {
-    
-    public enum Error: Swift.Error {
-        case failedGetKeyPairFromMnemonic
-    }
-    
     public static let words = String.englishMnemonics
     
     /**
@@ -147,10 +141,12 @@ public enum Mnemonic {
         let mnemonicArray = normalizeMnemonic(src: mnemonicArray)
         let seed = mnemonicToSeed(mnemonicArray: mnemonicArray, password: password)[0..<32]
         
-        guard let keyPair = Sodium().sign.keyPair(seed: Bytes(seed)) else {
-            throw Error.failedGetKeyPairFromMnemonic
+        do {
+            let keyPair = try TweetNacl.NaclSign.KeyPair.keyPair(fromSeed: seed)
+            return KeyPair(publicKey: .init(data: keyPair.publicKey), privateKey: .init(data: keyPair.secretKey))
+            
+        } catch {
+            throw error
         }
-        
-        return KeyPair(publicKey: .init(data: Data(keyPair.publicKey)), privateKey: .init(data: Data(keyPair.secretKey)))
     }
 }
