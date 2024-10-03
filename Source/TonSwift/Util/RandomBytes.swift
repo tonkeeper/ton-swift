@@ -6,7 +6,7 @@ public struct RandomBytes {
     case other
   }
   
-  static func generate(length: Int) throws -> Data {
+  public static func generate(length: Int) throws -> Data {
     var outputBuffer = Data(count: length)
     let resultCode = try outputBuffer.withUnsafeMutableBytes {
       guard let baseAddress = $0.baseAddress else { throw Error.other }
