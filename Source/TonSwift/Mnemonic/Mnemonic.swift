@@ -117,6 +117,22 @@ public enum Mnemonic {
         
         return seed[0] == 0
     }
+  
+    public static func isMultiAccountSeed(mnemonicArray: [String]) -> Bool {
+        let entropy = hmacSha512(phrase: "TON Keychain", password: mnemonicArray.joined(separator: " "))
+      
+        // There is a collision propability with TON mnemonics 
+        if (isBasicSeed(entropy: mnemonicToEntropy(mnemonicArray: mnemonicArray, password: ""))) {
+          return false
+        }
+      
+        let salt = "TON Keychain Version"
+        let saltData = Data(salt.utf8)
+        let seed = pbkdf2Sha512(phrase: entropy, salt: saltData, iterations: 1, keyLength: 64)
+        
+        return seed[0] == 0
+    }
+      
         
     public static func isPasswordSeed(entropy: Data) -> Bool {
         let salt = "TON fast seed version"
