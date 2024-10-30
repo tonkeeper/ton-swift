@@ -48,4 +48,20 @@ public struct JettonTransferData: CellCodable {
                                   customPayload: customPayload
         )
     }
+  
+  public init(queryId: UInt64,
+              amount: BigUInt,
+              toAddress: Address,
+              responseAddress: Address,
+              forwardAmount: BigUInt,
+              forwardPayload: Cell?,
+              customPayload: Cell? = nil) {
+    self.queryId = queryId
+    self.amount = amount
+    self.toAddress = toAddress
+    self.responseAddress = responseAddress
+    self.forwardAmount = forwardAmount
+    self.forwardPayload = forwardPayload
+    self.customPayload = customPayload
+  }
 }
