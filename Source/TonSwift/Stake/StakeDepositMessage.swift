@@ -38,12 +38,16 @@ public struct StakeDepositMessage {
   }
   
   public static func tfInternalMessage(queryId: BigUInt,
-                                             poolAddress: Address,
-                                             amount: BigUInt,
-                                             bounce: Bool = true) throws -> MessageRelaxed {
+                                       poolAddress: Address,
+                                       amount: BigUInt,
+                                       bounce: Bool = true,
+                                       withdrawal: Bool = false) throws -> MessageRelaxed {
+    
+    let comment = withdrawal ? "w" : "d"
+    
     let body = Builder()
     try body.store(uint: 0, bits: 32)
-    try body.writeSnakeData(Data("d".utf8))
+    try body.writeSnakeData(Data(comment.utf8))
     
     return MessageRelaxed.internal(
       to: poolAddress,
