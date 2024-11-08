@@ -13,7 +13,7 @@ public struct NFTTransferMessage {
                                        nftTransferAmount: BigUInt,
                                        bounce: Bool,
                                        to: Address,
-                                       from: Address,
+                                       responseAddress: Address,
                                        forwardPayload: Cell?) throws -> MessageRelaxed {
         let forwardAmount = BigUInt(stringLiteral: "1")
         let queryId = UInt64(Date().timeIntervalSince1970)
@@ -21,7 +21,7 @@ public struct NFTTransferMessage {
         let nftTransferData = NFTTransferData(
             queryId: queryId,
             newOwnerAddress: to,
-            responseAddress: from,
+            responseAddress: responseAddress,
             forwardAmount: forwardAmount,
             forwardPayload: forwardPayload)
         
