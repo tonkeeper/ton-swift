@@ -245,15 +245,19 @@ fileprivate struct BasicCell: Hashable {
     func precompute() throws -> (mask: LevelMask, hashes: [Data], depths: [UInt32]) {
         var levelMask: LevelMask
         var pruned: ExoticPruned? = nil
-        
+              
         switch type {
-        case .ordinary, .library:
+        case .ordinary:
             var mask: UInt32 = 0
             for r in refs {
                 mask = mask | r.mask.value
             }
             levelMask = LevelMask(mask: mask)
             
+        case .library:
+          try exoticLibrary(bits: bits, refs: refs)
+          levelMask = LevelMask()
+
         case .prunedBranch:
             pruned = try exoticPruned(bits: bits, refs: refs)
             levelMask = LevelMask(mask: pruned!.mask)
@@ -358,7 +362,7 @@ fileprivate struct BasicCell: Hashable {
 
 func getRepr(bits: Bitstring, refs: [Cell], level: UInt32, type: CellType) throws -> Data {
     // Allocate
-    let bitsLen = (bits.length + 7) / 8
+    let bitsLen = Int(ceil(Double(bits.length) / 8))
     var repr = Data(count: 2 + bitsLen + (2 + 32) * refs.count)
 
     // Write descriptors
@@ -569,6 +573,23 @@ func exoticMerkleProof(bits: Bitstring, refs: [Cell]) throws -> (proofDepth: UIn
     }
 
     return (proofDepth, proofHash)
+}
+
+func exoticLibrary(bits: Bitstring, refs: [Cell]) throws {
+    let reader = Slice(bits: bits)
+
+    // type + hash
+    let size = 8 + 256
+
+    if bits.length != size {
+        throw TonError.custom("Library cell must have exactly (8 + 256) bits, got \(bits.length)")
+    }
+
+    // Check type
+    let type = try reader.loadUint(bits: 8)
+    if type != 2 {
+        throw TonError.custom("Library cell must have type 2, got \(type)")
+    }
 }
 
 public struct LevelMask {
