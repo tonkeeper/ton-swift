@@ -22,7 +22,6 @@ public struct NFTTransferData: CellCodable {
         try builder.store(AnyAddress(responseAddress))
         try builder.store(bit: false) // null custom_payload
         try builder.store(coins: Coins(forwardAmount.magnitude))
-        try builder.store(bit: forwardPayload != nil) // forward_payload in this slice - false, separate cell - true
         try builder.storeMaybe(ref: forwardPayload)
     }
     
