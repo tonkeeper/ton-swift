@@ -34,6 +34,8 @@ public class WalletV4: WalletContract {
     public let walletId: UInt32
     public let plugins: Set<Address>
     public let code: Cell
+  
+    public let maxMessages: Int = 4
     
     fileprivate init(code: Cell,
                      seqno: Int64 = 0,
@@ -71,8 +73,8 @@ public class WalletV4: WalletContract {
     }
     
     public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
-        guard args.messages.count <= 4 else {
-            throw TonError.custom("Maximum number of messages in a single transfer is 4")
+        guard args.messages.count <= maxMessages else {
+            throw TonError.custom("Maximum number of messages in a single transfer is \(maxMessages)")
         }
         
         let signingMessage = try Builder().store(uint: walletId, bits: 32)

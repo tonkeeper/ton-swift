@@ -11,6 +11,8 @@ public final class WalletV1: WalletContract {
     public let stateInit: StateInit
     public let publicKey: Data
     public let revision: WalletContractV1Revision
+  
+    public let maxMessages: Int = 4
     
     public init(workchain: Int8, publicKey: Data, revision: WalletContractV1Revision) throws {
         self.workchain = workchain

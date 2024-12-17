@@ -4,6 +4,8 @@ import Foundation
 /// All wallets implement a compatible interface for sending messages
 public protocol WalletContract: Contract {
     func createTransfer(args: WalletTransferData, messageType: MessageType) throws -> WalletTransfer
+  
+    var maxMessages: Int { get }
 }
 
 /// Message type (external | internal) to sign. Is using in v5 wallet contract

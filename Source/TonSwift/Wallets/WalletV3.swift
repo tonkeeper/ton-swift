@@ -12,6 +12,8 @@ public final class WalletV3: WalletContract {
     public let publicKey: Data
     public let walletId: UInt64
     public let revision: WalletContractV3Revision
+  
+    public var maxMessages: Int = 4
     
     public init(workchain: Int8, publicKey: Data, walletId: UInt64? = nil, revision: WalletContractV3Revision) throws {
         self.workchain = workchain
@@ -43,8 +45,8 @@ public final class WalletV3: WalletContract {
     }
     
     public func createTransfer(args: WalletTransferData, messageType: MessageType = .ext) throws -> WalletTransfer {
-        guard args.messages.count <= 4 else {
-            throw TonError.custom("Maximum number of messages in a single transfer is 4")
+        guard args.messages.count <= maxMessages else {
+            throw TonError.custom("Maximum number of messages in a single transfer is \(maxMessages)")
         }
         
         let signingMessage = try Builder().store(uint: walletId, bits: 32)
