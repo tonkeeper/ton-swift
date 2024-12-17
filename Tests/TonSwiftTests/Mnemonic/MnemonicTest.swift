@@ -15,7 +15,7 @@ final class MnemonicTest: XCTestCase {
         
         // should create valid key pair
         
-        let keyPair = try Mnemonic.mnemonicToPrivateKey(mnemonicArray: mnemonicArray)
+        let keyPair = try Mnemonic.anyMnemonicToPrivateKey(mnemonicArray: mnemonicArray)
         XCTAssertEqual(keyPair.publicKey.hexString, "34eb4b67d64f74d989ce2bc2e3dfddb7ed4cb0eec92f29fbecd05b1eabab0254")
         XCTAssertEqual(keyPair.privateKey.hexString, "c893fc0b676782a5c157ad8fddb389f75caba6eea1c198d8075a8a43afce70a934eb4b67d64f74d989ce2bc2e3dfddb7ed4cb0eec92f29fbecd05b1eabab0254")
     }

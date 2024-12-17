@@ -146,6 +146,44 @@ public enum Mnemonic {
         return src.map({ $0.lowercased() })
     }
     
+    public static func isValidBip39Mnemonic(mnemonicArray: [String]) -> Bool {
+        guard !mnemonicArray.isEmpty else { return false }
+        guard mnemonicArray.allSatisfy({ words.contains($0) }) else { return false }
+        return mnemonicArray.count % 3 == 0
+    }
+        
+    public static func bip39MnemonicToSeed(mnemonicArray: [String], password: String = "") -> Data {
+        let salt: (_ password: String) -> String = { password in
+            let salt = "mnemonic" + password
+            return salt
+        }
+        
+        let mnemonicBuffer = Data(normalizeMnemonic(src: mnemonicArray).joined(separator: " ").utf8)
+        let saltBuffer = Data(salt(password).utf8)
+        
+        let res = pbkdf2Sha512(phrase: mnemonicBuffer, salt: saltBuffer, iterations: 2048, keyLength: 64)
+        
+        return Data(res)
+    }
+    
+    public static func bip39MnemonicToPrivateKey(mnemonicArray: [String]) throws -> KeyPair {
+        guard isValidBip39Mnemonic(mnemonicArray: mnemonicArray) else {
+            throw NSError(domain: "Mnemonic", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid mnemonic"])
+        }
+        
+        let seed = bip39MnemonicToSeed(mnemonicArray: mnemonicArray)
+        
+        do {
+            let derived = try Ed25519.derivePath(path: "m/44'/607'/0'", seed: seed.hexString())
+            
+            let keyPair = try TweetNacl.NaclSign.KeyPair.keyPair(fromSeed: derived.key)
+            return KeyPair(publicKey: .init(data: keyPair.publicKey), privateKey: .init(data: keyPair.secretKey))
+            
+        } catch {
+            throw error
+        }
+    }
+    
     /**
      Extract private key from mnemonic
      
@@ -163,6 +201,14 @@ public enum Mnemonic {
             
         } catch {
             throw error
+        }
+    }
+    
+    public static func anyMnemonicToPrivateKey(mnemonicArray: [String], password: String = "") throws -> KeyPair {
+        if(mnemonicValidate(mnemonicArray: mnemonicArray)) {
+            return try mnemonicToPrivateKey(mnemonicArray: mnemonicArray)
+        } else {
+            return try bip39MnemonicToPrivateKey(mnemonicArray: mnemonicArray)
         }
     }
 }
