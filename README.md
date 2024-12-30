@@ -18,8 +18,8 @@ The focus of the library is type safety and serialization. It does not support c
 - [x] Standard wallets
 - [ ] Data signatures [TEP/PR104](https://github.com/ton-blockchain/TEPs/pull/104)
 - [ ] Subscriptions V1
-- [ ] Jettons
-- [ ] NFT
+- [x] Jettons
+- [x] NFT
 - [ ] TON.DNS
 
 # Example
