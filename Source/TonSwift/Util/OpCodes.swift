@@ -12,4 +12,5 @@ public enum OpCodes {
   public static var WHALES_DEPOSIT: Int32 = 2077040623
   public static var WHALES_WITHDRAW: UInt32 = 3665837821
   public static var ENCRYPTED_COMMENT: Int32 = 0x2167da4b
+  public static var GASLESS: Int = 0x878da6e3
 }
