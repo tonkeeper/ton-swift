@@ -523,4 +523,17 @@ public class Builder {
         }
     }
 
+    // MARK: Storing Address
+
+    @discardableResult
+    public func store(address: Address?) throws -> Self {
+        if let address {
+            return try store(uint: 2, bits: 2)
+                .store(uint: 0, bits: 1)
+                .store(int: address.workchain, bits: 8)
+                .store(data: address.hash)
+        } else {
+            return try store(uint: 0, bits: 2)
+        }
+    }
 }
