@@ -41,12 +41,12 @@ public struct AES_CBC {
   }
   
   public func encrypt(data: Data) throws -> Data {
-    var outputBuffer = Array<UInt8>(repeating: 0, count: data.count + kCCBlockSizeAES128)
+    var outputBuffer = Array<UInt8>(repeating: 0, count: data.count)
     var numBytesEncrypted = 0
     
     let status = CCCrypt(CCOperation(kCCEncrypt),
                          CCAlgorithm(kCCAlgorithmAES),
-                         CCOptions(kCCOptionPKCS7Padding),
+                         CCOptions(0),
                          Array(key),
                          kCCKeySizeAES256,
                          Array(iv),
