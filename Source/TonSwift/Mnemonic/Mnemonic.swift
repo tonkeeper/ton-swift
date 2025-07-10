@@ -146,86 +146,6 @@ public enum Mnemonic {
         return src.map({ $0.lowercased() })
     }
     
-    public static func isValidBip39Mnemonic(mnemonicArray: [String]) -> Bool {
-        let mnemonic = normalizeMnemonic(src: mnemonicArray)
-
-        guard !mnemonic.isEmpty,
-            mnemonic.allSatisfy({ words.contains($0) }),
-            mnemonic.count % 3 == 0,
-            (12...24).contains(mnemonic.count)
-        else {
-            return false
-        }
-
-        var bits = ""
-        for word in mnemonic {
-            guard let idx = words.firstIndex(of: word) else { return false }
-            let bin = String(idx, radix: 2)
-            bits += String(repeating: "0", count: 11 - bin.count) + bin
-        }
-
-        let entLength = mnemonic.count * 11 * 32 / 33
-        let checksumLen = entLength / 32
-
-        let entBits = bits.prefix(entLength)
-        let csBits = bits.suffix(checksumLen)
-
-        var entropyBytes: [UInt8] = []
-        var i = entBits.startIndex
-        while i < entBits.endIndex {
-            let next = entBits.index(i, offsetBy: 8)
-            let byteStr = String(entBits[i..<next])
-            guard let byte = UInt8(byteStr, radix: 2) else { return false }
-            entropyBytes.append(byte)
-            i = next
-        }
-
-        let hashData = Data(entropyBytes).sha256()
-
-        let hashBits =
-            hashData
-            .map { byte -> String in
-                let bin = String(byte, radix: 2)
-                return String(repeating: "0", count: 8 - bin.count) + bin
-            }
-            .joined()
-            .prefix(checksumLen)
-
-        return csBits == hashBits
-    }
-        
-    public static func bip39MnemonicToSeed(mnemonicArray: [String], password: String = "") -> Data {
-        let salt: (_ password: String) -> String = { password in
-            let salt = "mnemonic" + password
-            return salt
-        }
-        
-        let mnemonicBuffer = Data(normalizeMnemonic(src: mnemonicArray).joined(separator: " ").utf8)
-        let saltBuffer = Data(salt(password).utf8)
-        
-        let res = pbkdf2Sha512(phrase: mnemonicBuffer, salt: saltBuffer, iterations: 2048, keyLength: 64)
-        
-        return Data(res)
-    }
-    
-    public static func bip39MnemonicToPrivateKey(mnemonicArray: [String]) throws -> KeyPair {
-        guard isValidBip39Mnemonic(mnemonicArray: mnemonicArray) else {
-            throw NSError(domain: "Mnemonic", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid mnemonic"])
-        }
-        
-        let seed = bip39MnemonicToSeed(mnemonicArray: mnemonicArray)
-        
-        do {
-            let derived = try Ed25519.derivePath(path: "m/44'/607'/0'", seed: seed.hexString())
-            
-            let keyPair = try TweetNacl.NaclSign.KeyPair.keyPair(fromSeed: derived.key)
-            return KeyPair(publicKey: .init(data: keyPair.publicKey), privateKey: .init(data: keyPair.secretKey))
-            
-        } catch {
-            throw error
-        }
-    }
-    
     /**
      Extract private key from mnemonic
      
@@ -243,14 +163,6 @@ public enum Mnemonic {
             
         } catch {
             throw error
-        }
-    }
-    
-    public static func anyMnemonicToPrivateKey(mnemonicArray: [String], password: String = "") throws -> KeyPair {
-        if(mnemonicValidate(mnemonicArray: mnemonicArray)) {
-            return try mnemonicToPrivateKey(mnemonicArray: mnemonicArray)
-        } else {
-            return try bip39MnemonicToPrivateKey(mnemonicArray: mnemonicArray)
         }
     }
 }
