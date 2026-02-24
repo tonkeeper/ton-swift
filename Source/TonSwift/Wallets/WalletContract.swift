@@ -50,7 +50,11 @@ public struct WalletTransfer {
         self.signaturePosition = signaturePosition
     }
     
-    public func signMessage(signer: WalletTransferSigner) throws -> Data {
-        return try signer.signMessage(signingMessage.endCell().hash())
+    public func signMessage(signer: WalletTransferSigner, hashModifier: ((Data) -> Data)? = nil) throws -> Data {
+        var hash = try signingMessage.endCell().hash()
+        if let hashModifier {
+            hash = hashModifier(hash)
+        }
+        return try signer.signMessage(hash)
     }
 }

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'TonSwift'
-  s.version          = '1.0.3'
+  s.version          = '1.0.18'
   s.homepage         = 'https://github.com/tonkeeper/ton-swift'
   s.source           = { :git => 'https://github.com/tonkeeper/ton-swift.git', :tag => s.version.to_s }
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'BigInt'
   s.dependency 'TweetNacl'
+  s.dependency 'Sodium'
 
   s.test_spec 'Tests' do |test_spec|
     test_spec.source_files = ["Tests/*.{swift,h}", "Tests/**/*.{swift,c,h}", "Tests/**/**/*.{swift,c,h}"]
