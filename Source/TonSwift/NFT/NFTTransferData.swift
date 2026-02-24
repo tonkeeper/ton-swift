@@ -32,11 +32,7 @@ public struct NFTTransferData: CellCodable {
         let responseAddress: Address = try slice.loadType()
         try slice.skip(1)
         let forwardAmount = try slice.loadCoins().amount
-        let hasPayloadCell = try slice.loadBoolean()
-        var forwardPayload: Cell?
-        if hasPayloadCell, let payloadCell = try slice.loadMaybeRef() {
-            forwardPayload = payloadCell
-        }
+        let forwardPayload = try slice.loadMaybeRef()
         return NFTTransferData(
             queryId: queryId,
             newOwnerAddress: newOwnerAddress,
