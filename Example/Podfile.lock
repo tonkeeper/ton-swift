@@ -1,10 +1,13 @@
 PODS:
   - BigInt (5.2.0)
-  - TonSwift (1.0.3):
+  - Sodium (0.9.1)
+  - TonSwift (1.0.18):
     - BigInt
+    - Sodium
     - TweetNacl
-  - TonSwift/Tests (1.0.3):
+  - TonSwift/Tests (1.0.18):
     - BigInt
+    - Sodium
     - TweetNacl
   - TweetNacl (1.0.2)
 
@@ -15,6 +18,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - BigInt
+    - Sodium
     - TweetNacl
 
 EXTERNAL SOURCES:
@@ -23,9 +27,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  TonSwift: 8263886e6a34c81a721cde1674cc70229a1d0d44
+  Sodium: 23d11554ecd556196d313cf6130d406dfe7ac6da
+  TonSwift: 772c4cf09140c087ce6a82253ad0b9ab0f7444ed
   TweetNacl: 3abf4d1d2082b0114e7a67410e300892448951e6
 
-PODFILE CHECKSUM: adb693e82e588cc090eb72c366a3aff89a95e709
+PODFILE CHECKSUM: 2346665ec6fa725b886bf775946ddbfd1a195f90
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
