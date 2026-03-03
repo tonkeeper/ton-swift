@@ -12,8 +12,8 @@ public enum Ed25519 {
     public static let HARDENED_OFFSET: UInt32 = 0x80000000
     
     public struct Keys {
-        var key: Data
-        var chainCode: Data
+        public var key: Data
+        public var chainCode: Data
     }
     
     public static func getSharedSecret(privateKey: PrivateKey, publicKey: PublicKey) throws -> Data {
