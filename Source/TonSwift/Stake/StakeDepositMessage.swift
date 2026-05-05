@@ -27,7 +27,7 @@ public struct StakeDepositMessage {
     let body = Builder()
     try body.store(uint: OpCodes.LIQUID_TF_DEPOSIT, bits: 32)
     try body.store(uint: queryId, bits: 64)
-    try body.store(uint: 0x000000000005b7ce, bits: 64)
+    try body.store(uint: 0x000000000005b7c1, bits: 64)
     
     return MessageRelaxed.internal(
       to: poolAddress,
