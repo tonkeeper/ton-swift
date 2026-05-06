@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "TonSwift", targets: ["TonSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/attaswift/BigInt", .exact("5.3.0")),
+        .package(url: "https://github.com/attaswift/BigInt", .exact("5.7.0")),
         .package(url: "https://github.com/bitmark-inc/tweetnacl-swiftwrap", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/jedisct1/swift-sodium", .exact("0.9.1"))
     ],
