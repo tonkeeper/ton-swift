@@ -48,4 +48,19 @@ final class AddressTest: XCTestCase {
         XCTAssertNotEqual(addr2, addr3)
         XCTAssertNotEqual(addr4, addr3)
     }
+
+    func testRawAddressRejectsWrongHashLength() throws {
+        let validHash = "2cf55953e92efbeadab7ba725c3f93a0b23f842cbba72d7b8e6f510a70e422e3" // 32 bytes
+
+        // A valid 32-byte hash parses.
+        XCTAssertNoThrow(try Address.parse(raw: "0:\(validHash)"))
+
+        // A hash that decodes as hex but is the wrong byte length must be
+        // rejected — a TON address hash is always bits256 (32 bytes). Previously
+        // these produced a malformed Address that failed only later (e.g. when
+        // serialized), instead of a clean parse error.
+        XCTAssertThrowsError(try Address.parse(raw: "0:abcd"))                    // 2 bytes
+        XCTAssertThrowsError(try Address.parse(raw: "0:\(validHash)00"))          // 33 bytes
+        XCTAssertThrowsError(try Address.parse(raw: "0:\(validHash.dropLast(2))")) // 31 bytes
+    }
 }
