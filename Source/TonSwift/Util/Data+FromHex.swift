@@ -2,6 +2,11 @@ import Foundation
 
 public extension Data {
     init?(hex: String) {
+        // An odd number of hex characters cannot represent whole bytes; reject
+        // it instead of silently dropping the trailing nibble.
+        guard hex.count % 2 == 0 else {
+            return nil
+        }
         let len = hex.count / 2
         var data = Data(capacity: len)
         var i = hex.startIndex
