@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   
   s.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
 
-  s.dependency 'BigInt'
+  s.dependency 'BigInt', '5.7.0'
   s.dependency 'TweetNacl'
   s.dependency 'Sodium', '0.11.0'
 
