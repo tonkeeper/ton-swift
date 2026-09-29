@@ -56,6 +56,42 @@ final class WalletContractV5Test: XCTestCase {
                      """)
     }
     
+    func testR1StoresTimeoutWhenSeqnoIsZero() throws {
+        let contractR1 = WalletV5R1(workchain: 0, publicKey: publicKey, walletId: WalletId(networkGlobalId: -239, workchain: 0))
+
+        let transfer = try contractR1.createTransfer(args: try argsDeploy(timeout: 1680179023))
+
+        XCTAssertEqual(try validUntil(of: transfer), 1680179023)
+    }
+
+    func testR1NeverExpiresWhenSeqnoIsZeroWithoutTimeout() throws {
+        let contractR1 = WalletV5R1(workchain: 0, publicKey: publicKey, walletId: WalletId(networkGlobalId: -239, workchain: 0))
+
+        let transfer = try contractR1.createTransfer(args: try argsDeploy(timeout: nil))
+
+        XCTAssertEqual(try validUntil(of: transfer), 0xFFFFFFFF)
+    }
+    
+    private func argsDeploy(timeout: UInt64?) throws -> WalletTransferData {
+        return try WalletTransferData(
+            seqno: 0,
+            messages: [
+                .internal(
+                    to: Address.parse("kQD6oPnzaaAMRW24R8F0_nlSsJQni0cGHntR027eT9_sgtwt"),
+                    value: BigUInt(1 * 1000000000)
+                ),
+            ],
+            sendMode: SendMode(payMsgFees: true),
+            timeout: timeout
+        )
+    }
+    
+    private func validUntil(of transfer: WalletTransfer) throws -> UInt64 {
+        let slice = try transfer.signingMessage.endCell().beginParse()
+        try slice.skip(32 + 32)
+        return try slice.loadUint(bits: 32)
+    }
+    
     private func argsMultiple() throws -> WalletTransferData {
         return try WalletTransferData(
             seqno: 2,

@@ -123,12 +123,14 @@ public class WalletV5: WalletContract {
             .store(uint: messageType.opCode, bits: 32)
             .store(self.storeWalletId())
         
-        if (args.seqno == 0) {
+        if let timeout = args.timeout {
+            try signingMessage.store(uint: timeout, bits: 32)
+        } else if (args.seqno == 0) {
             // 32 bits with 1
             try signingMessage.store(uint: 0xFFFFFFFF, bits: 32)
         } else {
             let defaultTimeout = UInt64(Date().timeIntervalSince1970) + 60 // Default timeout: 60 seconds
-            try signingMessage.store(uint: args.timeout ?? defaultTimeout, bits: 32)
+            try signingMessage.store(uint: defaultTimeout, bits: 32)
         }
 
         try signingMessage
