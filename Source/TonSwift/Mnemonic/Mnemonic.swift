@@ -18,7 +18,7 @@ public enum Mnemonic {
             mnemonicArray = []
             let rnd = [Int](repeating: 0, count: wordsCount).map({ _ in Int.random(in: 0..<Int.max) })
             for i in 0..<wordsCount {
-                mnemonicArray.append(words[rnd[i] % (words.count - 1)])
+                mnemonicArray.append(words[rnd[i] % words.count])
             }
             
             if password.count > 0 {

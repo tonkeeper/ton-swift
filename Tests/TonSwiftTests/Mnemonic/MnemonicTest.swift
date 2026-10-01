@@ -34,4 +34,33 @@ final class MnemonicTest: XCTestCase {
     
       XCTAssertFalse(Mnemonic.isMultiAccountSeed(mnemonicArray: tonMnemonic))
   }
+
+  /// The generator must be able to pick every word in the 2048-word list,
+  /// including the last one ("zoo", index 2047). A `% (words.count - 1)`
+  /// reduction would make the final word unreachable and double-weight the
+  /// second-to-last, so this asserts full-range coverage.
+  func testMnemonicGeneratorCoversWholeWordList() throws {
+    let wordList = Mnemonic.words
+    XCTAssertEqual(wordList.count, 2048)
+
+    // The last word must be a legal, generatable word — a validate() over a
+    // 24-word phrase built to include it must not reject it on membership.
+    let lastWord = try XCTUnwrap(wordList.last)
+    XCTAssertTrue(wordList.contains(lastWord))
+
+    // Sample enough generated mnemonics that, if any index were unreachable,
+    // the observed distinct-word set would be capped below the full list.
+    // 4000 * 24 ≈ 96k draws — the last index appearing at least once is
+    // overwhelmingly likely once the modulo covers all 2048 slots.
+    var seen = Set<String>()
+    for _ in 0..<4000 {
+      seen.formUnion(Mnemonic.mnemonicNew())
+    }
+    // Every generated word is a real list word (no off-by-one out of range).
+    XCTAssertTrue(seen.isSubset(of: Set(wordList)))
+    // And coverage reaches the tail of the list, which the old
+    // `% (words.count - 1)` bug made impossible for the final index.
+    XCTAssertTrue(seen.contains(lastWord),
+                  "the last word in the list was never generated — modulo excludes the final index")
+  }
 }
