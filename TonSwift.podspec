@@ -13,9 +13,9 @@ Pod::Spec.new do |s|
   
   s.source_files = ["Source/*.{swift,h}", "Source/**/*.{swift,c,h}", "Source/**/**/*.{swift,c,h}"]
 
-  s.dependency 'BigInt'
+  s.dependency 'BigInt', '5.7.0'
   s.dependency 'TweetNacl'
-  s.dependency 'Sodium'
+  s.dependency 'Sodium', '0.11.0'
 
   s.test_spec 'Tests' do |test_spec|
     test_spec.source_files = ["Tests/*.{swift,h}", "Tests/**/*.{swift,c,h}", "Tests/**/**/*.{swift,c,h}"]
