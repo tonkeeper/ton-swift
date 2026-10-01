@@ -36,6 +36,9 @@ public struct Address: Hashable, Codable {
         guard let hash = Data(hex: String(parts[1])) else {
             throw TonError.custom("Raw address is malformed: hash part should be correctly hex-encoded")
         }
+        guard hash.count == 32 else {
+            throw TonError.custom("Raw address is malformed: hash part must be 32 bytes (64 hex chars)")
+        }
         return Address(workchain: wc, hash: hash)
     }
 
